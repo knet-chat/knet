@@ -1,18 +1,24 @@
 #!/bin/sh
 
-SW_PATH="/home/node-7/visible/platforms/node"
+if [ "$(id -u)" != "0" ]; then
+   echo "ERROR: This script must be run as root" 1>&2
+   exit 1
+fi
 
-cd $SW_PATH;
-su - node-7 -c "forever stopall"
-sleep 3;
-cd $SW_PATH;
-su - node-7 -c "forever start -l $SW_PATH/instance_0.log -a $SW_PATH/server.js --instanceNumber=0 & "
-su - node-7 -c "forever start -l $SW_PATH/instance_1.log -a $SW_PATH/server.js --instanceNumber=1 & "
-su - node-7 -c "forever start -l $SW_PATH/instance_2.log -a $SW_PATH/server.js --instanceNumber=2 & "
+SW_PATH=$(pwd);
 
-su - node-7 -c "forever start -l $SW_PATH/instance_3.log -a $SW_PATH/server.js --instanceNumber=3 & "
-su - node-7 -c "forever start -l $SW_PATH/instance_4.log -a $SW_PATH/server.js --instanceNumber=4 & "
+forever stopall
 sleep 3;
-su - node-7 -c "tail -f $SW_PATH/instance_?.log "
+
+targetCnt=`cat $SW_PATH/server/lib/installer/NUMBER_OF_INSTANCES.dat`
+NUMBER_OF_INSTANCES=$(($targetCnt + 0))
+COUNTER=0
+while [  $COUNTER -lt $NUMBER_OF_INSTANCES ]; do
+  forever start -l $SW_PATH/server/log/instance_$COUNTER.log -a $SW_PATH/server/server.js --instanceNumber=$COUNTER &
+  let COUNTER=COUNTER+1 
+done
+sleep 3;
+
+tail -f $SW_PATH/server/log/instance_?.log
 
 

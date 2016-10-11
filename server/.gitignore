@@ -1,3 +1,4 @@
 node_modules/
 lib/*config.json
 lib/installer/nginx.conf
+lib/installer/NUMBER_OF_INSTANCES.dat

@@ -27,7 +27,7 @@ log4js.configure({
   appenders: [
 	  {
 	      type: 'file',
-	      filename:  __dirname + "/log/server_" + argv.instanceNumber + ".log" ,
+	      filename:  __dirname + "/log/instance_" + argv.instanceNumber + ".log" ,
 	      maxLogSize: 1024*40,
 	      backups: 10,
 	      category: 'LOG',
@@ -51,7 +51,7 @@ server = http.createServer(app);
 
 var	io = require("socket.io")(server);
 var	brokerOfVisibles = new BrokerOfVisibles(io, logger);
-var	postMan = new PostMan(io, logger);
+var	postMan = new PostMan(io, logger, parseInt(argv.instanceNumber) );
  
 
 app.use(cors());
@@ -693,12 +693,8 @@ if ( conf.useTLS ){
 	};//END onRegistryRequest
 	
 	app.locals.onRequestTLSConnection = function( input , socket){
-//TODO		
-//		if ( ! postMan.isPEM( input.clientPEM ) ){ return; }
-		
-		//var keys = postMan.createAsymetricKeys();
-		var keys = postMan.getAsymetricKeyFromList();
-		
+
+		var keys = postMan.getAsymetricKeyFromList();		
 		var options = {
 			keys : keys,
 			clientPEMcertificate : input.clientPEMcertificate,
@@ -713,10 +709,7 @@ if ( conf.useTLS ){
 			io.sockets.to(socket.id).emit('ResponseTLSConnection', answer );			
 		}catch(e){
 			logger.info("onRequestTLSConnection ::: send ::: exception"  + e);
-		}
-		
-		//postMan.setAsymetricKey2List( postMan.createAsymetricKeys() );
-		
+		}		
 	};// END onRequestTLSConnection
 	
 	app.locals.onTLSmsg = function (socket , input) {

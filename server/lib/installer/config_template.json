@@ -25,8 +25,8 @@
 		"username" : "yourPayPalname",
 		"password" : "yourPayPalpass",
 		"signature" : "yourPayPalSignature",
-		"returnURL" : "http://127.0.0.1:8090/successPayment",
-		"cancelURL" : "http://127.0.0.1:8090/cancelPayment"
+		"returnURL" : "http://127.0.0.1/successPayment",
+		"cancelURL" : "http://127.0.0.1/cancelPayment"
 	},
 	"keyGCM" : "yourKeyGCM",
 	"redis" : {

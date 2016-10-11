@@ -48,7 +48,7 @@ var config = require('./Config.js');
 var workerFarm = require('worker-farm');
 var workers = workerFarm(require.resolve('./KeysGenerator'));
 
-function PostMan(_io, _logger) {
+function PostMan( _io, _logger, _instanceNumber) {
 	var io = _io; //pointer to io.sockets
 	var listOfMessages = []; //array of Message.js (DB)
 	var listOfACKs = []; //array of {msgID ,to ,from } (DB)	
@@ -57,7 +57,8 @@ function PostMan(_io, _logger) {
 	var lastServerAsigned = 0;
 	var logger = _logger;
 	var listOfAsimetricKeys = [];
-	
+	var conf = config.instance[ _instanceNumber ];
+
 
 	this.createAsymetricKeys = function() {
 		
@@ -117,11 +118,12 @@ function PostMan(_io, _logger) {
 		// self-sign certificate
 		cert.sign(keys.privateKey);
 
-		keys.cert = cert;
-		//console.info('certificate created for \"' + cn + '\": \n' + forge.pki.certificateToPem( keys.cert) );
-		logger.debug('createAsymetricKeys ::: key-pair & certificate created.');
+		var setOfKeys = {};
+		setOfKeys.publicKey = forge.pki.publicKeyToPem( keys.publicKey );
+		setOfKeys.privateKey = forge.pki.privateKeyToPem( keys.privateKey );
+		setOfKeys.certificate = forge.pki.certificateToPem( cert );	
 
-		return keys;
+		return setOfKeys;
 	};
 	
 	this.createBufferOfKeys = function() {
@@ -134,10 +136,6 @@ function PostMan(_io, _logger) {
 				listOfAsimetricKeys.push( keys );
 				logger.debug("callback ::: current number of certs", listOfAsimetricKeys.length );
 			});
-			/*
-			listOfAsimetricKeys.push( self.createAsymetricKeys() );
-			logger.debug("callback ::: current number of certs", listOfAsimetricKeys.length );
-			*/
 		}
 	};
 	
@@ -204,10 +202,12 @@ function PostMan(_io, _logger) {
 	this.getAsymetricKeyFromList = function (){
 		workers(function (keys) {
 			listOfAsimetricKeys.push( keys );
-			logger.debug("callback ::: current number of certs", listOfAsimetricKeys.length );
 		});
-		logger.debug("getAsymetricKeyFromList ::: current number of certs", listOfAsimetricKeys.length );
-		return listOfAsimetricKeys.pop();		
+		if ( listOfAsimetricKeys.length == 0 ){			
+			return self.createAsymetricKeys();				 
+		}else{
+			return listOfAsimetricKeys.pop();			
+		}
 	};	
 
 	
@@ -216,7 +216,10 @@ function PostMan(_io, _logger) {
     //	client.end();
 	this.initDBConnection = function (user, pass, host, name){
 		
-		self.createBufferOfKeys();
+		if ( conf.useTLS ){
+			logger.info('PostMan:::initDBConnection this server generates Keys');
+			self.createBufferOfKeys();
+		}		
 		
 		var d = when.defer();
 		var conString = "postgres://" +  user + ":" + pass + "@" + host + "/" + name;
