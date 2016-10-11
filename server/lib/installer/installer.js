@@ -27,6 +27,8 @@ rl.question('Number of TLS instances ? ', function(numberTLSintances) {
 		}				
 		console.log('INFO ::: assigning ports from 8080 and on for Non TLS instances ... ');
 		
+		config.listOfServerSockets[0].ipServerSockets = ipServer;
+		
 		config.instance = [];
 		var nginx_io_nodes = "";
 		for ( i = 0 ; i < parseInt(numberNonTLSintances) ;  i++  ){
@@ -67,7 +69,7 @@ rl.question('Number of TLS instances ? ', function(numberTLSintances) {
 		fs.writeFileSync( __dirname + '/../config.json' , JSON.stringify(config) + "\n", { encoding : "utf8", flag: 'w'} );
 		console.log('INFO ::: server/lib/config.json ,  done!');
 		
-		console.log('INFO ::: writing configuration for Nginx');		
+		console.log('INFO ::: writing configuration of Nginx');		
 		var NginxFile = fs.readFileSync(__dirname + '/nginx_template.conf', 'utf8');
 		
         NginxFile = NginxFile.replace(/#TO_BE_REPLACED_BY_INSTALLER_HERE_server_name/g, ipServer );        
@@ -77,7 +79,12 @@ rl.question('Number of TLS instances ? ', function(numberTLSintances) {
         fs.writeFileSync( __dirname + '/nginx.conf' , NginxFile + "\n", { encoding : "utf8", flag: 'w'} );
         
 		console.log('INFO ::: /etc/nginx/nginx.conf done!');
-        
+		
+		console.log('INFO ::: writing configuration of www client');		
+		var clientConfig = fs.readFileSync(__dirname + '/../../../client/js/config.js', 'utf8');		
+		clientConfig = clientConfig.replace(/TO_BE_REPLACED_BY_INSTALLER_HERE_ipServerAuth/g, ipServer );        
+        fs.writeFileSync( __dirname + '/../../../client/js/config.js' , clientConfig + "\n", { encoding : "utf8", flag: 'w'} );
+		        
 		console.log('INFO ::: redis is configured to work on : localhost:6379 ');
 		console.log('INFO ::: don\'t forget to set you Paypal details and the keyGCM');
 		
