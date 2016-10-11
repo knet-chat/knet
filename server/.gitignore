@@ -1,1 +1,3 @@
 node_modules/
+lib/*config.json
+lib/installer/nginx.conf

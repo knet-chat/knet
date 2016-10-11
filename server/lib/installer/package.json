@@ -1,0 +1,20 @@
+{
+  "name": "IPmapLoader",
+  "version": "0.1.0",
+  "description": "loads the geolocation position of the IP addresses into the Database",
+  "main": "IPmapLoader.js",
+  "dependencies": {
+    "pg": 			"~4.3.0", 
+    "squel": 		"~3.10.0",
+    "n-readlines": 	"~0.2.0",
+    "shrinkwrap": 	"~0.0.3"
+  },
+  "repository": {
+    "type":	"git",
+    "url": 	"https://github.com/knet-chat/knet"
+  },
+  "author": 	"Marco Vereda Manchego",
+  "url": 		"http://www.instaltic.com",
+  "email": 		"support@instaltic.com",
+  "license": 	"GPL"
+}

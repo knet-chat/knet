@@ -38,7 +38,6 @@ log4js.configure({
 var logger = log4js.getLogger('LOG');
 logger.setLevel('DEBUG');
 logger.info('starting instance: ' + argv.instanceNumber);
-logger.info('my config: ' , conf);
 
 var app = express();
 var server;

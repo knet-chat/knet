@@ -1,0 +1,41 @@
+{
+	"MAX_SIZE_SMS" : 4000000 ,	
+	"MAX_SIZE_IMG" : 4000000 ,
+	"MAX_SIZE_NICKNAME" : 60,
+	"MAX_SIZE_COMMENTARY" : 80,
+	"MAX_SIZE_MODULUS" :  417,
+	"MAX_SIZE_CHALLENGE" : 360,
+	"MAX_PROFILES_QUERY" : 7,
+	"MAX_PROFILES_QUERY_ONLINE" : 7,
+	"MAX_SIZE_ASIM_KEYS_BUFFER" : 100,
+	"listOfServerSockets" : {
+		"0" : {
+			"ipServerSockets"	: "127.0.0.1",
+			"portServerSockets" : "80"
+		}
+	},
+	"instance" : [{
+        "id" : 0,
+		"db" : {
+			"host" : "127.0.0.1",
+			"name" : "yourDBname", 
+			"user" : "yourDBuser",
+			"pass" : "yourDBpass"
+		},
+		"ipAddress" : "127.0.0.1",
+		"portNumber" : "9081",
+		"useTLS" : false		
+	}],
+	"paypal" : {
+		"username" : "yourPayPalname",
+		"password" : "yourPayPalpass",
+		"signature" : "yourPayPalSignature",
+		"returnURL" : "http://127.0.0.1:8090/successPayment",
+		"cancelURL" : "http://127.0.0.1:8090/cancelPayment"
+	},
+	"keyGCM" : "yourKeyGCM",
+	"redis" : {
+		"host" : "localhost",
+		"port" : 6379 
+	}		
+}
