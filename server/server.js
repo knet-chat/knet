@@ -27,7 +27,7 @@ log4js.configure({
   appenders: [
 	  {
 	      type: 'file',
-	      filename: conf.logFile,
+	      filename:  __dirname + "/log/server_" + argv.instanceNumber + ".log" ,
 	      maxLogSize: 1024*40,
 	      backups: 10,
 	      category: 'LOG',
@@ -38,6 +38,7 @@ log4js.configure({
 var logger = log4js.getLogger('LOG');
 logger.setLevel('DEBUG');
 logger.info('starting instance: ' + argv.instanceNumber);
+logger.info('my config: ' , conf);
 
 var app = express();
 var server;
