@@ -73,7 +73,7 @@ rl.question('Enter your keyGCM: ', function(keyGCM) {
 		config.paypal.username = paypalInputArray[0];
 		config.paypal.password = paypalInputArray[1];
 		config.paypal.signature = paypalInputArray[2];
-		config.paypal.returnURL = "http://" + ipServer + "/successPaymentipServer";
+		config.paypal.returnURL = "http://" + ipServer + "/successPayment";
 		config.paypal.cancelURL = "http://" + ipServer + "/cancelPayment";
 		
 		config.keyGCM = keyGCM;
@@ -91,6 +91,7 @@ rl.question('Enter your keyGCM: ', function(keyGCM) {
         NginxFile = NginxFile.replace(/#TO_BE_REPLACED_BY_INSTALLER_HERE_server_name/g, ipServer );        
         NginxFile = NginxFile.replace(/#TO_BE_REPLACED_BY_INSTALLER_HERE_io_nodes/g, nginx_io_nodes );        
         NginxFile = NginxFile.replace(/#TO_BE_REPLACED_BY_INSTALLER_HERE_tls_nodes/g, nginx_tls_nodes );
+        NginxFile = NginxFile.replace(/#TO_BE_REPLACED_BY_INSTALLER_HERE_www/g, __dirname + '/../../../client' );
         
         fs.writeFileSync( __dirname + '/nginx.conf' , NginxFile + "\n", { encoding : "utf8", flag: 'w'} );
         
@@ -105,10 +106,9 @@ rl.question('Enter your keyGCM: ', function(keyGCM) {
 		console.log('INFO ::: writing configuration of shell scripts');	
 		var numberOfInstances = parseInt(numberNonTLSintances) + parseInt(numberTLSintances);
 		fs.writeFileSync( __dirname + '/NUMBER_OF_INSTANCES.dat' , numberOfInstances + "\n", { encoding : "utf8", flag: 'w'} );
+		fs.writeFileSync( __dirname + '/SERVER_IP_ADDRESS.dat' , ipServer + "\n", { encoding : "utf8", flag: 'w'} );
 		
-			        
 
-		
 		process.exit();
 		
 	});	// END connection to pg

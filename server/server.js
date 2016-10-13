@@ -57,7 +57,7 @@ var	postMan = new PostMan(io, logger, parseInt(argv.instanceNumber) );
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static( __dirname + '../client/htm'));
+app.use(express.static( __dirname + '../client'));
 
 
 app.post('/payment', function (req, res) {
@@ -118,7 +118,7 @@ app.get('/successPayment', function (req, res) {
 	if ( ! postMan.isPaypalPayer(req.query.PayerID) ) return;
 	
 	var options = {
-		root: __dirname + '../client/htm/',
+		root: __dirname + '/../client/htm/',
 		dotfiles: 'deny',
 		headers: {
         	'x-timestamp': Date.now(),
@@ -157,7 +157,7 @@ app.get('/successPayment', function (req, res) {
 app.get('/cancelPayment', function (req, res) {
 	
 	var options = {
-		root: __dirname + '../client/htm/'
+		root: __dirname + '/../client/htm/'
 	};
 
 	var fileName = 'cancelPayment.html';
@@ -173,7 +173,7 @@ app.get('/cancelPayment', function (req, res) {
 app.get('/privacyPolicy', function (req, res) {
 	
 	var options = {
-		root: __dirname + '../client/htm/'
+		root: __dirname + '/../client/htm/'
 	};
 
 	var fileName = 'privacyPolicy.html';
