@@ -7,7 +7,7 @@
 	"MAX_SIZE_CHALLENGE" : 360,
 	"MAX_PROFILES_QUERY" : 7,
 	"MAX_PROFILES_QUERY_ONLINE" : 7,
-	"MAX_SIZE_ASIM_KEYS_BUFFER" : 100,
+	"MAX_SIZE_ASIM_KEYS_BUFFER" : 3,
 	"listOfServerSockets":[	{"ipServerSockets":"127.0.0.1","portServerSockets":"80"}],
 	"instance" : [{
         "id" : 0,

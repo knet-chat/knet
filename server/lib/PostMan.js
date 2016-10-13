@@ -58,6 +58,7 @@ function PostMan( _io, _logger, _instanceNumber) {
 	var logger = _logger;
 	var listOfAsimetricKeys = [];
 	var conf = config.instance[ _instanceNumber ];
+	var indexOfAsimetricKeyArray = 0;
 
 
 	this.createAsymetricKeys = function() {
@@ -131,12 +132,17 @@ function PostMan( _io, _logger, _instanceNumber) {
 			'Postman ::: creating Buffer of Keys, size of buffer: ',
 			config.MAX_SIZE_ASIM_KEYS_BUFFER );
 		
-		for (i = 0; i < config.MAX_SIZE_ASIM_KEYS_BUFFER; i++) {
+		/*for (i = 0; i < config.MAX_SIZE_ASIM_KEYS_BUFFER; i++) {
 			workers(function (keys) {
 				listOfAsimetricKeys.push( keys );
 				logger.debug("callback ::: current number of certs", listOfAsimetricKeys.length );
 			});
+		}*/
+		for (i = 0; i < config.MAX_SIZE_ASIM_KEYS_BUFFER; i++) {
+			listOfAsimetricKeys.push( self.createAsymetricKeys() );
+			logger.debug("callback ::: current number of certs", listOfAsimetricKeys.length );
 		}
+		
 	};
 	
 	this.createTLSConnection = function( options ) {
@@ -200,14 +206,15 @@ function PostMan( _io, _logger, _instanceNumber) {
 	};
 	
 	this.getAsymetricKeyFromList = function (){
-		workers(function (keys) {
-			listOfAsimetricKeys.push( keys );
-		});
-		if ( listOfAsimetricKeys.length == 0 ){			
-			return self.createAsymetricKeys();				 
-		}else{
-			return listOfAsimetricKeys.pop();			
+		//workers(function (keys) {
+		//	listOfAsimetricKeys.push( keys );
+		//});*/		  
+		indexOfAsimetricKeyArray = indexOfAsimetricKeyArray + 1;
+		if (indexOfAsimetricKeyArray >= config.MAX_SIZE_ASIM_KEYS_BUFFER){
+			indexOfAsimetricKeyArray = 0;
 		}
+		return listOfAsimetricKeys[indexOfAsimetricKeyArray];
+
 	};	
 
 	

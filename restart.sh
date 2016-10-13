@@ -19,6 +19,6 @@ while [  $COUNTER -lt $NUMBER_OF_INSTANCES ]; do
 done
 sleep 3;
 
-tail -f $SW_PATH/server/log/instance_?.log
+tail -f $SW_PATH/server/log/instance_*.log
 
 
