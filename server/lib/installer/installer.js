@@ -12,7 +12,7 @@ rl.question('What is the host of the database ? ', function(dbHost) {
 rl.question('What is the user of the database ? ', function(dbUser) {	
 rl.question('What is the password of the database ? ', function(pass) {
 rl.question('What is the name of the database ? ', function(dbName) {
-rl.question('IP address for the knet-server ? ', function(ipServer) {
+rl.question('public IP address for the knet-server ? ', function(ipServer) {
 rl.question('Number of Non TLS instances ? ', function(numberNonTLSintances) {
 rl.question('Number of TLS instances ? ', function(numberTLSintances) {
 rl.question('Enter your Paypal details like this: yourPayPalname,yourPayPalpass,yourPayPalSignature  ', function(paypalInput) {	
@@ -43,7 +43,7 @@ rl.question('Enter your keyGCM: ', function(keyGCM) {
 			config.instance[i].db.name = dbName;
 			config.instance[i].db.user = dbUser;
 			config.instance[i].db.pass = pass;
-			config.instance[i].ipAddress = ipServer;
+			config.instance[i].ipAddress = "127.0.0.1";
 			config.instance[i].portNumber = 8080 + i;
 			config.instance[i].useTLS = false;
 			nginx_io_nodes += "\t\tserver " + config.instance[i].ipAddress + ":" + config.instance[i].portNumber + "; \n";
@@ -62,7 +62,7 @@ rl.question('Enter your keyGCM: ', function(keyGCM) {
 			config.instance[i].db.name = dbName;
 			config.instance[i].db.user = dbUser;
 			config.instance[i].db.pass = pass;
-			config.instance[i].ipAddress = ipServer;
+			config.instance[i].ipAddress = "127.0.0.1";
 			config.instance[i].portNumber = 9080 + i - parseInt(numberNonTLSintances);
 			config.instance[i].useTLS = true;
 			nginx_tls_nodes += "\t\tserver " + config.instance[i].ipAddress + ":" + config.instance[i].portNumber + "; \n";
