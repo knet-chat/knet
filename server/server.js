@@ -15,6 +15,8 @@ var http = require('http');
 var https = require('https');
 var _ = require('underscore')._ ;
 var	forge = require('node-forge')({disableNativeCode: true});
+var serveStatic = require('serve-static');  // serve static files
+var easyrtc = require('easyrtc'); 
 
 var config 			= require('./lib/Config.js');
 var BrokerOfVisibles= require('./lib/BrokerOfVisibles.js');
@@ -40,16 +42,16 @@ logger.setLevel('DEBUG');
 logger.info('starting instance: ' + argv.instanceNumber);
 
 var app = express();
-var server;
+var webServer;
 
 if ( conf.useTLS ){
 	logger.info('Server ::: HTTP + TLS ');	
 }else{
 	logger.info('Server ::: HTTP ');
 }
-server = http.createServer(app);
+webServer = http.createServer(app);
 
-var	io = require("socket.io")(server);
+var	io = require("socket.io")(webServer);
 var	brokerOfVisibles = new BrokerOfVisibles(io, logger);
 var	postMan = new PostMan(io, logger, parseInt(argv.instanceNumber) );
  
@@ -58,7 +60,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static( __dirname + '../client'));
-
+app.use(serveStatic('static', {'index': ['index.html']}));
 
 app.post('/payment', function (req, res) {
 	
@@ -868,12 +870,53 @@ when.all ( DBConnectionEstablished ).then(function(){
 	app.set('port', conf.portNumber);
   	app.set('ipaddr', conf.ipAddress );
 
-	server.listen(	
+  	webServer.listen(	
 		app.get('port'),
 		app.get('ipaddr'), 
 		function(){	
 			logger.info('Server ::: listening on IP ' + app.get('ipaddr') + ' & port ' + app.get('port'));
 		}
-	);	
+	);
+	
+	easyrtc.setOption("logLevel", "debug");
+
+	// Overriding the default easyrtcAuth listener, only so we can directly access its callback
+	easyrtc.events.on("easyrtcAuth", function(socket, easyrtcid, msg, socketCallback, callback) {
+	    easyrtc.events.defaultListeners.easyrtcAuth(socket, easyrtcid, msg, socketCallback, function(err, connectionObj){
+	        if (err || !msg.msgData || !msg.msgData.credential || !connectionObj) {
+	            callback(err, connectionObj);
+	            return;
+	        }
+
+	        connectionObj.setField("credential", msg.msgData.credential, {"isShared":false});
+
+	        console.log("["+easyrtcid+"] Credential saved!", connectionObj.getFieldValueSync("credential"));
+
+	        callback(err, connectionObj);
+	    });
+	});
+
+	// To test, lets print the credential to the console for every room join!
+	easyrtc.events.on("roomJoin", function(connectionObj, roomName, roomParameter, callback) {
+	    console.log("["+connectionObj.getEasyrtcid()+"] Credential retrieved!", connectionObj.getFieldValueSync("credential"));
+	    easyrtc.events.defaultListeners.roomJoin(connectionObj, roomName, roomParameter, callback);
+	});
+
+	//var nsp = io.of('/my-namespaceNew');
+	// Start EasyRTC server
+	var rtc = easyrtc.listen(app, io, null, function(err, rtcRef) {
+	    console.log("Initiated");
+
+	    rtcRef.events.on("roomCreate", function(appObj, creatorConnectionObj, roomName, roomOptions, callback) {
+	        console.log("roomCreate fired! Trying to create: " + roomName);
+
+	        appObj.events.defaultListeners.roomCreate(appObj, creatorConnectionObj, roomName, roomOptions, callback);
+	    });
+	});
+	
+	
+	
+	
+	
 	
 });

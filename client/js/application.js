@@ -798,6 +798,33 @@ Postman.prototype.onMsgFromClient = function ( input ){
 	  		} 
 		});
 		
+	}else if ( msg.messageBody.messageType == "req4EasyRTCid"){
+		easyrtc.initMediaSource(
+	      function(){
+	    	  easyrtc.connect("easyrtc.audioOnly",
+	    			  
+    			function (easyrtcid){
+	    		  var selfEasyrtcid = easyrtcid;
+	    		  log.info("Easyrtc ::: I am:  " + easyrtcid);
+	    		  app.easyrtcid = easyrtcid;
+	    		  var message2send = new Message({ 	
+	    			  to : msg.from, 
+	    			  from : user.publicClientID , 
+	    			  messageBody : { messageType : "res4EasyRTCid" , easyRTCid : easyrtcid }
+	    		  });
+	    		  postman.sendMsg( message2send );
+	    		  
+    	  		},
+	  			app.easyRTC_loginFailure );
+	      },
+	      function(errorCode, errmesg){
+	          easyrtc.showError(errorCode, errmesg);
+	      }  // failure callback
+	    );		
+	}else if ( msg.messageBody.messageType == "res4EasyRTCid"){
+		app.otherEasyrtcid = msg.messageBody.easyRTCid;	
+		log.debug("otherEasyrtcid", msg.messageBody.easyRTCid);
+		app.performRTCCall();
 	}
 };
 
@@ -1306,6 +1333,8 @@ GUI.prototype.bindDOMevents = function(){
 	window.addEventListener('popstate', function (event) {
 	    history.pushState(null, null, null);
 	});
+	
+	$("#performCall").on("click", app.requestPeerEasyRTCid );
 
 };
 
@@ -1731,7 +1760,7 @@ GUI.prototype.loadBody = function() {
 	strVar += "				   		<\/a>";
 	strVar += "			       	<\/div>";
 	strVar += "				    <div class=\"ui-block-c\"><\/div>";
-	strVar += "				    <div class=\"ui-block-d\"><a data-role=\"button\" class=\"ui-nodisc-icon icon-list\"><img src=\"res\/bubble_36x36.png\" alt=\"lists\" class=\"button2mainPage button ui-li-icon ui-corner-none \"><\/a><\/div>";
+	strVar += "				    <div id=\"performCall\" class=\"ui-block-d\"><a data-role=\"button\" class=\"ui-nodisc-icon icon-list\"><img src=\"res\/bubble_36x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \"><\/a><\/div>";
 	strVar += "				    <div class=\"ui-block-e\"><a id=\"mapButtonInChatPage\" data-role=\"button\" class=\"ui-nodisc-icon icon-list\"><img src=\"res\/mundo_36x36.png\" alt=\"lists\" class=\"ui-li-icon ui-corner-none \"><\/a><\/div>";
 	strVar += "			  	<\/div>";
 	strVar += "			<\/div><!-- \/header -->";
@@ -4161,6 +4190,8 @@ function Application() {
 	this.msg2forward = null;
 	this.authSocket = null;
 	this.keys = {};
+	this.easyrtcid = "";
+	this.otherEasyrtcid = "";
 };
 
 // Bind Event Listeners
@@ -4279,6 +4310,8 @@ Application.prototype.connect2server = function(result){
 			listOfReceivers : awarenessList
 		};
   		postman.send("WhoIsOnline",  ping );
+  		
+  		app.initEasyRTC();
   		
 	});
 	
@@ -4664,6 +4697,106 @@ Application.prototype.initializeDevice = function() {
 	}
 	
 };
+
+Application.prototype.initEasyRTC = function() {
+	
+		easyrtc.setStreamAcceptor( function(easyrtcid, stream) {
+  		    var audio = document.getElementById('callerAudio');
+  		    easyrtc.setVideoObjectSrc(audio,stream);
+  		});
+  		easyrtc.setOnStreamClosed( function (easyrtcid) {
+  		    easyrtc.setVideoObjectSrc(document.getElementById('callerAudio'), "");
+  		});
+  		
+  		easyrtc.setAcceptChecker(function(easyrtcid, callback) {
+  		    //document.getElementById('acceptCallBox').style.display = "block";
+  		    if( easyrtc.getConnectionCount() > 0 ) {
+  		    	//document.getElementById('acceptCallLabel').textContent =
+  		    	log.info("Drop current call and accept new from " + easyrtcid + " ?");
+  		    }
+  		    else {
+  		    	//document.getElementById('acceptCallLabel').textContent =
+  		    	log.info("Accept incoming call from " + easyrtcid + " ?");
+  		    }
+  		    var acceptTheCall = function(wasAccepted) {
+  		        //document.getElementById('acceptCallBox').style.display = "none";
+  		        if( wasAccepted && easyrtc.getConnectionCount() > 0 ) {
+  		            easyrtc.hangupAll();
+  		        }
+  		        callback(wasAccepted);
+  		    };
+  		    //
+  		    // <div id="acceptCallBox"> <!-- Should be initially hidden using CSS -->
+            //    <div id="acceptCallLabel"></div>
+            //    <button id="callAcceptButton" >Accept</button> 
+            //    <button id="callRejectButton">Reject</button>
+            // </div>
+  		    // document.getElementById("callAcceptButton").onclick = function() {
+  		        acceptTheCall(true);
+  		    //};
+  		    //document.getElementById("callRejectButton").onclick =function() {
+  		        //acceptTheCall(false);
+  		    //};
+  		} );  		
+		
+  		easyrtc.useThisSocketConnection( socket );
+  	    easyrtc.enableVideoReceive(false);
+
+	
+};
+
+Application.prototype.easyRTC_loginSuccess = function (easyrtcid){  
+	var selfEasyrtcid = easyrtcid;
+	log.info("Easyrtc ::: I am:  " + easyrtcid);
+	app.easyrtcid = easyrtcid;
+	
+    easyrtc.hangupAll();
+    
+    var acceptedCB = function(accepted, caller) {
+        if( !accepted ) {
+            easyrtc.showError("CALL-REJECTED", "Sorry, your call to was rejected");
+            //enable('otherClients');
+        }
+    };
+    var successCB = function() {
+        //enable('hangupButton');
+    };
+    var failureCB = function() {
+        //enable('otherClients');
+    };
+    easyrtc.call(app.otherEasyrtcid, successCB, failureCB, acceptedCB);
+};
+
+Application.prototype.easyRTC_loginFailure = function (errorCode, message){  
+	easyrtc.showError(errorCode, errmesg);    
+};
+
+Application.prototype.performRTCCall = function (){  
+    easyrtc.initMediaSource(
+      function(){        // success callback
+          easyrtc.connect("easyrtc.audioOnly", app.easyRTC_loginSuccess, app.easyRTC_loginFailure );
+      },
+      function(errorCode, errmesg){
+          easyrtc.showError(errorCode, errmesg);
+      }  // failure callback
+    );
+    
+};
+
+Application.prototype.requestPeerEasyRTCid = function (){
+		
+	var message2send = new Message(	{ 	
+		to : app.currentChatWith, 
+		from : user.publicClientID , 
+		messageBody : { messageType : "req4EasyRTCid" }
+	});
+
+	postman.sendMsg( message2send );
+	
+};
+
+
+
 
 Application.prototype.loadContacts = function() {
 	var singleKeyRange = IDBKeyRange.only("publicClientID"); 
@@ -7636,7 +7769,7 @@ function Dictionary(){
 
 //	window.shimIndexedDB.__debug(false);
 //  window.shimIndexedDB.__useShim();
-log4javascript.setEnabled(false);
+log4javascript.setEnabled(true);
 
 /***********************************************************************************************
  * *********************************************************************************************
