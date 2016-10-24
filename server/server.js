@@ -235,7 +235,12 @@ app.locals.onClientAlive = function ( publicClientID , socket ){
 		client.socketid = socket.id ;
 		socket.visibleClient = client;			
 		brokerOfVisibles.updateClientsProfile( client );
-		app.locals.onConnection( client );
+		
+		//XEP-0013: Flexible Offline Message Retrieval,2.3 Requesting Message Headers
+		postMan.sendKeysDeliveries( client ); 
+		postMan.sendMessageACKs( client );
+		postMan.sendMessageHeaders( client );
+		postMan.sendKeysRequests( client );	
 
 	});
 

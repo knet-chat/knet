@@ -946,6 +946,35 @@
 	word-wrap:break-word;
 	max-height : 54px;
 } 
+.ui-height-70percent{
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 30%;
+    text-align:center;
+}
+.conferenceCallBox{
+    position: absolute;
+    top: 70%;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    text-align:center;
+}
+.ui-height-100percent{
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+}
+
+.vertical-center{
+    vertical-align: middle;
+}
+
+
 .ui-block-20percent{
 	width: 20%;
 	float: left; 
@@ -1113,6 +1142,11 @@
   float: right;  
   height: 44px;
   width: 44px;
+}
+
+.max-nav-button {
+	max-width: 36px;
+	max-height: 36px;
 }
   
   
