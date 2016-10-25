@@ -809,8 +809,12 @@ Postman.prototype.onMsgFromClient = function ( input ){
 		
 		$('#callRejectButton').show().unbind("click").on("click", function(){ 
 			$('body').pagecontainer('change', '#chat-page', { transition : "none" });
+	   		easyrtc.disconnect();			  
+	   		easyrtc.closeLocalMediaStream();
+	   		easyrtc.setRoomOccupantListener( function(){});	
 		});
 		$('#callAcceptButton').show().unbind("click").on("click", function(){
+			$('#callAcceptButton').hide();
 		    easyrtc.initMediaSource(
 	  	      function(){        // success callback
 	  	          easyrtc.connect("easyrtc.audioOnly", app.easyRTC_getReady4Call, app.easyRTC_connectFailure );
@@ -4752,35 +4756,17 @@ Application.prototype.initEasyRTC = function() {
   		easyrtc.setAcceptChecker(function(easyrtcid, callback) {
   			log.info("easyRTC setAcceptChecker trigered");
   			
-  			$('#conferenceCallBox').show();
   			$('body').pagecontainer('change', '#conference-page', { transition : "none" });  			
-  			
-  			
+ 			
   		    if( easyrtc.getConnectionCount() > 0 ) {
   		    	log.info("Drop current call and accept new from " + easyrtcid + " ?");
+  		    	easyrtc.hangupAll();
   		    }
   		    else {
   		    	log.info("Accept incoming call from " + easyrtcid + " ?");
   		    }
-  		    var acceptTheCall = function(wasAccepted) {
-  		    	//$('#conferenceCallBox').show();
-  		        if( wasAccepted && easyrtc.getConnectionCount() > 0 ) {
-  		            easyrtc.hangupAll();
-  		        }
-  		        callback(wasAccepted);
-  		    };
+  		    callback(true);
 
-		   	$('#callAcceptButton').unbind("click").on("click", function(){ 
-		   		acceptTheCall(true);
-	   		});	
-  		        
-		   	$('#callRejectButton').unbind("click").on("click", function(){
-		   		$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-		   		acceptTheCall(false);
-		   		easyrtc.disconnect();			  
-		   		easyrtc.closeLocalMediaStream();
-		   		easyrtc.setRoomOccupantListener( function(){});		   		
-	   		});	
   		} );  		
 		
   		easyrtc.useThisSocketConnection( socket );
@@ -4826,7 +4812,9 @@ Application.prototype.easyRTC_getReady4Call = function ( easyrtcid ){
 		  from : user.publicClientID , 
 		  messageBody : { messageType : "res4EasyRTCid" , easyRTCid : easyrtcid }
 	  });
-	  postman.sendMsg( message2send );	    		  
+	  postman.sendMsg( message2send );
+	  
+	  gui.showLoadingSpinner();
 };
 
 Application.prototype.easyRTC_connectFailure = function (errorCode, message){  
