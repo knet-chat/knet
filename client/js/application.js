@@ -807,11 +807,9 @@ Postman.prototype.onMsgFromClient = function ( input ){
 		$('#imgConferenceCaller').remove();
 		$('.ui-height-70percent').prepend($('<img>',{id:'imgConferenceCaller',src: contact.imgsrc, class: 'vertical-center' }));
 		
-		$('#callRejectButton').show().unbind("click").on("click", function(){ 
+		$('#callRejectButton').show().unbind("click").on("click", function(){
 			$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-	   		easyrtc.disconnect();			  
-	   		easyrtc.closeLocalMediaStream();
-	   		easyrtc.setRoomOccupantListener( function(){});	
+			log.debug("callRejectButton trigerred in req4EasyRTCid");
 		});
 		$('#callAcceptButton').show().unbind("click").on("click", function(){
 			$('#callAcceptButton').hide();
@@ -826,7 +824,7 @@ Postman.prototype.onMsgFromClient = function ( input ){
 		});	
 		
 	}else if ( msg.messageBody.messageType == "res4EasyRTCid"){
-				
+		
 		app.otherEasyrtcid = msg.messageBody.easyRTCid;			
 		easyrtc.hangupAll();		
 	    easyrtc.initMediaSource(
@@ -839,7 +837,6 @@ Postman.prototype.onMsgFromClient = function ( input ){
 	    );
 	}
 };
-
 
 
 Postman.prototype.send = function(event2trigger, data  ) {
@@ -4737,20 +4734,35 @@ Application.prototype.initEasyRTC = function() {
 			log.info("easyRTC setStreamAcceptor trigered");
 			
 		   	$('#callRejectButton').show().unbind("click").on("click", function(){ 
-		   		$('body').pagecontainer('change', '#chat-page', { transition : "none" });
+				$('body').pagecontainer('change', '#chat-page', { transition : "none" });
+		   		 easyrtc.disconnect();	   		
+		   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
+		   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
+		   	     easyrtc.closeLocalMediaStream();	   	  
+		   		 easyrtc.setRoomOccupantListener( function(){});
 	   		});	    	
 	    	$('#callAcceptButton').hide();
 	    	$('#imgConferenceCaller').hide();
 	    	$('#conferenceTag').show();
 	    	
+	    	
   		    var conferenceStreamTag = document.getElementById('conferenceTag');
   		    easyrtc.setVideoObjectSrc( conferenceStreamTag, stream);
+  		    gui.hideLoadingSpinner();
   		    
   		});
   		easyrtc.setOnStreamClosed( function (easyrtcid) {
   			log.info("easyRTC setOnStreamClosed trigered");
-  		    easyrtc.setVideoObjectSrc(document.getElementById('conferenceTag'), "");
-  		    $('body').pagecontainer('change', '#chat-page', { transition : "none" });
+  		    
+	   		 easyrtc.disconnect();	   		
+	   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
+	   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
+	   	     easyrtc.closeLocalMediaStream();	   	  
+	   		 easyrtc.setRoomOccupantListener( function(){});
+	   		 
+	   		 gui.hideLoadingSpinner();
+	   		 $('body').pagecontainer('change', '#chat-page', { transition : "none" });
+  		    
   		});
   		
   		easyrtc.setAcceptChecker(function(easyrtcid, callback) {
@@ -4765,8 +4777,8 @@ Application.prototype.initEasyRTC = function() {
   		    else {
   		    	log.info("Accept incoming call from " + easyrtcid + " ?");
   		    }
+  		    gui.hideLoadingSpinner();
   		    callback(true);
-
   		} );  		
 		
   		easyrtc.useThisSocketConnection( socket );
@@ -4778,7 +4790,6 @@ Application.prototype.initEasyRTC = function() {
 };
 
 Application.prototype.easyRTC_PerformCall = function (easyrtcid){  
-	var selfEasyrtcid = easyrtcid;
 	log.info("Easyrtc ::: I am:  " + easyrtcid);
 	app.easyrtcid = easyrtcid;
 	
@@ -4787,39 +4798,39 @@ Application.prototype.easyRTC_PerformCall = function (easyrtcid){
     var acceptedCB = function(accepted, caller) {
         if( !accepted ) {
             easyrtc.showError("CALL-REJECTED", "Sorry, your call to was rejected");
-            $('body').pagecontainer('change', '#chat-page', { transition : "none" });
+            $('body').pagecontainer('change', '#chat-page', { transition : "none" });            
         }
+        gui.hideLoadingSpinner();
     };
     var successCB = function() {
 	   	$('#callRejectButton').show();	   	
     	$('#callAcceptButton').hide();
     	$('#imgConferenceCaller').hide();
     	$('#conferenceTag').show();
+    	gui.hideLoadingSpinner();
     };
     var failureCB = function() {
     	$('body').pagecontainer('change', '#chat-page', { transition : "none" });
+    	gui.hideLoadingSpinner();
     };
     easyrtc.call(app.otherEasyrtcid, successCB, failureCB, acceptedCB);
 };
 
 
-Application.prototype.easyRTC_getReady4Call = function ( easyrtcid ){  
-	  var selfEasyrtcid = easyrtcid;
-	  log.info("Easyrtc ::: I am:  " + easyrtcid);
-	  app.easyrtcid = easyrtcid;
-	  var message2send = new Message({ 	
-		  to : app.currentChatWith, 
-		  from : user.publicClientID , 
-		  messageBody : { messageType : "res4EasyRTCid" , easyRTCid : easyrtcid }
-	  });
-	  postman.sendMsg( message2send );
-	  
-	  gui.showLoadingSpinner();
+Application.prototype.easyRTC_getReady4Call = function ( easyrtcid ){ 
+  log.info("Easyrtc ::: I am:  " + easyrtcid);
+  app.easyrtcid = easyrtcid;
+  var message2send = new Message({ 	
+	  to : app.currentChatWith, 
+	  from : user.publicClientID , 
+	  messageBody : { messageType : "res4EasyRTCid" , easyRTCid : easyrtcid }
+  });
+  postman.sendMsg( message2send );
+  
+  gui.showLoadingSpinner();
 };
 
-Application.prototype.easyRTC_connectFailure = function (errorCode, message){  
-	easyrtc.showError(errorCode, errmesg);    
-};
+
 
 Application.prototype.requestPeerEasyRTCid = function (){
 		
@@ -4828,8 +4839,12 @@ Application.prototype.requestPeerEasyRTCid = function (){
 	 .show()
 	 .unbind("click")
 	 .on("click", function(){ 
-		 $('body').pagecontainer('change', '#chat-page', { transition : "none" });
-		 
+		$('body').pagecontainer('change', '#chat-page', { transition : "none" });
+   		 easyrtc.disconnect();	   		
+   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
+   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
+   	     easyrtc.closeLocalMediaStream();	   	  
+   		 easyrtc.setRoomOccupantListener( function(){});		 
    	 });
 	$('#callAcceptButton').hide();
 	$('#conferenceTag').hide();
@@ -4849,7 +4864,9 @@ Application.prototype.requestPeerEasyRTCid = function (){
 	gui.showLoadingSpinner();	
 };
 
-
+Application.prototype.easyRTC_connectFailure = function (errorCode, message){  
+	easyrtc.showError(errorCode, errmesg);    
+};
 
 
 Application.prototype.loadContacts = function() {
