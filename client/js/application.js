@@ -807,34 +807,50 @@ Postman.prototype.onMsgFromClient = function ( input ){
 		$('#imgConferenceCaller').remove();
 		$('.ui-height-70percent').prepend($('<img>',{id:'imgConferenceCaller',src: contact.imgsrc, class: 'vertical-center' }));
 		
-		$('#callRejectButton').show().unbind("click").on("click", function(){
+	   	$('#callRejectButton').show().unbind("click").on("click", function(){ 
 			$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-			log.debug("callRejectButton trigerred in req4EasyRTCid");
-		});
+	   		 //easyrtc.disconnect();	   		
+	   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
+	   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
+	   	     easyrtc.closeLocalMediaStream();	   	  
+	   		 easyrtc.setRoomOccupantListener( function(){});
+   		});	
 		$('#callAcceptButton').show().unbind("click").on("click", function(){
+			
 			$('#callAcceptButton').hide();
-		    easyrtc.initMediaSource(
-	  	      function(){        // success callback
-	  	          easyrtc.connect("easyrtc.audioOnly", app.easyRTC_getReady4Call, app.easyRTC_connectFailure );
-	  	      },
-	  	      function(errorCode, errmesg){
-	  	          easyrtc.showError(errorCode, errmesg);
-	  	      }  // failure callback
-	  	    );			
+
+			if ( app.easyrtcid != "" ){
+				app.easyRTC_getReady4Call ( app.easyrtcid );				
+			}else{
+				easyrtc.initMediaSource(
+		  	      function(){        // success callback
+		  	          easyrtc.connect("easyrtc.audioOnly", app.easyRTC_getReady4Call, app.easyRTC_connectFailure );
+		  	      },
+		  	      function(errorCode, errmesg){
+		  	          easyrtc.showError(errorCode, errmesg);
+		  	      }  // failure callback
+		  	    );	
+			}
+		    		
 		});	
 		
 	}else if ( msg.messageBody.messageType == "res4EasyRTCid"){
 		
 		app.otherEasyrtcid = msg.messageBody.easyRTCid;			
-		easyrtc.hangupAll();		
-	    easyrtc.initMediaSource(
-	      function(){        // success callback
-	          easyrtc.connect("easyrtc.audioOnly", app.easyRTC_PerformCall, app.easyRTC_connectFailure );
-	      },
-	      function(errorCode, errmesg){
-	          easyrtc.showError(errorCode, errmesg);
-	      }  // failure callback
-	    );
+		easyrtc.hangupAll();
+		
+		if ( app.easyrtcid != "" ){
+			app.easyRTC_PerformCall ( app.easyrtcid );				
+		}else{
+		    easyrtc.initMediaSource(
+	  	      function(){        // success callback
+	  	          easyrtc.connect("easyrtc.audioOnly", app.easyRTC_PerformCall, app.easyRTC_connectFailure );
+	  	      },
+	  	      function(errorCode, errmesg){
+	  	          easyrtc.showError(errorCode, errmesg);
+	  	      }  // failure callback
+	  	    );			
+		}
 	}
 };
 
@@ -1034,6 +1050,11 @@ GUI.prototype.bindButtonsOnMainPage = function() {
 /* $(document).on("click","#chat-input-button", gui.onChatInput );  (removed) */
 
 GUI.prototype.bindDOMevents = function(){
+	
+    function disableBack() { window.history.forward() }
+
+    window.onload = disableBack();
+    window.onpageshow = function(evt) { if (evt.persisted) disableBack() };
 	
 	$("body").on('pagecontainertransition', function( event, ui ) {
 	    if (ui.options.target == "#MainPage"){	    	
@@ -4345,7 +4366,8 @@ Application.prototype.connect2server = function(result){
 	
 	socket.on('disconnect', function () {
 		log.info("socket.on.disconnect, sendLogin in ", config.TIME_WAIT_WAKEUP); 		
-		setTimeout( function(){ app.sendLogin(); } , config.TIME_WAIT_WAKEUP); 
+		setTimeout( function(){ app.sendLogin(); } , config.TIME_WAIT_WAKEUP);
+		app.easyrtcid = "";
 	});
 	
 	socket.on('reconnect_attempt', function () {
@@ -4735,7 +4757,7 @@ Application.prototype.initEasyRTC = function() {
 			
 		   	$('#callRejectButton').show().unbind("click").on("click", function(){ 
 				$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-		   		 easyrtc.disconnect();	   		
+		   		 //easyrtc.disconnect();	   		
 		   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
 		   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
 		   	     easyrtc.closeLocalMediaStream();	   	  
@@ -4754,7 +4776,7 @@ Application.prototype.initEasyRTC = function() {
   		easyrtc.setOnStreamClosed( function (easyrtcid) {
   			log.info("easyRTC setOnStreamClosed trigered");
   		    
-	   		 easyrtc.disconnect();	   		
+	   		 //easyrtc.disconnect();	   		
 	   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
 	   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
 	   	     easyrtc.closeLocalMediaStream();	   	  
@@ -4835,12 +4857,9 @@ Application.prototype.easyRTC_getReady4Call = function ( easyrtcid ){
 Application.prototype.requestPeerEasyRTCid = function (){
 		
 	$('body').pagecontainer('change', '#conference-page', { transition : "none" });	
-	$('#callRejectButton')
-	 .show()
-	 .unbind("click")
-	 .on("click", function(){ 
+	$('#callRejectButton').show().unbind("click").on("click", function(){ 
 		$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-   		 easyrtc.disconnect();	   		
+   		 //easyrtc.disconnect();	   		
    		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
    	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
    	     easyrtc.closeLocalMediaStream();	   	  
@@ -7840,7 +7859,7 @@ function Dictionary(){
 
 //	window.shimIndexedDB.__debug(false);
 //  window.shimIndexedDB.__useShim();
-log4javascript.setEnabled(true);
+log4javascript.setEnabled(false);
 
 /***********************************************************************************************
  * *********************************************************************************************
@@ -7884,9 +7903,4 @@ $(document).ready(function() {
 	FastClick.attach(document.body);		
 	app.init();	
 	app.initializeDevice();
-	
-    function disableBack() { window.history.forward() }
-
-    window.onload = disableBack();
-    window.onpageshow = function(evt) { if (evt.persisted) disableBack() }
 });

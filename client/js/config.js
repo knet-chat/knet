@@ -17,7 +17,7 @@ function Config ()  {
 	this.MIN_WIDTH_IMG_PROFILE = 170;
 	this.MIN_HEIGHT_IMG_PROFILE = 170;
 	
-	this.SW_VERSION="1.0.0";
+	this.SW_VERSION="0.5.4";
 
 	this.TIME_FADE_ACK = 6000;
 	this.TIME_FADE_WRITING = 2500;
