@@ -798,58 +798,22 @@ Postman.prototype.onMsgFromClient = function ( input ){
 	  		} 
 		});
 		
-	}else if ( msg.messageBody.messageType == "req4EasyRTCid"){
+	}else if ( msg.messageBody.messageType == "req4call"){
 		
-	    $('body').pagecontainer('change', '#conference-page', { transition : "none" });
-	    app.currentChatWith = msg.from;
-		var contact = contactsHandler.getContactById( app.currentChatWith); 
-		if (typeof contact == "undefined" || contact == null) return;		
-		$('#imgConferenceCaller').remove();
-		$('.ui-height-70percent').prepend($('<img>',{id:'imgConferenceCaller',src: contact.imgsrc, class: 'vertical-center' }));
+		if ( easyrtc._isAmissedCall( msg ) ) return;
+		app.currentChatWith = msg.from;	
+		var callbackAccept = function(){ easyrtc._proccessCall( msg ); };
+		var callbackReject = function(){ easyrtc._sendRejection2peer( msg ); };
+		$('#callAcceptButton').show();
+		easyrtc._displayInOutComingCall( callbackAccept , callbackReject  );
+	
+	}else if ( msg.messageBody.messageType == "res4call"){
 		
-	   	$('#callRejectButton').show().unbind("click").on("click", function(){ 
-			$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-	   		 //easyrtc.disconnect();	   		
-	   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
-	   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
-	   	     easyrtc.closeLocalMediaStream();	   	  
-	   		 easyrtc.setRoomOccupantListener( function(){});
-   		});	
-		$('#callAcceptButton').show().unbind("click").on("click", function(){
-			
-			$('#callAcceptButton').hide();
+		if ( easyrtc._isAmissedCall( msg ) ) return;
 
-			if ( app.easyrtcid != "" ){
-				app.easyRTC_getReady4Call ( app.easyrtcid );				
-			}else{
-				easyrtc.initMediaSource(
-		  	      function(){        // success callback
-		  	          easyrtc.connect("easyrtc.audioOnly", app.easyRTC_getReady4Call, app.easyRTC_connectFailure );
-		  	      },
-		  	      function(errorCode, errmesg){
-		  	          easyrtc.showError(errorCode, errmesg);
-		  	      }  // failure callback
-		  	    );	
-			}
-		    		
-		});	
-		
-	}else if ( msg.messageBody.messageType == "res4EasyRTCid"){
-		
-		app.otherEasyrtcid = msg.messageBody.easyRTCid;			
-		easyrtc.hangupAll();
-		
-		if ( app.easyrtcid != "" ){
-			app.easyRTC_PerformCall ( app.easyrtcid );				
-		}else{
-		    easyrtc.initMediaSource(
-	  	      function(){        // success callback
-	  	          easyrtc.connect("easyrtc.audioOnly", app.easyRTC_PerformCall, app.easyRTC_connectFailure );
-	  	      },
-	  	      function(errorCode, errmesg){
-	  	          easyrtc.showError(errorCode, errmesg);
-	  	      }  // failure callback
-	  	    );			
+		if( msg.messageBody.easyRTCid == null ){			
+			//TODO easyrtc._releaseResources();
+			return;
 		}
 	}
 };
@@ -942,6 +906,7 @@ function GUI() {
 	this.searchMap = null; 
 	this.listOfPlans = null;
 	this.isPlanDisplayed = false;
+	this.timeoutPickupRTC = null;
 };
 
 GUI.prototype._parseLinks = function(htmlOfContent) {
@@ -1365,8 +1330,7 @@ GUI.prototype.bindDOMevents = function(){
 	});
 	
 	$("#performCall").on("click", function(){		
-		
-		app.requestPeerEasyRTCid();
+		easyrtc._peerRequest4aCall();
 	});
 
 };
@@ -4239,8 +4203,8 @@ function Application() {
 	this.msg2forward = null;
 	this.authSocket = null;
 	this.keys = {};
-	this.easyrtcid = "";
-	this.otherEasyrtcid = "";
+	this.easyrtcid = null;
+	this.otherEasyrtcid = null;
 };
 
 // Bind Event Listeners
@@ -4360,14 +4324,14 @@ Application.prototype.connect2server = function(result){
 		};
   		postman.send("WhoIsOnline",  ping );
   		
-  		app.initEasyRTC();
+  		easyrtc._init();
   		
 	});
 	
 	socket.on('disconnect', function () {
 		log.info("socket.on.disconnect, sendLogin in ", config.TIME_WAIT_WAKEUP); 		
 		setTimeout( function(){ app.sendLogin(); } , config.TIME_WAIT_WAKEUP);
-		app.easyrtcid = "";
+		app.easyrtcid = null;
 	});
 	
 	socket.on('reconnect_attempt', function () {
@@ -4750,142 +4714,6 @@ Application.prototype.initializeDevice = function() {
 	
 };
 
-Application.prototype.initEasyRTC = function() {
-	
-		easyrtc.setStreamAcceptor( function(easyrtcid, stream) {
-			log.info("easyRTC setStreamAcceptor trigered");
-			
-		   	$('#callRejectButton').show().unbind("click").on("click", function(){ 
-				$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-		   		 //easyrtc.disconnect();	   		
-		   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
-		   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
-		   	     easyrtc.closeLocalMediaStream();	   	  
-		   		 easyrtc.setRoomOccupantListener( function(){});
-	   		});	    	
-	    	$('#callAcceptButton').hide();
-	    	$('#imgConferenceCaller').hide();
-	    	$('#conferenceTag').show();
-	    	
-	    	
-  		    var conferenceStreamTag = document.getElementById('conferenceTag');
-  		    easyrtc.setVideoObjectSrc( conferenceStreamTag, stream);
-  		    gui.hideLoadingSpinner();
-  		    
-  		});
-  		easyrtc.setOnStreamClosed( function (easyrtcid) {
-  			log.info("easyRTC setOnStreamClosed trigered");
-  		    
-	   		 //easyrtc.disconnect();	   		
-	   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
-	   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
-	   	     easyrtc.closeLocalMediaStream();	   	  
-	   		 easyrtc.setRoomOccupantListener( function(){});
-	   		 
-	   		 gui.hideLoadingSpinner();
-	   		 $('body').pagecontainer('change', '#chat-page', { transition : "none" });
-  		    
-  		});
-  		
-  		easyrtc.setAcceptChecker(function(easyrtcid, callback) {
-  			log.info("easyRTC setAcceptChecker trigered");
-  			
-  			$('body').pagecontainer('change', '#conference-page', { transition : "none" });  			
- 			
-  		    if( easyrtc.getConnectionCount() > 0 ) {
-  		    	log.info("Drop current call and accept new from " + easyrtcid + " ?");
-  		    	easyrtc.hangupAll();
-  		    }
-  		    else {
-  		    	log.info("Accept incoming call from " + easyrtcid + " ?");
-  		    }
-  		    gui.hideLoadingSpinner();
-  		    callback(true);
-  		} );  		
-		
-  		easyrtc.useThisSocketConnection( socket );
-  	    easyrtc.enableVideoReceive(true);
-		easyrtc.enableAudio(true);
-		easyrtc.enableVideo(true);
-  	  	easyrtc.enableDataChannels(true);
-	
-};
-
-Application.prototype.easyRTC_PerformCall = function (easyrtcid){  
-	log.info("Easyrtc ::: I am:  " + easyrtcid);
-	app.easyrtcid = easyrtcid;
-	
-    easyrtc.hangupAll();
-    
-    var acceptedCB = function(accepted, caller) {
-        if( !accepted ) {
-            easyrtc.showError("CALL-REJECTED", "Sorry, your call to was rejected");
-            $('body').pagecontainer('change', '#chat-page', { transition : "none" });            
-        }
-        gui.hideLoadingSpinner();
-    };
-    var successCB = function() {
-	   	$('#callRejectButton').show();	   	
-    	$('#callAcceptButton').hide();
-    	$('#imgConferenceCaller').hide();
-    	$('#conferenceTag').show();
-    	gui.hideLoadingSpinner();
-    };
-    var failureCB = function() {
-    	$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-    	gui.hideLoadingSpinner();
-    };
-    easyrtc.call(app.otherEasyrtcid, successCB, failureCB, acceptedCB);
-};
-
-
-Application.prototype.easyRTC_getReady4Call = function ( easyrtcid ){ 
-  log.info("Easyrtc ::: I am:  " + easyrtcid);
-  app.easyrtcid = easyrtcid;
-  var message2send = new Message({ 	
-	  to : app.currentChatWith, 
-	  from : user.publicClientID , 
-	  messageBody : { messageType : "res4EasyRTCid" , easyRTCid : easyrtcid }
-  });
-  postman.sendMsg( message2send );
-  
-  gui.showLoadingSpinner();
-};
-
-
-
-Application.prototype.requestPeerEasyRTCid = function (){
-		
-	$('body').pagecontainer('change', '#conference-page', { transition : "none" });	
-	$('#callRejectButton').show().unbind("click").on("click", function(){ 
-		$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-   		 //easyrtc.disconnect();	   		
-   		 easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
-   	     easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
-   	     easyrtc.closeLocalMediaStream();	   	  
-   		 easyrtc.setRoomOccupantListener( function(){});		 
-   	 });
-	$('#callAcceptButton').hide();
-	$('#conferenceTag').hide();
-					
-	var message2send = new Message(	{ 	
-		to : app.currentChatWith, 
-		from : user.publicClientID , 
-		messageBody : { messageType : "req4EasyRTCid" }
-	});
-	postman.sendMsg( message2send );
-	
-	var contact = contactsHandler.getContactById( app.currentChatWith); 
-	if (typeof contact == "undefined" || contact == null) return;
-	$('#imgConferenceCaller').remove();
-	$('.ui-height-70percent').prepend($('<img>',{id:'imgConferenceCaller',src: contact.imgsrc, class: 'vertical-center' }));
-	
-	gui.showLoadingSpinner();	
-};
-
-Application.prototype.easyRTC_connectFailure = function (errorCode, message){  
-	easyrtc.showError(errorCode, errmesg);    
-};
 
 
 Application.prototype.loadContacts = function() {
@@ -5633,7 +5461,166 @@ ContactsHandler.prototype.updateContactOnDB = function( contact ) {
 		log.debug("ContactsHandler.prototype.updateContactOnDB", e);
 	}
 };
+
+
+easyrtc._init = function() {
 	
+	easyrtc.setStreamAcceptor( function(easyrtcid, stream) {			
+		log.info("easyRTC setStreamAcceptor trigered");
+		var conferenceStreamTag = document.getElementById('conferenceTag');
+		clearTimeout( gui.timeoutPickupRTC );
+		easyrtc.setVideoObjectSrc( conferenceStreamTag, stream);
+	   	$('#callRejectButton').show().unbind("click").on("click", function(){ 
+	   		easyrtc._releaseResources(); 
+   		});	    	
+    	$('#imgConferenceCaller').hide();
+    	$('#conferenceTag').show();
+    	gui.hideLoadingSpinner();  		    
+	});
+	easyrtc.setOnStreamClosed( function (easyrtcid) {
+		log.info("easyRTC setOnStreamClosed trigered");
+		easyrtc._releaseResources();  		    
+	});
+		
+	easyrtc.setAcceptChecker(function(easyrtcid, callback) {
+		log.info("easyRTC setAcceptChecker trigered");
+		clearTimeout( gui.timeoutPickupRTC );
+	    if( easyrtc.getConnectionCount() > 0 ) {
+	    	log.info("Dropping current call and accept new from " + easyrtcid );
+	    	easyrtc.hangupAll();
+	    }
+	    else {
+	    	log.info("Acceptting incoming call from " + easyrtcid );
+	    }
+	    callback(true);
+	} );  		
+	
+	easyrtc.useThisSocketConnection( socket );
+    easyrtc.enableVideoReceive(true);
+    easyrtc.enableAudio(true);
+    easyrtc.enableVideo(true);
+  	easyrtc.enableDataChannels(true);
+};
+
+easyrtc._performCall = function (easyrtcid){  
+	
+	app.easyrtcid = easyrtcid;
+	log.debug("easyrtc._performCall, I'm: " + easyrtcid );
+	
+	easyrtc.hangupAll();
+	
+	var acceptedCB = function(accepted, caller) {
+	    if( !accepted ) {
+	        easyrtc.showError("CALL-REJECTED", "Sorry, your call to was rejected");
+	        $('body').pagecontainer('change', '#chat-page', { transition : "none" });            
+	    }
+	    gui.hideLoadingSpinner();
+	};
+	var successCB = function() {
+	   	$('#callRejectButton').show();	   	
+		$('#conferenceTag').show();
+		gui.hideLoadingSpinner();
+	};
+	var failureCB = function() {
+		$('body').pagecontainer('change', '#chat-page', { transition : "none" });
+		gui.hideLoadingSpinner();
+	};
+	easyrtc.call(app.otherEasyrtcid, successCB, failureCB, acceptedCB);
+};
+
+
+easyrtc._req4call = function ( easyrtcid ){
+	
+	app.easyrtcid = easyrtcid;
+	log.debug("easyrtc._req4call, I'm: " + easyrtcid );
+	
+	var message2send = new Message(	{ 	
+		to : app.currentChatWith, 
+		from : user.publicClientID , 
+		messageBody : { messageType : "req4call" , easyRTCid : easyrtcid }
+	});
+	postman.sendMsg( message2send );
+};
+
+easyrtc._initMediaResource = function ( successCallback ){
+	
+	log.debug("easyrtc._initMediaResource " + app.easyrtcid );
+	if ( app.easyrtcid == null || typeof  app.easyrtcid == "undefined"){
+		easyrtc.initMediaSource(
+	      function(){        // success callback
+	          easyrtc.connect("easyrtc.audioOnly", successCallback, easyrtc._connectFailure );
+	      },
+	      function(errorCode, errmesg){
+	          easyrtc.showError(errorCode, errmesg);
+	      }  // failure callback
+    	);						
+	}else{
+		successCallback ( app.easyrtcid );		
+	}
+	
+};
+
+easyrtc._isAmissedCall = function ( msg ){
+	var msgTime = new Date(msg.timestamp).getTime();
+	var currentTime = new Date().getTime();	
+	return (( currentTime - msgTime ) > config.TIME_WAIT_PICKUP );
+};
+
+easyrtc._displayInOutComingCall = function ( callAceptanceCB, callRejectionCB ){
+	
+	$('body').pagecontainer('change', '#conference-page', { transition : "none" });	
+	$('#callRejectButton').unbind("click").on("click", function(){ 
+		callRejectionCB();		 
+	});
+	$('#callAcceptButton').unbind("click").on("click", function(){ 
+		callAceptanceCB();
+	});	
+	$('#conferenceTag').hide();
+	$('#imgConferenceCaller').remove();
+	
+	var contact = contactsHandler.getContactById( app.currentChatWith); 
+	if (typeof contact == "undefined" || contact == null) return;
+	
+	$('.ui-height-70percent').prepend($('<img>',{id:'imgConferenceCaller',src: contact.imgsrc, class: 'vertical-center' }));	
+	gui.showLoadingSpinner();
+};
+
+easyrtc._peerRequest4aCall = function (){	
+	easyrtc._initMediaResource ( easyrtc._req4call );
+	easyrtc._displayInOutComingCall(function(){}, easyrtc._releaseResources );
+	$('#callAcceptButton').hide();
+	gui.timeoutPickupRTC = setTimeout( easyrtc._releaseResources , config.TIME_WAIT_PICKUP );
+};
+
+easyrtc._connectFailure = function (errorCode, message){  
+	easyrtc.showError(errorCode, message);    
+};
+
+easyrtc._releaseResources = function (errorCode, message){
+	clearTimeout( gui.timeoutPickupRTC );
+	$('body').pagecontainer('change', '#chat-page', { transition : "none" });
+	gui.hideLoadingSpinner();
+	easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
+	easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
+	easyrtc.closeLocalMediaStream();	   	  
+	easyrtc.setRoomOccupantListener( function(){});  
+};
+
+easyrtc._sendRejection2peer = function ( msg){
+	easyrtc._releaseResources();	   		 
+	var message2send = new Message({ 	
+		to : msg.from, 
+		from : user.publicClientID , 
+		messageBody : { messageType : "res4call" , easyRTCid : null }
+	});
+	postman.sendMsg( message2send ); 
+};
+
+easyrtc._proccessCall = function ( msg){
+	$('#callAcceptButton').hide();
+	app.otherEasyrtcid = msg.messageBody.easyRTCid;			
+	easyrtc._initMediaResource( easyrtc._performCall );
+};	
 
 function Group( g ) {
 	this.publicClientID = (g.publicClientID) ? g.publicClientID : this.assignId();
@@ -7859,7 +7846,7 @@ function Dictionary(){
 
 //	window.shimIndexedDB.__debug(false);
 //  window.shimIndexedDB.__useShim();
-log4javascript.setEnabled(false);
+log4javascript.setEnabled(true);
 
 /***********************************************************************************************
  * *********************************************************************************************

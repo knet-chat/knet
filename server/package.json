@@ -1,6 +1,6 @@
 {
   "name": "knet",
-  "version": "0.5.2",
+  "version": "0.5.4",
   "description": "server side of knet",
   "main": "server.js",
   "dependencies": {

@@ -1,9 +1,9 @@
 function Config ()  {  
 
-	this.ipServerAuth = "TO_BE_REPLACED_BY_INSTALLER_HERE_ipServerAuth";
+	this.ipServerAuth = "167.114.231.50";
 	this.portServerAuth	= "443";		
 
-	this.ipServerSockets = "TO_BE_REPLACED_BY_INSTALLER_HERE_ipServerAuth";
+	this.ipServerSockets = "167.114.231.50";
 	this.portServerSockets	= "80";
 		
 	this.MAX_HEIGHT_IMG = 500;
@@ -31,6 +31,7 @@ function Config ()  {
 	this.TIME_WAIT_HTTP_POST = 7000;
 	this.TIME_WAIT_MAILBOX_POLLING = 330;
 	this.TIME_WAIT_WAKEUP = 2000;
+	this.TIME_WAIT_PICKUP = 60000;
 	
 	this.pushOptions = {
 		"android": { senderID: "442395718407", clearNotifications : true, forceShow : true , icon: "icon" },
