@@ -427,6 +427,8 @@ app.locals.onReqPlanImg = function(input , socket) {
 };
 
 app.locals.onWhoIsOnline = function( input , socket) {	
+	
+	logger.debug('WhoIsonline ::: init ' );
 
 	var client = socket.visibleClient;	
 	var ping = postMan.getWhoIsOnline( input, client);		
@@ -666,6 +668,8 @@ if ( conf.useTLS ){
 			// challenge forwarding to the Client
 			when.all ( clientUpdate ).then(function(){
 				
+				logger.info('clientUpdate sequence::: client ' + client.publicClientID  );
+
 				var answer = {
 					event : "LoginResponse",
 					data : {
@@ -737,7 +741,7 @@ if ( conf.useTLS ){
 	
 }// END IF conf.useTLS
 
-if ( conf.useTLS ){
+
 	
 	io.sockets.on("connection", function (socket) {
 		
@@ -754,7 +758,7 @@ if ( conf.useTLS ){
 
 	});
 	
-}else {
+
 	io.adapter(redis({ host: config.redis.host , port: config.redis.port }));
 
 	io.use(function(socket, next){
@@ -862,7 +866,7 @@ if ( conf.useTLS ){
 		
 		
 	});	
-}
+
 
 
 var DBConnectionEstablished = [

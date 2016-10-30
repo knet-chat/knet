@@ -803,16 +803,15 @@ Postman.prototype.onMsgFromClient = function ( input ){
 		if ( easyrtc._isAmissedCall( msg ) ) return;
 		app.currentChatWith = msg.from;	
 		var callbackAccept = function(){ easyrtc._proccessCall( msg ); };
-		var callbackReject = function(){ easyrtc._sendRejection2peer( msg ); };
+		var callbackReject = function(){ easyrtc._sendRejection2peer( msg ); };		
+		gui.showConferencePage( callbackAccept , callbackReject  );
 		$('#callAcceptButton').show();
-		easyrtc._displayInOutComingCall( callbackAccept , callbackReject  );
 	
 	}else if ( msg.messageBody.messageType == "res4call"){
 		
 		if ( easyrtc._isAmissedCall( msg ) ) return;
-
 		if( msg.messageBody.easyRTCid == null ){			
-			//TODO easyrtc._releaseResources();
+			easyrtc._releaseResources();
 			return;
 		}
 	}
@@ -1839,7 +1838,7 @@ GUI.prototype.loadBody = function() {
 	strVar += "		<div data-role=\"page\" data-theme=\"a\" id=\"conference-page\" > ";
 	strVar += "			<div  data-theme=\"a\"  class=\"ui-height-100percent\">";	
 	strVar += "				<div class=\"ui-height-70percent\">";	
-	strVar += "					<video id=\"conferenceTag\"><\/video>";
+	strVar += "					<video id=\"conferenceTag\" class=\"video-center\"><\/video>";
 	strVar += "				 <\/div>";
 	strVar += "				<div class=\"conferenceCallBox\">";
 	strVar += "			    	<a id=\"callAcceptButton\" data-role=\"button\" class=\"ui-nodisc-icon icon-list\">";
@@ -2795,7 +2794,21 @@ GUI.prototype.showBlockSomebodyPrompt = function() {
 	});
 	
 };
-
+GUI.prototype.showConferencePage = function( callAceptanceCB, callRejectionCB ){
+	
+	$('body').pagecontainer('change', '#conference-page', { transition : "none" });	
+	$('#callRejectButton').unbind("click").on("click", callRejectionCB );	
+	$('#callAcceptButton').unbind("click").on("click", callAceptanceCB );	
+	$('#conferenceTag').hide();
+	$('#imgConferenceCaller').remove();
+	
+	var contact = contactsHandler.getContactById( app.currentChatWith); 
+	if (typeof contact == "undefined" || contact == null) return;
+	
+	$('.ui-height-70percent').prepend($('<img>',{id:'imgConferenceCaller',src: contact.imgsrc, class: 'vertical-center' }));	
+	gui.showLoadingSpinner();
+	
+};
 GUI.prototype.showConsentMenu = function() {
 
 	var prompt2show="";
@@ -4290,8 +4303,9 @@ Application.prototype.connect2server = function(result){
   	if ( typeof socket != "undefined"){
   		socket.disconnect();  		
   	}
+  	log.info("remoteServer" , remoteServer);
 
-  	var url = 'http://' + config.ipServerSockets +  ":" + config.portServerSockets ;
+  	var url = 'https://' + config.ipServerSockets +  ":" + config.portServerSockets ;
   	var options = { 
 		forceNew : true,
 		secure : true, 
@@ -4323,7 +4337,7 @@ Application.prototype.connect2server = function(result){
 			listOfReceivers : awarenessList
 		};
   		postman.send("WhoIsOnline",  ping );
-  		
+  		log.info("send ... WhoIsOnline");
   		easyrtc._init();
   		
 	});
@@ -4355,6 +4369,8 @@ Application.prototype.connect2server = function(result){
 	});
 
 	socket.on("MessageDeliveryReceipt", function(inputDeliveryReceipt) {
+
+		log.info("MessageDeliveryReceipt "); 		
 
   		var deliveryReceipt = postman.getDeliveryReceipt(inputDeliveryReceipt);
   		if ( deliveryReceipt == null) { return; }	
@@ -5129,7 +5145,7 @@ Application.prototype.establishTLS = function ( params ){
 		app.authSocket.TLS.close();		
 	}
   	var options = { forceNew : true	};
-	var url = 'http://' + config.ipServerAuth +  ":" + config.portServerAuth ;
+	var url = 'https://' + config.ipServerAuth +  ":" + config.portServerAuth ;
   	app.authSocket = io.connect( url, options );
 	
   	app.authSocket.on('connect', function () {
@@ -5467,12 +5483,12 @@ easyrtc._init = function() {
 	
 	easyrtc.setStreamAcceptor( function(easyrtcid, stream) {			
 		log.info("easyRTC setStreamAcceptor trigered");
+		$('body').pagecontainer('change', '#conference-page', { transition : "none" });	
+
 		var conferenceStreamTag = document.getElementById('conferenceTag');
 		clearTimeout( gui.timeoutPickupRTC );
 		easyrtc.setVideoObjectSrc( conferenceStreamTag, stream);
-	   	$('#callRejectButton').show().unbind("click").on("click", function(){ 
-	   		easyrtc._releaseResources(); 
-   		});	    	
+	   	$('#callRejectButton').show().unbind("click").on("click", easyrtc._releaseResources );	    	
     	$('#imgConferenceCaller').hide();
     	$('#conferenceTag').show();
     	gui.hideLoadingSpinner();  		    
@@ -5512,7 +5528,7 @@ easyrtc._performCall = function (easyrtcid){
 	var acceptedCB = function(accepted, caller) {
 	    if( !accepted ) {
 	        easyrtc.showError("CALL-REJECTED", "Sorry, your call to was rejected");
-	        $('body').pagecontainer('change', '#chat-page', { transition : "none" });            
+	    	$.mobile.back();           
 	    }
 	    gui.hideLoadingSpinner();
 	};
@@ -5522,7 +5538,7 @@ easyrtc._performCall = function (easyrtcid){
 		gui.hideLoadingSpinner();
 	};
 	var failureCB = function() {
-		$('body').pagecontainer('change', '#chat-page', { transition : "none" });
+		$.mobile.back();
 		gui.hideLoadingSpinner();
 	};
 	easyrtc.call(app.otherEasyrtcid, successCB, failureCB, acceptedCB);
@@ -5566,28 +5582,9 @@ easyrtc._isAmissedCall = function ( msg ){
 	return (( currentTime - msgTime ) > config.TIME_WAIT_PICKUP );
 };
 
-easyrtc._displayInOutComingCall = function ( callAceptanceCB, callRejectionCB ){
-	
-	$('body').pagecontainer('change', '#conference-page', { transition : "none" });	
-	$('#callRejectButton').unbind("click").on("click", function(){ 
-		callRejectionCB();		 
-	});
-	$('#callAcceptButton').unbind("click").on("click", function(){ 
-		callAceptanceCB();
-	});	
-	$('#conferenceTag').hide();
-	$('#imgConferenceCaller').remove();
-	
-	var contact = contactsHandler.getContactById( app.currentChatWith); 
-	if (typeof contact == "undefined" || contact == null) return;
-	
-	$('.ui-height-70percent').prepend($('<img>',{id:'imgConferenceCaller',src: contact.imgsrc, class: 'vertical-center' }));	
-	gui.showLoadingSpinner();
-};
-
 easyrtc._peerRequest4aCall = function (){	
 	easyrtc._initMediaResource ( easyrtc._req4call );
-	easyrtc._displayInOutComingCall(function(){}, easyrtc._releaseResources );
+	gui.showConferencePage(function(){}, easyrtc._releaseResources );
 	$('#callAcceptButton').hide();
 	gui.timeoutPickupRTC = setTimeout( easyrtc._releaseResources , config.TIME_WAIT_PICKUP );
 };
@@ -5598,12 +5595,12 @@ easyrtc._connectFailure = function (errorCode, message){
 
 easyrtc._releaseResources = function (errorCode, message){
 	clearTimeout( gui.timeoutPickupRTC );
-	$('body').pagecontainer('change', '#chat-page', { transition : "none" });
-	gui.hideLoadingSpinner();
 	easyrtc.clearMediaStream( document.getElementById('conferenceTag'));
 	easyrtc.setVideoObjectSrc(document.getElementById("conferenceTag"),"");
 	easyrtc.closeLocalMediaStream();	   	  
-	easyrtc.setRoomOccupantListener( function(){});  
+	easyrtc.setRoomOccupantListener( function(){}); 
+	$.mobile.back();
+	gui.hideLoadingSpinner();
 };
 
 easyrtc._sendRejection2peer = function ( msg){
