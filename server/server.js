@@ -44,11 +44,6 @@ logger.info('starting instance: ' + argv.instanceNumber);
 var app = express();
 var webServer;
 
-if ( conf.useTLS ){
-	logger.info('Server ::: HTTP + TLS ');	
-}else{
-	logger.info('Server ::: HTTP ');
-}
 webServer = http.createServer(app);
 
 var	io = require("socket.io")(webServer);
@@ -636,113 +631,108 @@ app.locals.onMessage2client = function( msg , socket){
 	});
 };
 
-if ( conf.useTLS ){
+app.locals.onLoginRequest = function (socket , input) {
 	
-	app.locals.onLoginRequest = function (socket , input) {
+	if ( ! postMan.isUUID( input.handshakeToken ) ) {
+  		logger.error('login ::: ! postMan.isUUID(req.body.handshakeToken)');
+		return;
+	}
+	
+	brokerOfVisibles.getClientByHandshakeToken(input.handshakeToken).then(function(client){
 		
-		if ( ! postMan.isUUID( input.handshakeToken ) ) {
-	  		logger.error('login ::: ! postMan.isUUID(req.body.handshakeToken)');
+		if (client == null ){
+	  		logger.error('login ::: unknown client with this handshakeToken' + input.handshakeToken );	  		
 			return;
-		}
+		} 
 		
-		brokerOfVisibles.getClientByHandshakeToken(input.handshakeToken).then(function(client){
-			
-			if (client == null ){
-		  		logger.error('login ::: unknown client with this handshakeToken' + input.handshakeToken );	  		
-				return;
-			} 
-			
-			client.indexOfCurrentKey = Math.floor((Math.random() * 7) + 0);
-			client.currentChallenge = uuid.v4();		
-			var sHeaders = socket.handshake.headers;
-			var ip = sHeaders['x-forwarded-for'];
-			logger.info('onLoginRequest ::: client ' + client.publicClientID + ' ip ' + ip );
-			
-			var clientUpdate = [ 
-	             brokerOfVisibles.updateClientsLocation( client, ip ) ,
-			     brokerOfVisibles.updateClientsHandshake( client )
-			];
-			
-			var server2connect = postMan.getRightServer2connect();
+		client.indexOfCurrentKey = Math.floor((Math.random() * 7) + 0);
+		client.currentChallenge = uuid.v4();		
+		var sHeaders = socket.handshake.headers;
+		var ip = sHeaders['x-forwarded-for'];
+		logger.info('onLoginRequest ::: client ' + client.publicClientID + ' ip ' + ip );
 		
-			// challenge forwarding to the Client
-			when.all ( clientUpdate ).then(function(){
-				
-				logger.info('clientUpdate sequence::: client ' + client.publicClientID  );
-
-				var answer = {
-					event : "LoginResponse",
-					data : {
-						index: client.indexOfCurrentKey , 
-						challenge :  postMan.encrypt( { challenge : client.currentChallenge} , client ),
-						server2connect : postMan.encrypt( server2connect , client )				
-					}										 
-				};				
-				socket.TLS.prepare( JSON.stringify(answer) );
-				
-			});	
-					
-		});	//END getClientByHandshakeToken	
+		var clientUpdate = [ 
+             brokerOfVisibles.updateClientsLocation( client, ip ) ,
+		     brokerOfVisibles.updateClientsHandshake( client )
+		];
 		
-	};//END onLoginRequest
+		var server2connect = postMan.getRightServer2connect();
 	
-	app.locals.onRegistryRequest = function (socket , input) {
-		logger.debug("app.locals.onRegistryRequest ::: do something...", input);
-		
-		brokerOfVisibles.createNewClient( input.clientPEMpublicKey ).then(function (newClient){			
+		// challenge forwarding to the Client
+		when.all ( clientUpdate ).then(function(){
+			
+			logger.info('clientUpdate sequence::: client ' + client.publicClientID  );
+
 			var answer = {
-				event : "registration",
+				event : "LoginResponse",
 				data : {
-					publicClientID : newClient.publicClientID , 
-					myArrayOfKeys : newClient.myArrayOfKeys,
-					handshakeToken : newClient.handshakeToken						
+					index: client.indexOfCurrentKey , 
+					challenge :  postMan.encrypt( { challenge : client.currentChallenge} , client ),
+					server2connect : postMan.encrypt( server2connect , client )				
 				}										 
 			};				
 			socket.TLS.prepare( JSON.stringify(answer) );
+			
+		});	
+				
+	});	//END getClientByHandshakeToken	
 	
-		});
-	};//END onRegistryRequest
-	
-	app.locals.onRequestTLSConnection = function( input , socket){
+};//END onLoginRequest
 
-		var keys = postMan.getAsymetricKeyFromList();		
-		var options = {
-			keys : keys,
-			clientPEMcertificate : input.clientPEMcertificate,
-			socket : socket,
-			onTLSmsg : app.locals.onTLSmsg,
-			onClose : function(){ socket.disconnect(); }
-	  	};
-		socket.TLS = postMan.createTLSConnection( options );
-		// send serversPEM for the client to establish TLS connection
-		var answer = { serversPEM : keys.certificate };	
-		try{
-			io.sockets.to(socket.id).emit('ResponseTLSConnection', answer );			
-		}catch(e){
-			logger.info("onRequestTLSConnection ::: send ::: exception"  + e);
-		}		
-	};// END onRequestTLSConnection
+app.locals.onRegistryRequest = function (socket , input) {
+	logger.debug("app.locals.onRegistryRequest ::: do something...", input);
 	
-	app.locals.onTLSmsg = function (socket , input) {
-		//TODO to use parseNotEval.....
-		var obj = JSON.parse( input );
-		var event = obj.event;
-		switch (event) {
-			case "register":
-				app.locals.onRegistryRequest( socket , obj.data);
-				break;
-			case "login":
-				app.locals.onLoginRequest( socket , obj.data);
-				break;
-			default:
-				break;
-		}
-	};// END onTLSmsg
-	
-}// END IF conf.useTLS
+	brokerOfVisibles.createNewClient( input.clientPEMpublicKey ).then(function (newClient){			
+		var answer = {
+			event : "registration",
+			data : {
+				publicClientID : newClient.publicClientID , 
+				myArrayOfKeys : newClient.myArrayOfKeys,
+				handshakeToken : newClient.handshakeToken						
+			}										 
+		};				
+		socket.TLS.prepare( JSON.stringify(answer) );
 
+	});
+};//END onRegistryRequest
 
+app.locals.onRequestTLSConnection = function( input , socket){
+
+	var keys = postMan.getAsymetricKeyFromList();		
+	var options = {
+		keys : keys,
+		clientPEMcertificate : input.clientPEMcertificate,
+		socket : socket,
+		onTLSmsg : app.locals.onTLSmsg,
+		onClose : function(){ socket.disconnect(); }
+  	};
+	socket.TLS = postMan.createTLSConnection( options );
+	// send serversPEM for the client to establish TLS connection
+	var answer = { serversPEM : keys.certificate };	
+	try{
+		io.sockets.to(socket.id).emit('ResponseTLSConnection', answer );			
+	}catch(e){
+		logger.info("onRequestTLSConnection ::: send ::: exception"  + e);
+	}		
+};// END onRequestTLSConnection
+
+app.locals.onTLSmsg = function (socket , input) {
+	//TODO to use parseNotEval.....
+	var obj = JSON.parse( input );
+	var event = obj.event;
+	switch (event) {
+		case "register":
+			app.locals.onRegistryRequest( socket , obj.data);
+			break;
+		case "login":
+			app.locals.onLoginRequest( socket , obj.data);
+			break;
+		default:
+			break;
+	}
+};// END onTLSmsg
 	
+if ( conf.useTLS ){
 	io.sockets.on("connection", function (socket) {
 		
 		socket.on("RequestTLSConnection", function (msg){ 
@@ -753,12 +743,11 @@ if ( conf.useTLS ){
 		socket.on("data2Server", function (data){
 			socket.TLS.process( forge.util.decode64( data ) );
 		});
-
-		socket.on('disconnect',  function (msg){ } );	   
-
-	});
 	
-
+		socket.on('disconnect',  function (msg){ } );	   
+	
+	});
+}else{
 	io.adapter(redis({ host: config.redis.host , port: config.redis.port }));
 
 	io.use(function(socket, next){
@@ -859,15 +848,33 @@ if ( conf.useTLS ){
 		
 		//XEP-XXXX: plan retreival
 		socket.on("Request4Plans", function (msg){ app.locals.onRequest4Plans ( msg , socket) } );
-	
+
 		//XEP-XXXX: plan img retreival
-		socket.on("ReqPlanImg", function (msg){ app.locals.onReqPlanImg ( msg , socket) } );
-		
-		
+		socket.on("ReqPlanImg", function (msg){ app.locals.onReqPlanImg ( msg , socket) } );	
 		
 	});	
+}
 
+easyrtc.setOption("logLevel", "debug");
 
+// Overriding the default easyrtcAuth listener, only so we can directly access its callback
+easyrtc.events.on("easyrtcAuth", function(socket, easyrtcid, msg, socketCallback, callback) {
+    easyrtc.events.defaultListeners.easyrtcAuth(socket, easyrtcid, msg, socketCallback, function(err, connectionObj){
+        if (err || !msg.msgData || !msg.msgData.credential || !connectionObj) {
+            callback(err, connectionObj);
+            return;
+        }
+        connectionObj.setField("credential", msg.msgData.credential, {"isShared":false});
+        console.log("["+easyrtcid+"] Credential saved!", connectionObj.getFieldValueSync("credential"));
+        callback(err, connectionObj);
+    });
+});
+
+// To test, lets print the credential to the console for every room join!
+easyrtc.events.on("roomJoin", function(connectionObj, roomName, roomParameter, callback) {
+    console.log("["+connectionObj.getEasyrtcid()+"] Credential retrieved!", connectionObj.getFieldValueSync("credential"));
+    easyrtc.events.defaultListeners.roomJoin(connectionObj, roomName, roomParameter, callback);
+});
 
 var DBConnectionEstablished = [
 	postMan.initDBConnection( conf.db.user, conf.db.pass, conf.db.host, conf.db.name ),
@@ -887,45 +894,9 @@ when.all ( DBConnectionEstablished ).then(function(){
 		}
 	);
 	
-	easyrtc.setOption("logLevel", "debug");
+  	if ( conf.useTLS == false ){
+  		easyrtc.listen(app, io, null, function(err, rtcRef) {});
+  	}
 
-	// Overriding the default easyrtcAuth listener, only so we can directly access its callback
-	easyrtc.events.on("easyrtcAuth", function(socket, easyrtcid, msg, socketCallback, callback) {
-	    easyrtc.events.defaultListeners.easyrtcAuth(socket, easyrtcid, msg, socketCallback, function(err, connectionObj){
-	        if (err || !msg.msgData || !msg.msgData.credential || !connectionObj) {
-	            callback(err, connectionObj);
-	            return;
-	        }
-
-	        connectionObj.setField("credential", msg.msgData.credential, {"isShared":false});
-
-	        console.log("["+easyrtcid+"] Credential saved!", connectionObj.getFieldValueSync("credential"));
-
-	        callback(err, connectionObj);
-	    });
-	});
-
-	// To test, lets print the credential to the console for every room join!
-	easyrtc.events.on("roomJoin", function(connectionObj, roomName, roomParameter, callback) {
-	    console.log("["+connectionObj.getEasyrtcid()+"] Credential retrieved!", connectionObj.getFieldValueSync("credential"));
-	    easyrtc.events.defaultListeners.roomJoin(connectionObj, roomName, roomParameter, callback);
-	});
-
-	//var nsp = io.of('/my-namespaceNew');
-	// Start EasyRTC server
-	var rtc = easyrtc.listen(app, io, null, function(err, rtcRef) {
-	    console.log("Initiated");
-
-	    rtcRef.events.on("roomCreate", function(appObj, creatorConnectionObj, roomName, roomOptions, callback) {
-	        console.log("roomCreate fired! Trying to create: " + roomName);
-
-	        appObj.events.defaultListeners.roomCreate(appObj, creatorConnectionObj, roomName, roomOptions, callback);
-	    });
-	});
-	
-	
-	
-	
-	
 	
 });

@@ -5144,7 +5144,8 @@ Application.prototype.establishTLS = function ( params ){
 	if ( app.authSocket != null && typeof app.authSocket.TLS != "undefined" ){
 		app.authSocket.TLS.close();		
 	}
-  	var options = { forceNew : true	};
+  	var options = { forceNew : true	, path: '/tls/socket.io'};
+	//var options = { forceNew : true	};
 	var url = 'https://' + config.ipServerAuth +  ":" + config.portServerAuth ;
   	app.authSocket = io.connect( url, options );
 	
