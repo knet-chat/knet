@@ -73,8 +73,8 @@ rl.question('Enter your keyGCM: ', function(keyGCM) {
 		config.paypal.username = paypalInputArray[0];
 		config.paypal.password = paypalInputArray[1];
 		config.paypal.signature = paypalInputArray[2];
-		config.paypal.returnURL = "http://" + ipServer + "/successPayment";
-		config.paypal.cancelURL = "http://" + ipServer + "/cancelPayment";
+		config.paypal.returnURL = "https://" + ipServer + "/wss/successPayment";
+		config.paypal.cancelURL = "https://" + ipServer + "/wss/cancelPayment";
 		
 		config.keyGCM = keyGCM;
 		

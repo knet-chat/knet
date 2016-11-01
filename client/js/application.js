@@ -192,7 +192,10 @@ Postman.prototype.generateKeyPair = function() {
 	    var array = ['var base_url = "' + base_url + '";' + $('#worker_1').html()];
 	    var blob = new Blob(array, {type: "text/javascript"});
 	    options.workerScript  = window.URL.createObjectURL(blob);
+		log.debug("$.browser.chrome true");
+
 	}else{
+		log.debug("$.browser.chrome false");
 		options.workerScript = "js/prime.worker.js";
 	}
 		
@@ -1801,7 +1804,7 @@ GUI.prototype.loadBody = function() {
 	strVar += "				<\/div>";
 	strVar += "				<h3 class=\"darkink\"> <spam id=\"label_33\"> Total :<\/spam> <spam id=\"price\"> 1 &euro;<\/spam><\/h3>";
 	strVar += "				<button id=\"buyButton\">Buy<\/button>";
-	strVar += "				<div class=\"paypalButton\"><img id=\"paypal\" src=\"res\/AM_mc_vs_dc_ae.jpg\" width=\"100%\"><\/div>";
+	strVar += "				<div class=\"paypalButton\"><img id=\"paypal\" src=\"res\/AM_mc_vs_dc_ae.jpg\" ><\/div>";
 	strVar += "			<\/div><!-- \/content -->";
 	strVar += "		<\/div><!-- \/activateAccount page-->";
 	
@@ -2872,7 +2875,12 @@ GUI.prototype.showConversation = function( obj , callback ) {
 
 	if ( obj instanceof ContactOnKnet ){
 		contactsHandler.sendProfileRequest( obj );	
-	}	
+	}
+	
+	if ( !document.getElementById('css/jquery.emojipicker.tw.css') ){
+		app.loadjscssfile('css/jquery.emojipicker.tw.css','css');
+		log.info("gui.showConversation - loadjscssfile called");
+	}
 		
 };
 
@@ -4310,7 +4318,8 @@ Application.prototype.connect2server = function(result){
 		forceNew : true,
 		secure : true, 
 		reconnection : true,
-		query : 'token=' + app.tokenSigned + '&version=' + config.SW_VERSION	
+		query : 'token=' + app.tokenSigned + '&version=' + config.SW_VERSION,
+		path: '/wss/socket.io'
 	};
   	socket = io.connect( url, options );
 	
@@ -4768,6 +4777,25 @@ Application.prototype.loadGroups = function() {
      	}
 	};	
 };
+
+Application.prototype.loadjscssfile = function (filename, filetype) {
+	if (filetype == "js") { 
+		var fileref = document.createElement('script');
+		fileref.setAttribute("type", "text/javascript");
+		fileref.setAttribute("src", filename);
+		fileref.setAttribute("id", filename);
+	}
+	else if (filetype == "css") {
+		var fileref = document.createElement("link");
+		fileref.setAttribute("rel", "stylesheet");
+		fileref.setAttribute("type", "text/css");
+		fileref.setAttribute("href", filename);
+		fileref.setAttribute("id", filename);
+	}
+	if (typeof fileref != "undefined")
+		document.getElementsByTagName("head")[0].appendChild(fileref);
+};
+
 
 Application.prototype.loadMyNumber = function() {
 	if ( ! (typeof cordova == "undefined" || cordova == null) ){
@@ -5275,7 +5303,7 @@ AbstractHandler.prototype.setOnList = function( obj ) {
 
 function ContactOnKnet( c ) {
 	this.publicClientID = c.publicClientID;
-	this.imgsrc = (typeof c.imgsrc == 'undefined' || c.imgsrc == "" || c.imgsrc == null ) ? "./res/logo_300x300.png" : c.imgsrc ;
+	this.imgsrc = (typeof c.imgsrc == 'undefined' || c.imgsrc == "" || c.imgsrc == null ) ? "./res/logo_300x300.jpg" : c.imgsrc ;
 	this.nickName = (c.nickName) ? c.nickName : dictionary.Literals.label_23;
 	this.location = (c.location) ? c.location : { lat : "", lon : "" };
 	this.commentary = (typeof c.commentary == 'undefined' || c.commentary == "") ? dictionary.Literals.label_12 : c.commentary;
