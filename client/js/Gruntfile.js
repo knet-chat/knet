@@ -10,7 +10,7 @@ module.exports = function(grunt) {
 			},
 			build: {
 				files: {
-		        	'bundle1.js': [
+		        	'lib-1.js': [
 		   				'fastClick.js',
 						'jquery-1.10.2.min.js',
 						'jquery.mobile.mobileinit.js',
@@ -21,7 +21,7 @@ module.exports = function(grunt) {
 						'jquery.emojipicker.tw.js',
 						'jquery.debouncedresize.js'
 		        	],
-		        	'bundle2.js': [
+		        	'lib-2.js': [
 						'twemoji.min.js',
 						'config.js',
 						'log4javascript-1.4.13.js',
@@ -29,20 +29,24 @@ module.exports = function(grunt) {
 						'photoswipe-ui-default.min.js',
 						'jsrsasign-4.1.4-all-min.js',
 						'json-sans-eval-min.js',
-						'jws-3.0.min.js',
-						'forge.bundle-0.7.0.js',
-						'indexeddbshim.min-2.2.1.js',
+						'jws-3.0.min.js'						
+					],
+		        	'lib-3.js': [
+ 						'indexeddbshim.min-2.2.1.js',
 						'cldr-0.4.3.js',
 						'./cldr/event.js',
 						'./cldr/supplemental.js',
 						'globalize-1.1.0.js',
 						'./globalize/date_number.min.js',
 						'socket.io-1.3.5.js',
-						'pickadate.js-3.5.6/picker.js',
-						'pickadate.js-3.5.6/picker.date.js',
-						'pickadate.js-3.5.6/picker.time.js',
-						'pickadate.js-3.5.6/legacy.js',
-						'easyrtc-1.0.15.js'
+ 						'pickadate.js-3.5.6/picker.js',
+ 						'pickadate.js-3.5.6/picker.date.js',
+ 						'pickadate.js-3.5.6/picker.time.js',
+ 						'pickadate.js-3.5.6/legacy.js',
+ 						'easyrtc-1.0.15.js'
+ 		        	],
+		        	'lib-4.js': [ 
+        	              'forge.bundle-0.7.0.js'
 		        	]
 		      	}
 			}
@@ -55,15 +59,17 @@ module.exports = function(grunt) {
 			},
 			build: {
 				files: {
-					'bundle1.min.js': ['bundle1.js'],
-					'bundle2.min.js': ['bundle2.js'],
+					'lib-1.min.js': ['lib-1.js'],
+					'lib-2.min.js': ['lib-2.js'],
+					'lib-3.min.js': ['lib-3.js'],
+					'lib-4.min.js': ['lib-4.js'],
 					'app.min.js': ['application.js']
 				}
 			}
 		},
 		clean: {
 		  build: {
-		    src: ['bundle1.js', 'bundle2.js']
+		    src: ['lib-1.js', 'lib-2.js','lib-3.js', 'lib-4.js']
 		  }
 		},		
 		cssmin: {

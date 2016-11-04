@@ -12,7 +12,7 @@ rl.question('What is the host of the database ? ', function(dbHost) {
 rl.question('What is the user of the database ? ', function(dbUser) {	
 rl.question('What is the password of the database ? ', function(pass) {
 rl.question('What is the name of the database ? ', function(dbName) {
-rl.question('public IP address for the knet-server ? ', function(ipServer) {
+rl.question('domain name for the knet-server ? ', function(ipServer) {
 rl.question('Number of Non TLS instances ? ', function(numberNonTLSintances) {
 rl.question('Number of TLS instances ? ', function(numberTLSintances) {
 rl.question('Enter your Paypal details like this: yourPayPalname,yourPayPalpass,yourPayPalSignature  ', function(paypalInput) {	
