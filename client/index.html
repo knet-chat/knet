@@ -4,34 +4,24 @@
         <meta charset="utf-8" />
         <meta name="format-detection" content="telephone=no" />
        	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
-       	<link rel="stylesheet" type="text/css" href="css/visible_1.0.0.css" />
+  <!--  
+      
+        <link rel="stylesheet" type="text/css" href="css/jquery.style.1.4.2.css" />
         <link rel="stylesheet" type="text/css" href="css/jquery.mobile.icons.min.css" />
 		<link rel="stylesheet" type="text/css" href="css/jquery.mobile.structure-1.4.2.css" />		
-		<link rel="stylesheet" type="text/css" href="css/font-face.css">
-		<link rel="stylesheet" type="text/css" href="css/application.css" media="all" />
-		<link rel="stylesheet" type="text/css" href="css/picedit.css" />		
-		<link rel="stylesheet" type="text/css" href="css/leaflet-0.7.5.css" /> 
-		<link rel="stylesheet" type="text/css" href="css/jquery.emojipicker.css" />
-		<!--<link rel="stylesheet" type="text/css" href="css/jquery.emojipicker.tw.css" />-->
-		<link rel="stylesheet" type="text/css" href="css/photoswipe.css?v=4.0.8-1.0.4" />
-		<link rel="stylesheet" type="text/css" href="css/default-skin/default-skin.css?v=4.0.8-1.0.4"  />
+        <link rel="stylesheet" type="text/css" href="css/jquery.emojipicker.css" />
+        <link rel="stylesheet" type="text/css" href="css/picedit.css" />
+		<link rel="stylesheet" type="text/css" href="css/application.css" media="all" />				
 		
+		<link rel="stylesheet" type="text/css" href="css/photoswipe-4.0.8.css" />
+		<link rel="stylesheet" type="text/css" href="css/default-skin/default-skin-4.0.8.css"  />		
 		<link rel="stylesheet" type="text/css" href="css/pickadate.js-3.5.6/default.css"  />
 		<link rel="stylesheet" type="text/css" href="css/pickadate.js-3.5.6/default.time.css"  />
 		<link rel="stylesheet" type="text/css" href="css/pickadate.js-3.5.6/default.date.css"  />
-	<!--	<link rel="stylesheet" type="text/css" href="css/pickadate.js-3.5.6/rtl.css"  /> -->
-		
-
-		
-		<script src="cordova.js"></script>
-		<script src='js/fastClick.min.js'></script>        
-		<script src="js/twemoji.min.js"></script>
-		<!-- WARNING BEGIN: there are some ad-hoc modifications on forge.bundle.js due to web Worker compatibilities -->		
-		<script id="worker_1" type="text/js-worker">		    
-            importScripts(base_url + '/js/prime.worker.js');
-        </script>
-        <!-- WARNING END-->
-        				
+		-->
+		<link rel="stylesheet" type="text/css" href="css/style.min.css"  />	
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+			
         <title>knet</title>
     </head>
 	<body>
@@ -52,66 +42,54 @@
 
 			</div>
 		</div>
-	
-		<script src="js/config.js"></script>
-		<script src="js/log4javascript-1.4.13.js"></script>
-
-        
-    	<script src="js/photoswipe.min.js"></script>
-		<script src="js/photoswipe-ui-default.min.js"></script>	
-
-		<script src="js/jsrsasign-4.1.4-all-min.js"></script>	
-		<script src="js/json-sans-eval-min.js"></script>
-		<script src="js/jws-3.0.min.js"></script>		
-		<script src="js/forge.bundle-0.7.0.min.js"></script>
 		
-		<script src="js/jquery-1.10.2.min.js"></script>
-	 	<script src="js/jquery.mobile.mobileinit.js"></script> 
-		<script src="js/jquery.mobile-1.4.5.min.js"></script>
-		<script src="js/jquery.browser.min.0.1.0.js"></script>
+	 <!--   
+	    <script src="js/jquery-1.10.2.min.js"></script>
+        <script src="js/jquery.mobile.mobileinit.js"></script> 
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jquery.browser.min.0.1.0.js"></script>
         <script src="js/jquery.picedit-1.0.0.js"></script>
         <script src="js/jquery.emojipicker.js"></script>
         <script src="js/jquery.emojipicker.tw.js"></script>
         <script src="js/jquery.debouncedresize.js"></script>
-        
-        <!-- <script src="js/jquery.lazy-0.6.4.min.js"></script> -->
-        
-        <script type="text/javascript">
-	    
-//			var head = document.getElementsByTagName('head')[0];
-//			var js = document.createElement("script");			
-//			js.type = "text/javascript";			
-//			if ( $.browser.msedge || $.browser["windows phone"] || $.browser.msie || $.browser.win ){
-//			    js.src = "js/IndexedDBShim.old.js";
-//			}else {
-//			    js.src = "js/indexeddbshim.min-2.2.1.js";
-//			}
-//			head.appendChild(js);
-			
-		</script>
-		<script src="js/indexeddbshim.min-2.2.1.js"></script> 
-	    <!--<script src="js/IndexedDBShim.old.js"></script> -->  
-        
+		-->
+		<script src="js/bundle1.min.js"></script>
+		
+		<!-- WARNING: cordova.js only for apache cordova build --> 
+		<script src="cordova.js"></script>
+        <!-- WARNING: there are some ad-hoc modifications on forge.bundle.js due to web Worker compatibilities -->        
+        <script id="worker_1" type="text/js-worker"> importScripts(base_url + '/js/prime.worker.js');  </script>
+        <script src="js/bundle2.min.js"></script>
+<!--
+	    <script src='js/fastClick.min.js'></script>        
+        <script src="js/twemoji.min.js"></script>
+		<script src="js/config.js"></script>
+		<script src="js/log4javascript-1.4.13.js"></script>        
+    	<script src="js/photoswipe.min.js"></script>
+		<script src="js/photoswipe-ui-default.min.js"></script>	
+		<script src="js/jsrsasign-4.1.4-all-min.js"></script>	
+		<script src="js/json-sans-eval-min.js"></script>
+		<script src="js/jws-3.0.min.js"></script>		
+		<script src="js/forge.bundle-0.7.0.min.js"></script>
+    -->
+        <!-- WARNING: js/IndexedDBShim.old.js for windows phone build -->   
+       <!--     
+		<script src="js/indexeddbshim.min-2.2.1.js"></script>        
         <script src="js/cldr-0.4.3.js"></script>
 	    <script src="js/cldr/event.js"></script>
 	    <script src="js/cldr/supplemental.js"></script>
-
-
 	    <script src="js/globalize-1.1.0.js"></script>
-	    <script src="js/globalize/date_number.min.js"></script>
-	
-        		
-		<script src="js/socket.io-1.3.5.min.js"></script>
-			
-	    <script src="js/leaflet-0.7.5.js"></script>
-	    
+	    <script src="js/globalize/date_number.min.js"></script>        		
+		<script src="js/socket.io-1.3.5.min.js"></script>			
 	    <script src="js/pickadate.js-3.5.6/picker.js"></script>
 	    <script src="js/pickadate.js-3.5.6/picker.date.js"></script>
 	    <script src="js/pickadate.js-3.5.6/picker.time.js"></script>
         <script src="js/pickadate.js-3.5.6/legacy.js"></script>	
-        <script src="js/easyrtc-1.0.15.min.js"></script>	
- 	    		    
-		<script src="js/application.js"></script>		      
+        <script src="js/easyrtc-1.0.15.min.js"></script>   		    
+		  <script src="js/application.js"></script>	      
+-->
+	    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
 
+    <script src="js/app.min.js"></script>
     </body>
 </html>

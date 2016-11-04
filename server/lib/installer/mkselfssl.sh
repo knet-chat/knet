@@ -17,22 +17,8 @@
 DIR_SSL_CERT="/etc/nginx/ssl/cert"
 DIR_SSL_KEY="/etc/nginx/ssl/private"
 
-SSLNAME=$1
-SSLDAYS=$2
-
-if [ -z $1 ]; then
-  printf "Enter the SSL Certificate Name:"
-  read SSLNAME
-fi
-
-if [ -z $2 ]; then
-  printf "How many days the Certificate will be valid:"
-  read SSLDAYS
-fi
-
-if [[ $SSLDAYS == "" ]]; then
-  $SSLDAYS = 365
-fi
+SSLNAME=knet
+SSLDAYS=365
 
 echo "Creating a new Certificate ..."
 openssl req -x509 -nodes -newkey rsa:2048 -keyout $SSLNAME.key -out $SSLNAME.crt -days $SSLDAYS
@@ -49,6 +35,8 @@ fi
 # Place SSL Certificate within defined path
 cp $SSLNAME.key $DIR_SSL_KEY/$SSLNAME.key
 cp $SSLNAME.crt $DIR_SSL_CERT/$SSLNAME.crt
+
+
 
 # Print output for Nginx site config
 printf "+-------------------------------
