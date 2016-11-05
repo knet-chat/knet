@@ -4265,7 +4265,7 @@ Application.prototype.bindPushEvents = function() {
 Application.prototype.connect2paypal = function(myPurchase) {
 	
 	$.ajax({
-		url: 'http://' + config.ipServerSockets +  ":" + config.portServerSockets + '/payment',
+		url: 'https://' + config.ipServerSockets +  ":" + config.portServerSockets + '/payment',
 		method : "POST",
 		data: {	
 			handshakeToken: user.handshakeToken  , 
@@ -6061,11 +6061,11 @@ function Dictionary(){
 			          "decimal": ".",
 			          "exponential": "E",
 			          "group": ",",
-			          "infinity": "∞",
+			          "infinity": "âˆž",
 			          "minusSign": "-",
 			          "nan": "NaN",
 			          "percentSign": "%",
-			          "perMille": "‰",
+			          "perMille": "â€°",
 			          "plusSign": "+",
 			          "timeSeparator": ":"
 			        },
@@ -6109,7 +6109,7 @@ function Dictionary(){
 			    "plurals-type-cardinal": {
 			      "en": {
 			        "pluralRule-count-one": "i = 1 and v = 0 @integer 1",
-			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, … @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, …"
+			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, â€¦ @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, â€¦"
 			      }
 			    }
 			  }
@@ -6415,11 +6415,11 @@ function Dictionary(){
 		          "decimal": ".",
 		          "exponential": "E",
 		          "group": ",",
-		          "infinity": "∞",
+		          "infinity": "âˆž",
 		          "minusSign": "-",
 		          "nan": "NaN",
 		          "percentSign": "%",
-		          "perMille": "‰",
+		          "perMille": "â€°",
 		          "plusSign": "+",
 		          "timeSeparator": ":"
 		        },
@@ -6463,7 +6463,7 @@ function Dictionary(){
 		    "plurals-type-cardinal": {
 		      "de": {
 		        "pluralRule-count-one": "i = 1 and v = 0 @integer 1",
-		        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, … @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, …"
+		        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, â€¦ @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, â€¦"
 		      }
 		    }
 		  }
@@ -6769,11 +6769,11 @@ function Dictionary(){
 			          "decimal": ".",
 			          "exponential": "E",
 			          "group": ",",
-			          "infinity": "∞",
+			          "infinity": "âˆž",
 			          "minusSign": "-",
 			          "nan": "NaN",
 			          "percentSign": "%",
-			          "perMille": "‰",
+			          "perMille": "â€°",
 			          "plusSign": "+",
 			          "timeSeparator": ":"
 			        },
@@ -6817,7 +6817,7 @@ function Dictionary(){
 			    "plurals-type-cardinal": {
 			      "de": {
 			        "pluralRule-count-one": "i = 1 and v = 0 @integer 1",
-			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, … @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, …"
+			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, â€¦ @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, â€¦"
 			      }
 			    }
 			  }
@@ -6857,7 +6857,7 @@ function Dictionary(){
 		label_32: "Donaci&oacute;n para nuestra Iniciativa Open Source",
 		label_33: "Total: ",
 		label_34: "Comprar"	,
-		label_35 : "\u00A1Bienvenido! generando su canal de seguridad, este proceso podría tardar unos minutos, por favor sea paciente",
+		label_35 : "\u00A1Bienvenido! generando su canal de seguridad, este proceso podrÃ­a tardar unos minutos, por favor sea paciente",
 		label_36 : "nuevo grupo",
 		label_37 : "mis Grupos",
 		label_38 : "crear",
@@ -7087,11 +7087,11 @@ function Dictionary(){
 			          "decimal": ".",
 			          "exponential": "E",
 			          "group": ",",
-			          "infinity": "∞",
+			          "infinity": "âˆž",
 			          "minusSign": "-",
 			          "nan": "NaN",
 			          "percentSign": "%",
-			          "perMille": "‰",
+			          "perMille": "â€°",
 			          "plusSign": "+",
 			          "timeSeparator": ":"
 			        },
@@ -7135,7 +7135,7 @@ function Dictionary(){
 			    "plurals-type-cardinal": {
 			      "es": {
 			        "pluralRule-count-one": "i = 1 and v = 0 @integer 1",
-			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, … @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, …"
+			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, â€¦ @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, â€¦"
 			      }
 			    }
 			  }
@@ -7441,11 +7441,11 @@ function Dictionary(){
 			          "decimal": ".",
 			          "exponential": "E",
 			          "group": ",",
-			          "infinity": "∞",
+			          "infinity": "âˆž",
 			          "minusSign": "-",
 			          "nan": "NaN",
 			          "percentSign": "%",
-			          "perMille": "‰",
+			          "perMille": "â€°",
 			          "plusSign": "+",
 			          "timeSeparator": ":"
 			        },
@@ -7489,7 +7489,7 @@ function Dictionary(){
 			    "plurals-type-cardinal": {
 			      "fr": {
 			        "pluralRule-count-one": "i = 1 and v = 0 @integer 1",
-			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, … @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, …"
+			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, â€¦ @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, â€¦"
 			      }
 			    }
 			  }
@@ -7528,7 +7528,7 @@ function Dictionary(){
 		label_32: "Doa&ccedil;&atilde;o para o nosso Iniciativa Open Source",
 		label_33: "Total: ",
 		label_34: "Comprar",
-		label_35 : "Bem-vindo! gerando seu protocolo de segurança, esse processo pode levar alguns minutos, por favor, seja paciente",
+		label_35 : "Bem-vindo! gerando seu protocolo de seguranÃ§a, esse processo pode levar alguns minutos, por favor, seja paciente",
 		label_36 : "novo grupo",
 		label_37 : "meus Grupos",
 		label_38 : "criar",
@@ -7613,7 +7613,7 @@ function Dictionary(){
 			                    "wide": {
 			                      "1": "janeiro",
 			                      "2": "fevereiro",
-			                      "3": "mar�o",
+			                      "3": "março",
 			                      "4": "abril",
 			                      "5": "maio",
 			                      "6": "junho",
@@ -7657,7 +7657,7 @@ function Dictionary(){
 			                    "wide": {
 			                      "1": "janeiro",
 			                      "2": "fevereiro",
-			                      "3": "mar�o",
+			                      "3": "março",
 			                      "4": "abril",
 			                      "5": "maio",
 			                      "6": "junho",
@@ -7679,7 +7679,7 @@ function Dictionary(){
 			                      "wed": "qua",
 			                      "thu": "qui",
 			                      "fri": "sex",
-			                      "sat": "s�b"
+			                      "sat": "sáb"
 			                    },
 			                    "narrow": {
 			                      "sun": "D",
@@ -7697,16 +7697,16 @@ function Dictionary(){
 			                      "wed": "qua",
 			                      "thu": "qui",
 			                      "fri": "sex",
-			                      "sat": "s�b"
+			                      "sat": "sáb"
 			                    },
 			                    "wide": {
 			                      "sun": "domingo",
 			                      "mon": "segunda-feira",
-			                      "tue": "ter�a-feira",
+			                      "tue": "terça-feira",
 			                      "wed": "quarta-feira",
 			                      "thu": "quinta-feira",
 			                      "fri": "sexta-feira",
-			                      "sat": "s�bado"
+			                      "sat": "sábado"
 			                    }
 			                  },
 			                  "stand-alone": {
@@ -7717,7 +7717,7 @@ function Dictionary(){
 			                      "wed": "qua",
 			                      "thu": "qui",
 			                      "fri": "sex",
-			                      "sat": "s�b"
+			                      "sat": "sáb"
 			                    },
 			                    "narrow": {
 			                      "sun": "D",
@@ -7735,16 +7735,16 @@ function Dictionary(){
 			                      "wed": "qua",
 			                      "thu": "qui",
 			                      "fri": "sex",
-			                      "sat": "s�b"
+			                      "sat": "sáb"
 			                    },
 			                    "wide": {
 			                      "sun": "domingo",
 			                      "mon": "segunda-feira",
-			                      "tue": "ter�a-feira",
+			                      "tue": "terça-feira",
 			                      "wed": "quarta-feira",
 			                      "thu": "quinta-feira",
 			                      "fri": "sexta-feira",
-			                      "sat": "s�bado"
+			                      "sat": "sábado"
 			                    }
 			                  }
 			                },
@@ -7796,11 +7796,11 @@ function Dictionary(){
 			          "decimal": ".",
 			          "exponential": "E",
 			          "group": ",",
-			          "infinity": "∞",
+			          "infinity": "âˆž",
 			          "minusSign": "-",
 			          "nan": "NaN",
 			          "percentSign": "%",
-			          "perMille": "‰",
+			          "perMille": "â€°",
 			          "plusSign": "+",
 			          "timeSeparator": ":"
 			        },
@@ -7844,7 +7844,7 @@ function Dictionary(){
 			    "plurals-type-cardinal": {
 			      "pt": {
 			        "pluralRule-count-one": "i = 1 and v = 0 @integer 1",
-			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, … @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, …"
+			        "pluralRule-count-other": " @integer 0, 2~16, 100, 1000, 10000, 100000, 1000000, â€¦ @decimal 0.0~1.5, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, â€¦"
 			      }
 			    }
 			  }

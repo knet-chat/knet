@@ -63,7 +63,7 @@ module.exports = function(grunt) {
 					'lib-3.min.js': ['lib-3.js'],
 					'lib-4.min.js': ['lib-4.js'],
 					'config.min.js': ['config.js'],
-					'app.min.js': ['application.js']
+					'app.min.js': ['app.js']
 				}
 			}
 		},

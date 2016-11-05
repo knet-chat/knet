@@ -18,8 +18,8 @@ sleep 3;
 
 SERVER_IP_ADDRESS=`cat $SW_PATH/server/lib/installer/SERVER_IP_ADDRESS.dat`; 
 
-sed "s/TO_BE_REPLACED_BY_INSTALLER_HERE_ipServerAuth/$SERVER_IP_ADDRESS/g" $SW_PATH/client/js/config.js > temp ;
-mv temp $SW_PATH/client/js/config.js;
+sed "s/#TO_BE_REPLACED_BY_INSTALLER_HERE_server_name/$SERVER_IP_ADDRESS/g" $SW_PATH/client/js/config.min.js > temp ;
+mv temp $SW_PATH/client/js/config.min.js;
 
 targetCnt=`cat $SW_PATH/server/lib/installer/NUMBER_OF_INSTANCES.dat`;
 NUMBER_OF_INSTANCES=$(($targetCnt + 0)); 
