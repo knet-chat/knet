@@ -99,8 +99,8 @@ rl.question('Enter your keyGCM: ', function(keyGCM) {
 		
 		console.log('INFO ::: writing configuration of www client');		
 		var clientConfig = fs.readFileSync(__dirname + '/../../../client/js/config.js', 'utf8');		
-		clientConfig = clientConfig.replace(/TO_BE_REPLACED_BY_INSTALLER_HERE_ipServerAuth/g, ipServer );        
-        fs.writeFileSync( __dirname + '/../../../client/js/config.js' , clientConfig + "\n", { encoding : "utf8", flag: 'w'} );
+		clientConfig = clientConfig.replace(/#TO_BE_REPLACED_BY_INSTALLER_HERE_server_name/g, ipServer );        
+        fs.writeFileSync( __dirname + '/../../../client/js/config.min.js' , clientConfig + "\n", { encoding : "utf8", flag: 'w'} );
         
         
 		console.log('INFO ::: writing configuration of shell scripts');	

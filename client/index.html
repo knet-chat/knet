@@ -1,60 +1,40 @@
 <!DOCTYPE html>
 <html>
-    <head>
+	<head>
         <meta charset="utf-8" />
-        <meta name="format-detection" content="telephone=no" />
        	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
-  <!--  
-      
-        <link rel="stylesheet" type="text/css" href="css/jquery.style.1.4.2.css" />
-        <link rel="stylesheet" type="text/css" href="css/jquery.mobile.icons.min.css" />
-		<link rel="stylesheet" type="text/css" href="css/jquery.mobile.structure-1.4.2.css" />		
-        <link rel="stylesheet" type="text/css" href="css/jquery.emojipicker.css" />
-        <link rel="stylesheet" type="text/css" href="css/picedit.css" />
-		<link rel="stylesheet" type="text/css" href="css/application.css" media="all" />				
-		
-		<link rel="stylesheet" type="text/css" href="css/photoswipe-4.0.8.css" />
-		<link rel="stylesheet" type="text/css" href="css/default-skin/default-skin-4.0.8.css"  />		
-		<link rel="stylesheet" type="text/css" href="css/pickadate.js-3.5.6/default.css"  />
-		<link rel="stylesheet" type="text/css" href="css/pickadate.js-3.5.6/default.time.css"  />
-		<link rel="stylesheet" type="text/css" href="css/pickadate.js-3.5.6/default.date.css"  />
-		-->
 		<link rel="stylesheet" type="text/css" href="css/style.min.css"  />	
-		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
-			
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />			
         <title>knet</title>
     </head>
 	<body>
 		<div data-role="page" data-theme="a" id="MainPage">
 			<div data-role="header" data-position="fixed">							
 			  <div class="ui-grid-d">
-			    <div class="ui-block-a"><a id="link2panel" data-role="button" class="ui-nodisc-icon icon-list"><img src="res/list_36x36.png" alt="lists" class="button ui-li-icon ui-corner-none"></a></div>
+			    <div class="ui-block-a"><a id="link2panel" data-role="button" class="ui-nodisc-icon icon-list"><img src="res/list_36x36.png"></a></div>
 			    <div class="ui-block-b"></div>
 			    <div class="ui-block-c"></div>
-			    <div class="ui-block-d"><a data-role="button" class="ui-nodisc-icon icon-list"><img src="res/bubble_36x36.png" alt="lists" class="button2mainPage button ui-li-icon ui-corner-none "></a></div>
-			    <div class="ui-block-e"><a id="mapButtonInMainPage" data-role="button" class="ui-nodisc-icon icon-list"><img src="res/mundo_36x36.png" alt="lists" class="ui-li-icon ui-corner-none "></a></div>
+			    <div class="ui-block-d"><a data-role="button" class="ui-nodisc-icon icon-list"><img src="res/bubble_36x36.png" class="button2mainPage"></a></div>
+			    <div class="ui-block-e"><a id="mapButtonInMainPage" data-role="button" class="ui-nodisc-icon icon-list"><img src="res/mundo_36x36.png"></a></div>
 			  </div>
 			</div>
-			<div id="contentOfMainPage" data-role="content" data-theme="a">
-				
+			<div id="contentOfMainPage" data-role="content" data-theme="a">				
 				<ul id="listOfContactsInMainPage" data-role="listview" data-inset="true" data-divider-theme="a">					
 				</ul>
-
 			</div>
 		</div>		
-		
 		<!-- WARNING: cordova.js only for apache cordova build --> 
 		<script src="cordova.js"></script>
         <!-- WARNING: there are some ad-hoc modifications on forge.bundle.js due to web Worker compatibilities -->        
         <script id="worker_1" type="text/js-worker"> importScripts(base_url + '/js/prime.worker.js');  </script>
-        <!-- WARNING: js/IndexedDBShim.old.js for windows phone build --> 
-        <script src="js/lib-1.min.js"></script>
+        <!-- WARNING: js/IndexedDBShim.old.js for windows phone build -->
+ 
+      	<script src="js/lib-1.min.js"></script>
         <script src="js/lib-2.min.js"></script>
         <script src="js/lib-3.min.js"></script>
-        <script src="js/lib-4.min.js"></script>
+        <script src="js/lib-4.min.js"></script>         
 	    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
-	    <script src="js/app.min.js"></script>
-	    
-	    
+	    <script src="js/config.min.js"></script>
+	    <script src="js/app.min.js"></script>	    
     </body>
 </html>

@@ -1,11 +1,8 @@
 function Config ()  {  
 
-	this.ipServerAuth = "217.127.199.47";
-	this.portServerAuth	= "443";		
+	this.ipServerSockets = "#TO_BE_REPLACED_BY_INSTALLER_HERE_server_name";
+	this.portServerSockets	= "443";		
 
-	this.ipServerSockets = "217.127.199.47";
-	this.portServerSockets	= "443";
-		
 	this.MAX_HEIGHT_IMG = 500;
 	this.MAX_HEIGHT_IMG_PROFILE = 320;
 	this.MAX_LENGTH_TRUNCATED_SMS = 20;

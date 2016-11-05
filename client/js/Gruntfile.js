@@ -23,7 +23,6 @@ module.exports = function(grunt) {
 		        	],
 		        	'lib-2.js': [
 						'twemoji.min.js',
-						'config.js',
 						'log4javascript-1.4.13.js',
 						'photoswipe.min.js',
 						'photoswipe-ui-default.min.js',
@@ -63,6 +62,7 @@ module.exports = function(grunt) {
 					'lib-2.min.js': ['lib-2.js'],
 					'lib-3.min.js': ['lib-3.js'],
 					'lib-4.min.js': ['lib-4.js'],
+					'config.min.js': ['config.js'],
 					'app.min.js': ['application.js']
 				}
 			}

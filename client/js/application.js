@@ -4265,7 +4265,7 @@ Application.prototype.bindPushEvents = function() {
 Application.prototype.connect2paypal = function(myPurchase) {
 	
 	$.ajax({
-		url: 'http://' + config.ipServerAuth +  ":" + config.portServerAuth + '/payment',
+		url: 'http://' + config.ipServerSockets +  ":" + config.portServerSockets + '/payment',
 		method : "POST",
 		data: {	
 			handshakeToken: user.handshakeToken  , 
@@ -5174,7 +5174,7 @@ Application.prototype.establishTLS = function ( params ){
 	}
   	var options = { forceNew : true	, path: '/tls/socket.io'};
 	//var options = { forceNew : true	};
-	var url = 'https://' + config.ipServerAuth +  ":" + config.portServerAuth ;
+	var url = 'https://' + config.ipServerSockets +  ":" + config.portServerSockets ;
   	app.authSocket = io.connect( url, options );
 	
   	app.authSocket.on('connect', function () {
