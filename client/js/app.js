@@ -188,8 +188,9 @@ Postman.prototype.generateKeyPair = function() {
 	options.e = 0x10001;
 	
 	if ( $.browser.chrome ){
+		
 	    var base_url = window.location.href.replace(/\\/g,'/').replace(/\/[^\/]*$/, '');
-	    var array = ['var base_url = "' + base_url + '";' + $('#worker_1').html()];
+	    var array = ['var base_url = "' + base_url + '";' + 'importScripts(base_url + "/js/prime.worker.forChrome.js");'];
 	    var blob = new Blob(array, {type: "text/javascript"});
 	    options.workerScript  = window.URL.createObjectURL(blob);
 		log.debug("$.browser.chrome true");

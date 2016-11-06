@@ -1,40 +1,70 @@
 <!DOCTYPE html>
 <html>
-	<head>
-        <meta charset="utf-8" />
-       	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
-		<link rel="stylesheet" type="text/css" href="css/style.min.css"  />	
-		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />			
-        <title>knet</title>
-    </head>
-	<body>
-		<div data-role="page" data-theme="a" id="MainPage">
-			<div data-role="header" data-position="fixed">							
-			  <div class="ui-grid-d">
-			    <div class="ui-block-a"><a id="link2panel" data-role="button" class="ui-nodisc-icon icon-list"><img src="res/list_36x36.png"></a></div>
-			    <div class="ui-block-b"></div>
-			    <div class="ui-block-c"></div>
-			    <div class="ui-block-d"><a data-role="button" class="ui-nodisc-icon icon-list"><img src="res/bubble_36x36.png" class="button2mainPage"></a></div>
-			    <div class="ui-block-e"><a id="mapButtonInMainPage" data-role="button" class="ui-nodisc-icon icon-list"><img src="res/mundo_36x36.png"></a></div>
-			  </div>
-			</div>
-			<div id="contentOfMainPage" data-role="content" data-theme="a">				
-				<ul id="listOfContactsInMainPage" data-role="listview" data-inset="true" data-divider-theme="a">					
-				</ul>
-			</div>
-		</div>		
-		<!-- WARNING: cordova.js only for apache cordova build --> 
-		<script src="cordova.js"></script>
-        <!-- WARNING: there are some ad-hoc modifications on forge.bundle.js due to web Worker compatibilities -->        
-        <script id="worker_1" type="text/js-worker"> importScripts(base_url + '/js/prime.worker.js');  </script>
-        <!-- WARNING: js/IndexedDBShim.old.js for windows phone build -->
- 
-      	<script src="js/lib-1.min.js"></script>
-        <script src="js/lib-2.min.js"></script>
-        <script src="js/lib-3.min.js"></script>
-        <script src="js/lib-4.min.js"></script>         
-	    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
-	    <script src="js/config.min.js"></script>
-	    <script src="js/app.min.js"></script>	    
-    </body>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+    <link rel="stylesheet" type="text/css" href="css/style.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    <title>knet</title>
+</head>
+
+<body>
+    <div data-role="page" data-theme="a" id="MainPage">
+        <div data-role="header" data-position="fixed">
+            <div class="ui-grid-d">
+                <div class="ui-block-a">
+                    <a id="link2panel" data-role="button" class="ui-nodisc-icon icon-list"><img src="res/list_36x36.png"></a>
+                </div>
+                <div class="ui-block-b"></div>
+                <div class="ui-block-c"></div>
+                <div class="ui-block-d">
+                    <a data-role="button" class="ui-nodisc-icon icon-list"><img src="res/bubble_36x36.png" class="button2mainPage"></a>
+                </div>
+                <div class="ui-block-e">
+                    <a id="mapButtonInMainPage" data-role="button" class="ui-nodisc-icon icon-list"><img src="res/mundo_36x36.png"></a>
+                </div>
+            </div>
+        </div>
+        <div id="contentOfMainPage" data-role="content" data-theme="a">
+            <ul id="listOfContactsInMainPage" data-role="listview" data-inset="true" data-divider-theme="a">
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+    <script type="text/javascript" src="js/fastClick.min.js"></script>
+    <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery.mobile.mobileinit.min.js"></script>
+    <script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="js/jquery.browser.min.0.1.0.js"></script>
+    <script type="text/javascript" src="js/jquery.picedit-1.0.0.min.js"></script>
+    <script type="text/javascript" src="js/jquery.emojipicker.min.js"></script>
+    <script type="text/javascript" src="js/jquery.emojipicker.tw.min.js"></script>
+    <script type="text/javascript" src="js/jquery.debouncedresize.min.js"></script>
+    <script type="text/javascript" src="js/twemoji.min.js"></script>
+    <script type="text/javascript" src="js/log4javascript-1.4.13.min.js"></script>
+    <script type="text/javascript" src="js/photoswipe.min.js"></script>
+    <script type="text/javascript" src="js/photoswipe-ui-default.min.js"></script>
+    <script type="text/javascript" src="js/jsrsasign-4.1.4-all-min.js"></script>
+    <script type="text/javascript" src="js/json-sans-eval-min.js"></script>
+    <script type="text/javascript" src="js/jws-3.0.min.js"></script>
+    <script type="text/javascript" src="js/indexeddbshim.min-2.2.1.js"></script>
+    <script type="text/javascript" src="js/cldr-0.4.3.min.js"></script>
+    <script type="text/javascript" src="js/cldr/event.min.js"></script>
+    <script type="text/javascript" src="js/cldr/supplemental.min.js"></script>
+    <script type="text/javascript" src="js/globalize-1.1.0.min.js"></script>
+    <script type="text/javascript" src="js/globalize/date_number.min.js"></script>
+    <script type="text/javascript" src="js/socket.io-1.3.5.min.js"></script>
+    <script type="text/javascript" src="js/pickadate.js-3.5.6/picker.min.js"></script>
+    <script type="text/javascript" src="js/pickadate.js-3.5.6/picker.date.min.js"></script>
+    <script type="text/javascript" src="js/pickadate.js-3.5.6/picker.time.min.js"></script>
+    <script type="text/javascript" src="js/pickadate.js-3.5.6/legacy.min.js"></script>
+    <script type="text/javascript" src="js/easyrtc-1.0.15..minjs"></script>
+    <script type="text/javascript" src="js/forge.bundle-0.7.0.min.js"></script>
+    <script type="text/javascript" src="js/config.min.js"></script>
+    <script type="text/javascript" src="js/app.min.js"></script>
+
+</body>
+
 </html>

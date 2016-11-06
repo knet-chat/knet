@@ -1,6 +1,7 @@
 function Config ()  {  
 
-	this.ipServerSockets = "#TO_BE_REPLACED_BY_INSTALLER_HERE_server_name";
+//	this.ipServerSockets = "#TO_BE_REPLACED_BY_INSTALLER_HERE_server_name";
+	this.ipServerSockets = "217.127.199.47";
 	this.portServerSockets	= "443";		
 
 	this.MAX_HEIGHT_IMG = 500;
