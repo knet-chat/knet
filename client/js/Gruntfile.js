@@ -11,7 +11,7 @@ module.exports = function(grunt) {
 			},
 			cordova: {
 				files: {
-		        	'lib-1.js': [
+		        	'libs.js': [
 		   				'fastClick.js',
 						'jquery-1.10.2.min.js',
 						'jquery.mobile.mobileinit.js',
@@ -20,18 +20,14 @@ module.exports = function(grunt) {
 						'jquery.picedit-1.0.0.js',
 						'jquery.emojipicker.js',
 						'jquery.emojipicker.tw.js',
-						'jquery.debouncedresize.js'
-		        	],
-		        	'lib-2.js': [
+						'jquery.debouncedresize.js',
 						'twemoji.min.js',
 						'log4javascript-1.4.13.js',
 						'photoswipe.min.js',
 						'photoswipe-ui-default.min.js',
 						'jsrsasign-4.1.4-all-min.js',
 						'json-sans-eval-min.js',
-						'jws-3.0.min.js'						
-					],
-		        	'lib-3.js': [
+						'jws-3.0.min.js',						
  						'indexeddbshim.min-2.2.1.js',
 						'cldr-0.4.3.js',
 						'./cldr/event.js',
@@ -43,10 +39,10 @@ module.exports = function(grunt) {
  						'pickadate.js-3.5.6/picker.date.js',
  						'pickadate.js-3.5.6/picker.time.js',
  						'pickadate.js-3.5.6/legacy.js',
- 						'easyrtc-1.0.15.js'
- 		        	],
-		        	'lib-4.js': [ 
-        	              'forge.bundle-0.7.0.js'
+ 						'easyrtc-1.0.15.js',
+						'forge.bundle-0.7.0.js',
+						'leaflet-1.0.1.js',
+    	             	'config.js'
 		        	]
 		      	}
 			}
@@ -60,11 +56,7 @@ module.exports = function(grunt) {
 			},
 			cordova: {
 				files: {
-					'lib-1.min.js': ['lib-1.js'],
-					'lib-2.min.js': ['lib-2.js'],
-					'lib-3.min.js': ['lib-3.js'],
-					'lib-4.min.js': ['lib-4.js'],
-					'config.min.js': ['config.js'],
+					'libs.min.js': ['libs.js'],
 					'app.min.js': ['app.js']
 				}
 			},
@@ -97,8 +89,9 @@ module.exports = function(grunt) {
 					'pickadate.js-3.5.6/picker.date.min.js':	'pickadate.js-3.5.6/picker.date.js',
 					'pickadate.js-3.5.6/picker.time.min.js':	'pickadate.js-3.5.6/picker.time.js',
 					'pickadate.js-3.5.6/legacy.min.js':	'pickadate.js-3.5.6/legacy.js',
-					'easyrtc-1.0.15..minjs': 'easyrtc-1.0.15.js',
+					'easyrtc-1.0.15.min.js': 'easyrtc-1.0.15.js',
 					'forge.bundle-0.7.0.min.js':'forge.bundle-0.7.0.js',
+					'leaflet-1.0.1.min.js': 'leaflet-1.0.1.js',
 					'config.min.js': 'config.js',
 					'app.min.js': 'app.js'
 				}
@@ -107,7 +100,7 @@ module.exports = function(grunt) {
 		},
 		clean: {
 			cordova: {
-				src: ['lib-1.js', 'lib-2.js','lib-3.js', 'lib-4.js']
+				src: ['libs.js']
 			}
 		},		
 		cssmin: {
@@ -189,18 +182,38 @@ module.exports = function(grunt) {
         					'pickadate.js-3.5.6/picker.date.min.js',
         					'pickadate.js-3.5.6/picker.time.min.js',
         					'pickadate.js-3.5.6/legacy.min.js',
-        					'easyrtc-1.0.15..minjs',
-        					'forge.bundle-0.7.0.min.js',        					
+        					'easyrtc-1.0.15.min.js',
+        					'forge.bundle-0.7.0.min.js',
+        					'leaflet-1.0.1.min.js',
         					'config.min.js',
         					'app.min.js'
 	                    ]
 	                },
 	                styles: {
+	                    bundle: []
+	                },	                
+	                data: {
+	                    // Data to pass to templates 
+	                    version: "0.1.0",
+	                    title: "test",
+	                },
+	            }
+	        },
+	        cordova: {
+	            src: '../htm/index.html',
+	            dest: '../index.html',
+	            options: {
+	                beautify: true,
+	                relative: true,
+	                basePath: false,
+	                scripts: {
 	                    bundle: [
-	                        '<%= fixturesPath %>/css/libs.css',
-	                        '<%= fixturesPath %>/css/dev.css'
-	                    ],
-	                    test: '<%= fixturesPath %>/css/inline.css'
+         					'libs.min.js',
+        					'app.min.js'
+	                    ]
+	                },
+	                styles: {
+	                    bundle: []
 	                },	                
 	                data: {
 	                    // Data to pass to templates 
@@ -221,7 +234,6 @@ module.exports = function(grunt) {
 
 
 	//register the task
-	//grunt.registerTask('build_web', ['cssmin:web','uglify:web','htmlbuild:web']);
-	grunt.registerTask('build_web', ['htmlbuild:web']);
+	grunt.registerTask('build_web', ['cssmin:web','uglify:web','htmlbuild:web']);
 	grunt.registerTask('build_cordova', ['concat:cordova', 'cssmin:cordova','uglify:cordova','clean:cordova']);
 };
