@@ -115,6 +115,7 @@ module.exports = function(grunt) {
 						'../css/jquery.mobile.structure-1.4.2.css',
 						'../css/jquery.emojipicker.css',
 						'../css/picedit.css',
+						'../css/leaflet-1.0.1.css',
 						'../css/application.css',
 						'../css/photoswipe-4.0.8.css',
 						'../css/default-skin/default-skin-4.0.8.css',
@@ -135,6 +136,7 @@ module.exports = function(grunt) {
 						'../css/jquery.mobile.structure-1.4.2.css',
 						'../css/jquery.emojipicker.css',
 						'../css/picedit.css',
+						'../css/leaflet-1.0.1.css',
 						'../css/application.css',
 						'../css/photoswipe-4.0.8.css',
 						'../css/default-skin/default-skin-4.0.8.css',
@@ -187,7 +189,8 @@ module.exports = function(grunt) {
         					'leaflet-1.0.1.min.js',
         					'config.min.js',
         					'app.min.js'
-	                    ]
+	                    ],
+	                    cordova: [  ]
 	                },
 	                styles: {
 	                    bundle: []
@@ -210,7 +213,10 @@ module.exports = function(grunt) {
 	                    bundle: [
          					'libs.min.js',
         					'app.min.js'
-	                    ]
+	                    ],
+	                    cordova: [
+	           				'cordova.js'
+	  	                ]
 	                },
 	                styles: {
 	                    bundle: []
@@ -235,5 +241,5 @@ module.exports = function(grunt) {
 
 	//register the task
 	grunt.registerTask('build_web', ['cssmin:web','uglify:web','htmlbuild:web']);
-	grunt.registerTask('build_cordova', ['concat:cordova', 'cssmin:cordova','uglify:cordova','clean:cordova']);
+	grunt.registerTask('build_cordova', ['concat:cordova', 'cssmin:cordova','uglify:cordova','clean:cordova','htmlbuild:cordova']);
 };
