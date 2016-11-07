@@ -1,3 +1,0 @@
-[submodule "server/lib/easyrtc"]
-	path = server/lib/easyrtc
-	url = https://github.com/priologic/easyrtc.git

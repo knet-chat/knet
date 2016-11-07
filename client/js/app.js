@@ -4718,6 +4718,7 @@ Application.prototype.registrationProcess = function(){
 
 Application.prototype.init = function() {
 	
+	window.shimIndexedDB.__useShim();
 	gui.loadBody();
 	gui.loadAsideMenuMainPage();
 	gui.bindDOMevents();	
@@ -7871,9 +7872,8 @@ function Dictionary(){
  * *********************************************************************************************
  * *********************************************************************************************/
 
-//	window.shimIndexedDB.__debug(false);
-//  window.shimIndexedDB.__useShim();
-log4javascript.setEnabled(true);
+window.shimIndexedDB.__debug(false);
+log4javascript.setEnabled(false);
 
 /***********************************************************************************************
  * *********************************************************************************************
