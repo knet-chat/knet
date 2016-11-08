@@ -1,7 +1,6 @@
 function Config ()  {  
 
-//	this.ipServerSockets = "#TO_BE_REPLACED_BY_INSTALLER_HERE_server_name";
-	this.ipServerSockets = "217.127.199.47";
+	this.ipServerSockets = "#TO_BE_REPLACED_BY_GRUNT_server_name";
 	this.portServerSockets	= "443";		
 
 	this.MAX_HEIGHT_IMG = 500;
@@ -32,7 +31,12 @@ function Config ()  {
 	this.TIME_WAIT_PICKUP = 60000;
 	
 	this.pushOptions = {
-		"android": { senderID: "442395718407", clearNotifications : true, forceShow : true , icon: "icon" },
+		"android": { 
+			"senderID": "442395718407",
+			"clearNotifications" : true,
+			"forceShow" : true ,
+			"icon": "icon" 
+		},
 		"ios": { "alert": "true", "badge": "true", "sound": "true" },
 		"windows": {}
 	}; 

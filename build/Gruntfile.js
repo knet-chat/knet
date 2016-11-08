@@ -2,7 +2,7 @@ module.exports = function(grunt) {
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		myCustom : grunt.file.readJSON('package.json'),
+		myConfig : grunt.file.readJSON('../server/lib/config.json'),
 		concat: {
 			options: {
 				separator: "\n", //add a new line after each file
@@ -28,7 +28,7 @@ module.exports = function(grunt) {
 						'../client/js/jsrsasign-4.1.4-all-min.js',
 						'../client/js/json-sans-eval-min.js',
 						'../client/js/jws-3.0.min.js',						
- 						'../client/js/indexeddbshim.min-2.2.1.js',
+//it's added by plug-in'../client/js/indexeddbshim.min-2.2.1.js',
 						'../client/js/cldr-0.4.3.js',
 						'../client/js/./cldr/event.js',
 						'../client/js/./cldr/supplemental.js',
@@ -188,7 +188,8 @@ module.exports = function(grunt) {
         					'../client/js/forge.bundle-0.7.0.min.js',
         					'../client/js/leaflet-1.0.1.min.js',
         					'../client/js/config.min.js',
-        					'../client/js/app.min.js'
+        					//'../client/js/app.min.js'
+        					'../client/js/app.js'
 	                    ],
 	                    cordova: [  ]
 	                },
@@ -218,6 +219,19 @@ module.exports = function(grunt) {
 	                }
 	            }
 	        }
+	    },
+	    'string-replace': {
+	    	any: {
+	    		files: {
+    				'../client/js/config.js': '../client/js/config.js'
+	    	    },
+	    	    options: {
+	    	      replacements: [{
+	    	        pattern: /#TO_BE_REPLACED_BY_GRUNT_server_name/ig,
+	    	        replacement: '<%= myConfig.listOfServerSockets[0].ipServerSockets %>'
+	    	      }]
+	    	    }
+	    	  }
 	    }
 	});	
 
@@ -227,9 +241,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-html-build');
-
+	grunt.loadNpmTasks('grunt-string-replace');
 
 	//register the task
-	grunt.registerTask('build_web', ['cssmin:web','uglify:web','htmlbuild:web']);
-	grunt.registerTask('build_cordova', ['concat:cordova', 'cssmin:cordova','uglify:cordova','htmlbuild:cordova']);
+	grunt.registerTask('build:web', ['string-replace','cssmin:web','uglify:web','htmlbuild:web']);
+	grunt.registerTask('build:cordova', ['string-replace','concat:cordova', 'cssmin:cordova','uglify:cordova','htmlbuild:cordova']);
 };
