@@ -1136,6 +1136,16 @@
 } 
 */
 
+.chat-multimedia-image{
+    width: 100%;
+    width: 37px;
+    height: 37px;
+}
+.searchBtn{
+    width: 100%;
+    max-width: 36px;  
+}
+
 
 .imgOfChat-page-header {
     width: 100%;

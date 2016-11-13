@@ -27,8 +27,8 @@ module.exports = function(grunt) {
 						'../client/js/photoswipe-ui-default.min.js',
 						'../client/js/jsrsasign-4.1.4-all-min.js',
 						'../client/js/json-sans-eval-min.js',
-						'../client/js/jws-3.0.min.js',						
-//it's added by plug-in'../client/js/indexeddbshim.min-2.2.1.js',
+						'../client/js/jws-3.0.min.js',
+						'../client/js/IndexedDBShim.old.js',
 						'../client/js/cldr-0.4.3.js',
 						'../client/js/./cldr/event.js',
 						'../client/js/./cldr/supplemental.js',
@@ -56,17 +56,47 @@ module.exports = function(grunt) {
 			},
 			cordova: {
 				files: {
-					'../client/js/libs.min.js': ['../client/js/libs.js'],
-					'../client/js/app.min.js': ['../client/js/app.js']
+	   				'../client/js/fastClick.min.js' : '../client/js/fastClick.js',
+					'../client/js/jquery-1.10.2.min.js': '../client/js/jquery-1.10.2.min.js',
+					'../client/js/jquery.mobile.mobileinit.min.js': '../client/js/jquery.mobile.mobileinit.js',
+					'../client/js/jquery.browser.min.0.1.0.js': '../client/js/jquery.browser.min.0.1.0.js',
+					'../client/js/jquery.mobile-1.4.5.min.js': '../client/js/jquery.mobile-1.4.5.min.js',
+					'../client/js/jquery.picedit-1.0.0.min.js':'../client/js/jquery.picedit-1.0.0.js',
+					'../client/js/jquery.emojipicker.min.js':'../client/js/jquery.emojipicker.js',
+					'../client/js/jquery.emojipicker.tw.min.js':'../client/js/jquery.emojipicker.tw.js',
+					'../client/js/jquery.debouncedresize.min.js':'../client/js/jquery.debouncedresize.js',	        
+					'../client/js/twemoji.min.js':'../client/js/twemoji.min.js',
+					'../client/js/log4javascript-1.4.13.min.js':'../client/js/log4javascript-1.4.13.js',
+					'../client/js/photoswipe.min.js':'../client/js/photoswipe.min.js',
+					'../client/js/photoswipe-ui-default.min.js':'../client/js/photoswipe-ui-default.min.js',
+					'../client/js/jsrsasign-4.1.4-all-min.js': '../client/js/jsrsasign-4.1.4-all-min.js',
+					'../client/js/json-sans-eval-min.js':'../client/js/json-sans-eval-min.js',
+					'../client/js/jws-3.0.min.js':'../client/js/jws-3.0.min.js',        
+					'../client/js/indexeddbshim.min-2.2.1.js':	'../client/js/indexeddbshim.min-2.2.1.js',
+					'../client/js/cldr-0.4.3.min.js':'../client/js/cldr-0.4.3.js',
+					'../client/js/cldr/event.min.js':'../client/js/cldr/event.js',
+					'../client/js/cldr/supplemental.min.js': '../client/js/cldr/supplemental.js',
+					'../client/js/globalize-1.1.0.min.js':'../client/js/globalize-1.1.0.js',
+					'../client/js/globalize/date_number.min.js': '../client/js/globalize/date_number.min.js',
+					'../client/js/socket.io-1.3.5.min.js':'../client/js/socket.io-1.3.5.js',
+					'../client/js/pickadate.js-3.5.6/picker.min.js': 	'../client/js/pickadate.js-3.5.6/picker.js',
+					'../client/js/pickadate.js-3.5.6/picker.date.min.js':	'../client/js/pickadate.js-3.5.6/picker.date.js',
+					'../client/js/pickadate.js-3.5.6/picker.time.min.js':	'../client/js/pickadate.js-3.5.6/picker.time.js',
+					'../client/js/pickadate.js-3.5.6/legacy.min.js':	'../client/js/pickadate.js-3.5.6/legacy.js',
+					'../client/js/easyrtc-1.0.15.min.js': '../client/js/easyrtc-1.0.15.js',
+					'../client/js/forge.bundle-0.7.0.min.js':'../client/js/forge.bundle-0.7.0.js',
+					'../client/js/leaflet-1.0.1.min.js': '../client/js/leaflet-1.0.1.js',
+					'../client/js/config.min.js': '../client/js/config.js',
+					'../client/js/app.min.js': '../client/js/app.js'
 				}
 			},
 			web: {
 				files: {
 	   				'../client/js/fastClick.min.js' : '../client/js/fastClick.js',
 					'../client/js/jquery-1.10.2.min.js': '../client/js/jquery-1.10.2.min.js',
-					'../client/js/jquery.mobile.mobileinit.min.js': '../client/js/jquery.mobile.mobileinit.js',					
-					'../client/js/jquery.mobile-1.4.5.min.js': '../client/js/jquery.mobile-1.4.5.min.js',
+					'../client/js/jquery.mobile.mobileinit.min.js': '../client/js/jquery.mobile.mobileinit.js',
 					'../client/js/jquery.browser.min.0.1.0.js': '../client/js/jquery.browser.min.0.1.0.js',
+					'../client/js/jquery.mobile-1.4.5.min.js': '../client/js/jquery.mobile-1.4.5.min.js',
 					'../client/js/jquery.picedit-1.0.0.min.js':'../client/js/jquery.picedit-1.0.0.js',
 					'../client/js/jquery.emojipicker.min.js':'../client/js/jquery.emojipicker.js',
 					'../client/js/jquery.emojipicker.tw.min.js':'../client/js/jquery.emojipicker.tw.js',
@@ -190,8 +220,7 @@ module.exports = function(grunt) {
         					'../client/js/config.min.js',
         					//'../client/js/app.min.js'
         					'../client/js/app.js'
-	                    ],
-	                    cordova: [  ]
+	                    ]
 	                },
 	                styles: {
 	                    bundle: []
@@ -207,12 +236,39 @@ module.exports = function(grunt) {
 	                basePath: false,
 	                scripts: {
 	                    bundle: [
-         					'../client/js/libs.min.js',
+        	   				'../client/js/fastClick.min.js' ,
+        					'../client/js/jquery-1.10.2.min.js',
+        					'../client/js/jquery.mobile.mobileinit.min.js',					
+        					'../client/js/jquery.mobile-1.4.5.min.js',
+        					'../client/js/jquery.browser.min.0.1.0.js',
+        					'../client/js/jquery.emojipicker.min.js',
+        					'../client/js/jquery.emojipicker.tw.min.js',
+        					'../client/js/jquery.debouncedresize.min.js',
+        					'../client/js/jquery.picedit-1.0.0.min.js',
+        					'../client/js/twemoji.min.js',
+        					'../client/js/log4javascript-1.4.13.min.js',
+        					'../client/js/photoswipe.min.js',
+        					'../client/js/photoswipe-ui-default.min.js',
+        					'../client/js/jsrsasign-4.1.4-all-min.js',
+        					'../client/js/json-sans-eval-min.js',
+        					'../client/js/jws-3.0.min.js',        
+        					'../client/js/indexeddbshim.min-2.2.1.js',
+        					'../client/js/cldr-0.4.3.min.js',
+        					'../client/js/cldr/event.min.js',
+        					'../client/js/cldr/supplemental.min.js',
+        					'../client/js/globalize-1.1.0.min.js',
+        					'../client/js/globalize/date_number.min.js',
+        					'../client/js/socket.io-1.3.5.min.js',
+        					'../client/js/pickadate.js-3.5.6/picker.min.js',
+        					'../client/js/pickadate.js-3.5.6/picker.date.min.js',
+        					'../client/js/pickadate.js-3.5.6/picker.time.min.js',
+        					'../client/js/pickadate.js-3.5.6/legacy.min.js',
+        					'../client/js/easyrtc-1.0.15.min.js',
+        					'../client/js/forge.bundle-0.7.0.min.js',
+        					'../client/js/leaflet-1.0.1.min.js',
+        					'../client/js/config.min.js',
         					'../client/js/app.min.js'
-	                    ],
-	                    cordova: [
-	           				'../client/js/cordova.js'
-	  	                ]
+	                    ]
 	                },
 	                styles: {
 	                    bundle: []
@@ -223,12 +279,23 @@ module.exports = function(grunt) {
 	    'string-replace': {
 	    	any: {
 	    		files: {
-    				'../client/js/config.js': '../client/js/config.js'
+    				'../client/js/config.js': '../client/js/config.template.js'
 	    	    },
 	    	    options: {
 	    	      replacements: [{
 	    	        pattern: /#TO_BE_REPLACED_BY_GRUNT_server_name/ig,
 	    	        replacement: '<%= myConfig.listOfServerSockets[0].ipServerSockets %>'
+	    	      }]
+	    	    }
+	    	  },
+	    	cordova: {
+	    		files: {
+    				'../client/index.html': '../client/index.html'
+	    	    },
+	    	    options: {
+	    	      replacements: [{
+	    	        pattern: /<!-- htmlreplace:cordova -->/ig,
+	    	        replacement: '<script type="text/javascript" src="cordova.js"></script>'
 	    	      }]
 	    	    }
 	    	  }
@@ -244,6 +311,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-string-replace');
 
 	//register the task
-	grunt.registerTask('build:web', ['string-replace','cssmin:web','uglify:web','htmlbuild:web']);
-	grunt.registerTask('build:cordova', ['string-replace','concat:cordova', 'cssmin:cordova','uglify:cordova','htmlbuild:cordova']);
+	grunt.registerTask('build:web', ['string-replace:any','cssmin:web','uglify:web','htmlbuild:web']);
+	grunt.registerTask('build:cordova', ['string-replace:any', 'cssmin:cordova','uglify:cordova','htmlbuild:cordova','string-replace:cordova']);
 };

@@ -997,7 +997,6 @@ GUI.prototype.bindButtonsOnMainPage = function() {
 		$.browser.ipad || $.browser.iphone || $.browser.ipod || 
 		app.isMobile && (app.devicePlatform == "WinCE" || app.devicePlatform == "Win32NT") ){
 		$('#link2activateAccount').remove().trigger( "updatelayout" );
-		//$('#link2searchPage').remove().trigger( "updatelayout" );		
 		$('#mypanel-list').listview().listview('refresh');
 		$( "#mypanel" ).trigger( "updatelayout" );
 	}
@@ -1118,10 +1117,10 @@ GUI.prototype.bindDOMevents = function(){
 		.on("input", function() {
 			var textMessage = $("#chat-input").val();
 			if (textMessage == '') {
-				$('#chat-multimedia-image').attr("src", "res/multimedia_50x37.png");
-				$("#chat-multimedia-button").unbind().bind( "click", gui.showImagePic );		
+				$('#chat-multimedia-image').attr("src", "res/multimedia.png");
+				$("#chat-multimedia-button").unbind().bind( "click", gui.showImagePic );
 			}else{
-				$('#chat-multimedia-image').attr("src", "res/smile_50x37.png");
+				$('#chat-multimedia-image').attr("src", "js/36x36/1f600.png");
 				$("#chat-multimedia-button").unbind().bind( "click", gui.showEmojis );
 			}
 		})
@@ -1156,11 +1155,11 @@ GUI.prototype.bindDOMevents = function(){
 			}
 		})
 		.focus(function() {
-			$('#chat-multimedia-image').attr("src", "res/smile_50x37.png");
+			$('#chat-multimedia-image').attr("src", "js/36x36/1f600.png");
 			$("#chat-multimedia-button").unbind().bind( "click", gui.showEmojis );
 		})
 		.click(function() {
-			$('#chat-multimedia-image').attr("src", "res/smile_50x37.png");
+			$('#chat-multimedia-image').attr("src", "js/36x36/1f600.png");
 			$("#chat-multimedia-button").unbind().bind( "click", gui.showEmojis );
 		});	
 	
@@ -1334,6 +1333,12 @@ GUI.prototype.bindDOMevents = function(){
 	
 	$("#performCall").on("click", function(){		
 		easyrtc._peerRequest4aCall();
+	});
+	
+	$(".searchBtn").click(function(){		
+		if ( app.myPosition.coords.latitude != "" ){
+			$('body').pagecontainer('change', '#searchPage', { transition : "none" });
+		}
 	});
 
 };
@@ -1768,7 +1773,7 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<\/div><!-- \/content -->";
 	strVar += "			<div data-role=\"footer\" data-position=\"fixed\">				";
 	strVar += "				<div id=\"chat-multimedia-button\" class=\"ui-block-20percent\" >					";
-	strVar += "					<a data-role=\"button\" ><img id=\"chat-multimedia-image\" src=\"res\/multimedia_50x37.png\"> <\/a>";
+	strVar += "					<a data-role=\"button\" ><img id=\"chat-multimedia-image\" src=\"res\/multimedia.png\" class=\"chat-multimedia-image\"> <\/a>";
 	strVar += "				 <\/div>";
 	strVar += "				<div class=\"ui-block-80percent\">							";
 	strVar += "					<textarea data-role=\"none\" id=\"chat-input\" data-lastkeyup=\"0\" class=\"textarea-chat ui-input-text ui-body-inherit ui-textinput-autogrow\"> <\/textarea> 				   								";
@@ -2395,9 +2400,10 @@ GUI.prototype.onChatInput = function() {
 
 	postman.sendMsg( message2send );	
 	
-	$('#chat-multimedia-image').attr("src", "res/multimedia_50x37.png");
+	$('#chat-multimedia-image').attr("src", "res/multimedia.png");
 	$("#chat-multimedia-button").unbind( "click",  gui.showEmojis);
 	$("#chat-multimedia-button").bind( "click", gui.showImagePic );
+
 	
 	var obj = abstractHandler.getObjById( app.currentChatWith ); 
 	if ( ! obj.isAccepted ) gui.onConsentButton();
@@ -6034,7 +6040,16 @@ function Dictionary(){
 			                      "sat": "Saturday"
 			                    }
 			                  }
-			                }
+			                },
+				            "dateFormats": {
+				              "medium": "d/M/y"
+				            },
+				            "timeFormats": {
+				              "medium": "HH:mm",
+				            },
+				            "dateTimeFormats": {
+				              "medium": "{1} {0}"
+				            }
 			          	}	
 			        },
 			        "fields": {
