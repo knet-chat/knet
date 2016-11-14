@@ -1108,11 +1108,12 @@ GUI.prototype.bindDOMevents = function(){
 	});
 
 	$("#chat-input")
-	    .css( { "width": $(window).width() * 0.70 , "height" : 54 } )
+//	    .css( { "width": $(window).width() * 0.70 , "height" : 54 } )
+		.css( { "width": $(window).width() * 0.59 , "height" : 54 } )
 	    .emojiPicker({
 		    width: $(window).width(),
 		    height: $(window).height(),
-		    button: false
+		    button: false,
 		})
 		.on("input", function() {
 			var textMessage = $("#chat-input").val();
@@ -1291,8 +1292,11 @@ GUI.prototype.bindDOMevents = function(){
 	
 	$(window).on("debouncedresize", function( event ) {
 		$('#chat-input')
-			.css( { "width": $(window).width() * 0.70 , "height" : 54 } ) 
-			.emojiPicker("reset"); 
+//			.css( { "width": $(window).width() * 0.59 , "height" : 54 } ) 
+			.css( { "width": $(window).width() * 0.59 } )
+			.emojiPicker("reset");
+		$('#chat-input').emojiPicker("reset");		 
+
 	});	
 	$("#link2profileOfContact").bind("click", function(){ gui.showProfile(); } );	
 
@@ -1771,14 +1775,15 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<\/div><!-- \/header -->";
 	strVar += "			<div id=\"chat-page-content\" role=\"main\" class=\"ui-content\">";
 	strVar += "			<\/div><!-- \/content -->";
-	strVar += "			<div data-role=\"footer\" data-position=\"fixed\">				";
-	strVar += "				<div id=\"chat-multimedia-button\" class=\"ui-block-20percent\" >					";
-	strVar += "					<a data-role=\"button\" ><img id=\"chat-multimedia-image\" src=\"res\/multimedia.png\" class=\"chat-multimedia-image\"> <\/a>";
-	strVar += "				 <\/div>";
-	strVar += "				<div class=\"ui-block-80percent\">							";
-	strVar += "					<textarea data-role=\"none\" id=\"chat-input\" data-lastkeyup=\"0\" class=\"textarea-chat ui-input-text ui-body-inherit ui-textinput-autogrow\"> <\/textarea> 				   								";
-	strVar += "				<\/div>";
-	//strVar += "			   <button id=\"chat-input-button\" type=\"submit\" data-theme=\"a\">send<\/button>			";
+	strVar += "			<div data-role=\"footer\" data-position=\"fixed\">";
+	
+	strVar += "				<div class=\"ui-grid-d\">";
+	strVar += "					<div class=\"ui-block-a\" id=\"chat-multimedia-button\"><a data-role=\"button\" ><img id=\"chat-multimedia-image\" src=\"res\/multimedia.png\" class=\"chat-multimedia-image\"> <\/a><\/div>";
+	strVar += "				    <div class=\"ui-block-b ui-block-span3\"> <textarea id=\"chat-input\" data-lastkeyup=\"0\" class=\"textarea-chat\"> <\/textarea> <\/div>";
+	strVar += "				    <div class=\"ui-block-e\"><div class=\"vertical-right\">  <div data-role=\"none\" class=\"pswp__button pswp__button--share\" > </div> </div><\/div>";
+	strVar += "			  	<\/div>";
+
+
 	strVar += "			<\/div><!-- \/footer -->";
 	strVar += "		<\/div><!-- \/page chat-page-->		";
 	

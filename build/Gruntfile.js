@@ -148,7 +148,7 @@ module.exports = function(grunt) {
 						'../client/css/leaflet-1.0.1.css',
 						'../client/css/application.css',
 						'../client/css/photoswipe-4.0.8.css',
-						'../client/css/default-skin/default-skin-4.0.8.css',
+						'../client/css/photoswipe-skin-4.0.8.css',
 						'../client/css/pickadate.js-3.5.6/default.css',
 						'../client/css/pickadate.js-3.5.6/default.time.css',
 						'../client/css/pickadate.js-3.5.6/default.date.css'
@@ -169,7 +169,7 @@ module.exports = function(grunt) {
 						'../client/css/leaflet-1.0.1.css',
 						'../client/css/application.css',
 						'../client/css/photoswipe-4.0.8.css',
-						'../client/css/default-skin/default-skin-4.0.8.css',
+						'../client/css/photoswipe-skin-4.0.8.css',
 						'../client/css/pickadate.js-3.5.6/default.css',
 						'../client/css/pickadate.js-3.5.6/default.time.css',
 						'../client/css/pickadate.js-3.5.6/default.date.css'
@@ -218,12 +218,11 @@ module.exports = function(grunt) {
         					'../client/js/forge.bundle-0.7.0.min.js',
         					'../client/js/leaflet-1.0.1.min.js',
         					'../client/js/config.min.js',
-        					//'../client/js/app.min.js'
         					'../client/js/app.js'
 	                    ]
 	                },
 	                styles: {
-	                    bundle: []
+	                	bundle: ['../client/css/style.min.css']
 	                }
 	            }
 	        },
@@ -271,7 +270,68 @@ module.exports = function(grunt) {
 	                    ]
 	                },
 	                styles: {
-	                    bundle: []
+	                    bundle: ['../client/css/style.min.css']
+	                }
+	            }
+	        },
+	        dev: {
+	            src: '../client/htm/index.html',
+	            dest: '../client/index.html',
+	            options: {
+	                beautify: true,
+	                relative: true,
+	                basePath: false,
+	                scripts: {
+	                    bundle: [
+         	   				'../client/js/fastClick.js',
+        					'../client/js/jquery-1.10.2.min.js',
+        					'../client/js/jquery.mobile.mobileinit.js',
+        					'../client/js/jquery.browser.min.0.1.0.js',
+        					'../client/js/jquery.mobile-1.4.5.min.js',
+        					'../client/js/jquery.picedit-1.0.0.js',
+        					'../client/js/jquery.emojipicker.js',
+        					'../client/js/jquery.emojipicker.tw.js',
+        					'../client/js/jquery.debouncedresize.js',	        
+        					'../client/js/twemoji.min.js',
+        					'../client/js/log4javascript-1.4.13.js',
+        					'../client/js/photoswipe.min.js',
+        					'../client/js/photoswipe-ui-default.min.js',
+        					'../client/js/jsrsasign-4.1.4-all-min.js',
+        					'../client/js/json-sans-eval-min.js',
+        					'../client/js/jws-3.0.min.js',        
+        					'../client/js/indexeddbshim.min-2.2.1.js',
+        					'../client/js/cldr-0.4.3.js',
+        					'../client/js/cldr/event.js',
+        					'../client/js/cldr/supplemental.js',
+        					'../client/js/globalize-1.1.0.js',
+        					'../client/js/globalize/date_number.min.js',
+        					'../client/js/socket.io-1.3.5.js',
+        					'../client/js/pickadate.js-3.5.6/picker.js',
+        					'../client/js/pickadate.js-3.5.6/picker.date.js',
+        					'../client/js/pickadate.js-3.5.6/picker.time.js',
+        					'../client/js/pickadate.js-3.5.6/legacy.js',
+        					'../client/js/easyrtc-1.0.15.js',
+        					'../client/js/forge.bundle-0.7.0.js',
+        					'../client/js/leaflet-1.0.1.js',
+        					'../client/js/config.js',
+        					'../client/js/app.js'
+	                    ]
+	                },
+	                styles: {
+	                	bundle: [
+            	         	'../client/css/jquery.style.1.4.2.css',
+    						'../client/css/jquery.mobile.icons.min.css',
+    						'../client/css/jquery.mobile.structure-1.4.2.css',
+    						'../client/css/jquery.emojipicker.css',
+    						'../client/css/picedit.css',
+    						'../client/css/leaflet-1.0.1.css',
+    						'../client/css/application.css',
+    						'../client/css/photoswipe-4.0.8.css',
+    						'../client/css/photoswipe-skin-4.0.8.css',
+    						'../client/css/pickadate.js-3.5.6/default.css',
+    						'../client/css/pickadate.js-3.5.6/default.time.css',
+    						'../client/css/pickadate.js-3.5.6/default.date.css'
+    					]
 	                }
 	            }
 	        }
@@ -312,5 +372,7 @@ module.exports = function(grunt) {
 
 	//register the task
 	grunt.registerTask('build:web', ['string-replace:any','cssmin:web','uglify:web','htmlbuild:web']);
-	grunt.registerTask('build:cordova', ['string-replace:any', 'cssmin:cordova','uglify:cordova','htmlbuild:cordova','string-replace:cordova']);
+	grunt.registerTask('build:cordova', ['string-replace:any', 'htmlbuild:cordova','string-replace:cordova']);
+	grunt.registerTask('build:dev', ['string-replace:any', 'htmlbuild:dev']);
+
 };

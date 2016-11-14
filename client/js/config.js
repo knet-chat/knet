@@ -1,6 +1,6 @@
 function Config ()  {  
 
-	this.ipServerSockets = "#TO_BE_REPLACED_BY_GRUNT_server_name";
+	this.ipServerSockets = "www.knet-chat.org";
 	this.portServerSockets	= "443";		
 
 	this.MAX_HEIGHT_IMG = 500;
