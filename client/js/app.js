@@ -1288,8 +1288,7 @@ GUI.prototype.bindDOMevents = function(){
 	 .text( dictionary.Literals.label_38 )
 	 .data( 'action', 'create' );
 	 
-	//$(document).on("click","#firstLoginInputButton", gui.firstLogin );
-	
+
 	$(window).on("debouncedresize", function( event ) {
 		$('#chat-input')
 //			.css( { "width": $(window).width() * 0.59 , "height" : 54 } ) 
@@ -1317,18 +1316,10 @@ GUI.prototype.bindDOMevents = function(){
 		$('body').pagecontainer('change', '#searchResultsPage', { transition : "none" });
 	});
 		
-/*	$("#label_70").on("change", function() {
-		gui.groupOnMenu.meetingInitDate = $("#label_70").val();	
-	});
-	$("#label_71").on("change", function() {
-		gui.groupOnMenu.meetingInitTime = $("#label_71").val();	
-	});
-*/	
 	$("#planSubmitButton")
 	 .on("click", gui.onPlanSubmit )
 	 .text( dictionary.Literals.label_38 )
 	 .data( 'action', 'create' );
-
 
 	history.pushState(null, null, null);
 	window.addEventListener('popstate', function (event) {
@@ -1344,6 +1335,9 @@ GUI.prototype.bindDOMevents = function(){
 			$('body').pagecontainer('change', '#searchPage', { transition : "none" });
 		}
 	});
+	
+	$("#send-btn").click( gui.onChatInput );
+	
 
 };
 
@@ -1466,8 +1460,8 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<div data-role=\"header\" data-position=\"fixed\">";
 	strVar += "			  <div class=\"ui-grid-d\" >";
 	strVar += "			    <div class=\"ui-block-a\">";
-	strVar += "			    	<a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\">";
-	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \">";
+	strVar += "			    	<a data-role=\"none\" class=\"backButton ui-btn\">";
+	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\" >";
 	strVar += "		    		<\/a>";
 	strVar += "	    		<\/div>";
 	strVar += "			    <div class=\"ui-block-b\"><\/div>";
@@ -1489,8 +1483,8 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<div data-role=\"header\" data-position=\"fixed\">";
 	strVar += "			  <div class=\"ui-grid-d\" >";
 	strVar += "			    <div class=\"ui-block-a\">";
-	strVar += "			    	<a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\">";
-	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \">";
+	strVar += "			    	<a data-role=\"none\" class=\"backButton ui-btn\">";
+	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\">";
 	strVar += "		    		<\/a>";
 	strVar += "		    	<\/div>";	
 	strVar += "			    <div class=\"ui-block-b\"><\/div>";
@@ -1558,8 +1552,8 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<div data-role=\"header\" data-position=\"fixed\">";
 	strVar += "			  <div class=\"ui-grid-d\" >";
 	strVar += "			    <div class=\"ui-block-a\">";
-	strVar += "			    	<a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\">";
-	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \">";
+	strVar += "			    	<a data-role=\"none\" class=\"backButton ui-btn\">";
+	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\" >";
 	strVar += "		    		<\/a>";
 	strVar += "		    	<\/div>";	
 	strVar += "			    <div class=\"ui-block-b\"><\/div>";
@@ -1598,8 +1592,8 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<div data-role=\"header\" data-position=\"fixed\">";
 	strVar += "			  <div class=\"ui-grid-d\" >";
 	strVar += "			    <div class=\"ui-block-a\">";
-	strVar += "			    	<a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\">";
-	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \">";
+	strVar += "			    	<a data-role=\"none\" class=\"backButton ui-btn\">";
+	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\">";
 	strVar += "		    		<\/a>";
 	strVar += "		    	<\/div>";	
 	strVar += "			    <div class=\"ui-block-b\"><\/div>";
@@ -1662,8 +1656,8 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<div data-role=\"header\" data-position=\"fixed\">";
 	strVar += "			  <div class=\"ui-grid-d\" >";
 	strVar += "			    <div class=\"ui-block-a\">";
-	strVar += "			    	<a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\">";
-	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \">";
+	strVar += "			    	<a data-role=\"none\" class=\"backButton ui-btn\">";
+	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\">";
 	strVar += "		    		<\/a>";
 	strVar += "	    		<\/div>";
 	strVar += "			    <div class=\"ui-block-b\"><\/div>";
@@ -1740,14 +1734,14 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<div data-role=\"header\" data-position=\"fixed\">";
 	strVar += "			  <div class=\"ui-grid-d\" >";
 	strVar += "			    <div class=\"ui-block-a\">";
-	strVar += "			    	<a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\">";
+	strVar += "			    	<a data-role=\"none\" class=\"backButton ui-btn\">";
 	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \">";
 	strVar += "		    		<\/a> ";
 	strVar += "	    		<\/div>";
 	strVar += "			    <div class=\"ui-block-b\"><\/div>";
 	strVar += "			    <div class=\"ui-block-c\"><\/div>";
-	strVar += "			    <div class=\"ui-block-e\"><a data-role=\"button\" class=\"ui-nodisc-icon icon-list\"><img src=\"res\/bubble_36x36.png\" class=\"button2mainPage button ui-li-icon ui-corner-none \"><\/a><\/div>";
-	strVar += "			    <div class=\"ui-block-e\"><a id=\"mapButtonInmap-page\" data-role=\"button\" class=\"ui-nodisc-icon icon-list\"><img src=\"res\/mundo_36x36.png\" class=\"ui-li-icon ui-corner-none \"><\/a><\/div>";
+	strVar += "			    <div class=\"ui-block-e\"><a data-role=\"none\" class=\"ui-btn\"><img src=\"res\/bubble_36x36.png\" class=\"button2mainPage\"><\/a><\/div>";
+	strVar += "			    <div class=\"ui-block-e\"><a data-role=\"none\" class=\"ui-btn\" id=\"mapButtonInmap-page\" ><img src=\"res\/mundo_36x36.png\" ><\/a><\/div>";
 	strVar += "			  <\/div>";
 	strVar += "			<\/div><!-- \/header -->";
 	strVar += "			<div role=\"main\" id=\"map-canvas\" >";
@@ -1762,15 +1756,15 @@ GUI.prototype.loadBody = function() {
 	strVar += "		<div data-role=\"page\" id=\"chat-page\" data-url=\"chat-page\" >";
 	strVar += "			<div id=\"chat-page-header\" data-role=\"header\" data-position=\"fixed\">";
 	strVar += "				<div class=\"ui-grid-d\">";
-	strVar += "					<div class=\"ui-block-a\"><a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\"><img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \"><\/a><\/div>";
+	strVar += "					<div class=\"ui-block-a\"><a data-role=\"none\" class=\"backButton ui-btn\"><img src=\"res\/arrow-left_22x36.png\"><\/a><\/div>";
 	strVar += "				    <div class=\"ui-block-b\">";
-	strVar += "					   	<a id=\"link2profileOfContact\" data-role=\"button\" class=\"imgOfChat-page\" data-inline=\"false\">";
+	strVar += "					   	<a id=\"link2profileOfContact\" data-role=\"none\" class=\"imgOfChat-page ui-btn\" data-inline=\"false\">";
 	strVar += "				       		<img id=\"imgOfChat-page-header\" src=\"\" class=\"imgOfChat-page-header\">";
 	strVar += "				   		<\/a>";
 	strVar += "			       	<\/div>";
 	strVar += "				    <div class=\"ui-block-c\"><\/div>";
-	strVar += "				    <div id=\"performCall\" class=\"ui-block-d\"><a data-role=\"button\" class=\"ui-nodisc-icon icon-list\"><img src=\"res\/conference.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none max-nav-button\"><\/a><\/div>";
-	strVar += "				    <div class=\"ui-block-e\"><a id=\"mapButtonInChatPage\" data-role=\"button\" class=\"ui-nodisc-icon icon-list\"><img src=\"res\/mundo_36x36.png\" alt=\"lists\" class=\"ui-li-icon ui-corner-none \"><\/a><\/div>";
+	strVar += "				    <div class=\"ui-block-d\" id=\"performCall\"><a data-role=\"none\" class=\"ui-btn\"><img src=\"res\/conference.png\" class=\"menuBtn\"><\/a><\/div>";
+	strVar += "				    <div class=\"ui-block-e\"><a id=\"mapButtonInChatPage\"  data-role=\"none\" class=\"ui-btn menuBtn\"><img src=\"res\/mundo_36x36.png\" class=\"menuBtn\"><\/a><\/div>";
 	strVar += "			  	<\/div>";
 	strVar += "			<\/div><!-- \/header -->";
 	strVar += "			<div id=\"chat-page-content\" role=\"main\" class=\"ui-content\">";
@@ -1778,9 +1772,9 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<div data-role=\"footer\" data-position=\"fixed\">";
 	
 	strVar += "				<div class=\"ui-grid-d\">";
-	strVar += "					<div class=\"ui-block-a\" id=\"chat-multimedia-button\"><a data-role=\"button\" ><img id=\"chat-multimedia-image\" src=\"res\/multimedia.png\" class=\"chat-multimedia-image\"> <\/a><\/div>";
-	strVar += "				    <div class=\"ui-block-b ui-block-span3\"> <textarea id=\"chat-input\" data-lastkeyup=\"0\" class=\"textarea-chat\"> <\/textarea> <\/div>";
-	strVar += "				    <div class=\"ui-block-e\"><div class=\"vertical-right\">  <div data-role=\"none\" class=\"pswp__button pswp__button--share\" > </div> </div><\/div>";
+	strVar += "					<div class=\"ui-block-a\" id=\"chat-multimedia-button\"><a data-role=\"none\" class=\"ui-btn\" ><img id=\"chat-multimedia-image\" src=\"res\/multimedia.png\" class=\"chat-multimedia-image\"> <\/a><\/div>";
+	strVar += "				    <div class=\"ui-block-b ui-block-span3\"> <textarea data-role=\"none\" id=\"chat-input\" data-lastkeyup=\"0\" class=\"textarea-chat ui-input-text ui-body-inherit ui-textinput-autogrow\"> <\/textarea> <\/div>";
+	strVar += "				    <div class=\"ui-block-e\" id=\"send-btn\"><div class=\"vertical-right\">  <div data-role=\"none\" class=\"pswp__button pswp__button--share\" > </div> </div><\/div>";
 	strVar += "			  	<\/div>";
 
 
@@ -1790,7 +1784,7 @@ GUI.prototype.loadBody = function() {
 	strVar += "		<div data-role=\"page\" id=\"activateAccount\" data-url=\"activateAccount\" >";
 	strVar += "			<div data-role=\"header\" data-position=\"fixed\">";
 	strVar += "				<div class=\"ui-grid-d\">";
-	strVar += "					<div class=\"ui-block-a\"><a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\"><img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \"><\/a><\/div>";
+	strVar += "					<div class=\"ui-block-a\"><a data-role=\"none\" class=\"backButton ui-btn\"><img src=\"res\/arrow-left_22x36.png\" ><\/a><\/div>";
 	strVar += "				    <div class=\"ui-block-b\"><\/div>";
 	strVar += "				    <div class=\"ui-block-c\"><\/div>";
 	strVar += "				    <div class=\"ui-block-d\"><\/div>";
@@ -1833,7 +1827,7 @@ GUI.prototype.loadBody = function() {
 	strVar += "			<div data-role=\"header\" data-position=\"fixed\">";
 	strVar += "			  <div class=\"ui-grid-d\" >";
 	strVar += "			    <div class=\"ui-block-a\">";
-	strVar += "			    	<a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\">";
+	strVar += "			    	<a data-role=\"none\" class=\"backButton ui-btn\">";
 	strVar += "			    		<img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \">";
 	strVar += "		    		<\/a>";
 	strVar += "	    		<\/div>";
@@ -3571,8 +3565,8 @@ GUI.prototype.showProfile = function( input ) {
 	strVar += "			<div data-role=\"header\" data-position=\"fixed\">							";
 	strVar += "			  <div class=\"ui-grid-d\" >";
 	strVar += "			    <div class=\"ui-block-a\">";
-	strVar += "					<a data-role=\"button\" class=\"backButton ui-nodisc-icon icon-list\">";
-	strVar += "					 <img src=\"res\/arrow-left_22x36.png\" alt=\"lists\" class=\"button ui-li-icon ui-corner-none \">";
+	strVar += "					<a data-role=\"none\" class=\"backButton ui-btn\">";
+	strVar += "					 <img src=\"res\/arrow-left_22x36.png\" >";
 	strVar += "					<\/a>";
 	strVar += "	    		<\/div>";
 	strVar += "			    <div class=\"ui-block-b\"><\/div>";

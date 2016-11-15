@@ -946,7 +946,7 @@
 	float: right;
 	resize: none;
 	word-wrap:break-word;
-/*	max-height : 54px;*/
+	max-height : 54px;
 	
 } 
 .ui-height-70percent{
@@ -1140,16 +1140,19 @@
 */
 
 .chat-multimedia-image{
-    width: 100%;
     width: 37px;
     height: 37px;
 }
 .searchBtn{
-    width: 100%;
-    max-width: 36px;  
+    width: 36px;  
 }
-
-
+.menuBtn{
+    width: 36px;  
+}
+.max-nav-button {
+	max-width: 36px;
+	max-height: 36px;
+}
 .imgOfChat-page-header {
     width: 100%;
 	max-width: 63px;
@@ -1159,7 +1162,6 @@
 .imgOfChat-page {
 	padding : 0.1em 0.1em;
 }
-
 .imgInMainPage{
 	width: 100%;
 	height:100%;	
@@ -1171,14 +1173,7 @@
   float: right;  
   height: 44px;
   width: 44px;
-}
-
-
-.max-nav-button {
-	max-width: 36px;
-	max-height: 36px;
-}
-  
+} 
   
 .activity
 {
