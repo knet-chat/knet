@@ -372,7 +372,7 @@ module.exports = function(grunt) {
 
 	//register the task
 	grunt.registerTask('build:web', ['string-replace:any','cssmin:web','uglify:web','htmlbuild:web']);
-	grunt.registerTask('build:cordova', ['string-replace:any', 'htmlbuild:cordova','string-replace:cordova']);
+	grunt.registerTask('build:cordova', ['string-replace:any','cssmin:cordova','uglify:cordova', 'htmlbuild:cordova','string-replace:cordova']);
 	grunt.registerTask('build:dev', ['string-replace:any', 'htmlbuild:dev']);
 
 };

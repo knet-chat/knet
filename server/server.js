@@ -66,11 +66,10 @@ app.post('/payment', function (req, res) {
 		var purchase = req.body.purchase;
 		var amount = 0;
 
-		if(purchase.licenseDurationChoosen == "fourYears") amount = amount + 3;
-		if(purchase.licenseDurationChoosen == "oneYear") amount = amount + 1;
-		if(purchase.isNGOdonationChecked == "true") amount = amount + 1;
-		if(purchase.isFSIdonationChecked == "true") amount = amount + 1;
-//		if(purchase.isBackupChecked == "true") amount = amount + 1;	
+		if(purchase.isCoffeeChecked == "true") amount = amount + 1;
+		if(purchase.isBeerChecked == "true") amount = amount + 3;
+		if(purchase.isHamburgerChecked == "true") amount = amount + 6;
+		if(purchase.isBillChecked == "true") amount = amount + 40;
 		
 		var answer = {	
 			OK : true,
@@ -97,12 +96,8 @@ app.post('/payment', function (req, res) {
 		    }else{
 		    	answer.URL = url;
 		    	res.json( answer );
-		    	//brokerOfVisibles.getClientByHandshakeToken(req.body.handshakeToken).then(function (client){
-		    		
-		    	//});
 		    }
-		});	
-		
+		});		
 		
 	}catch (ex) {
 		logger.error("post/payment  :::  exceptrion thrown " + ex  );						

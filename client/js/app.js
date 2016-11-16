@@ -1278,10 +1278,10 @@ GUI.prototype.bindDOMevents = function(){
 	});
 	
 	$("#buyButton").on("click", app.onProcessPayment );	
-	$("input[name='license-choice']").on("change", gui.refreshPurchasePrice );
-	$("#NGOdonation").on("change", gui.refreshPurchasePrice );
-	$("#FSIdonation").on("change", gui.refreshPurchasePrice );
-//	$("#Backup").on("change", gui.refreshPurchasePrice );
+	$("#coffee").on("change", gui.refreshPurchasePrice );
+	$("#beer").on("change", gui.refreshPurchasePrice );
+	$("#hamburger").on("change", gui.refreshPurchasePrice );
+	$("#bill").on("change", gui.refreshPurchasePrice );
 	
 	$("#groupsButton")
 	 .on("click", gui.onGroupsButton )
@@ -1382,9 +1382,11 @@ GUI.prototype.forwardMsg = function( contact ){
 
 GUI.prototype.getPurchaseDetails = function() {
 	var purchase = {};
-	purchase.licenseDurationChoosen = $("input[name='license-choice']:checked").val();
-	purchase.isNGOdonationChecked = $("#NGOdonation").is(':checked');
-	purchase.isFSIdonationChecked = $("#FSIdonation").is(':checked');
+
+	purchase.isCoffeeChecked = $("#coffee").is(':checked');
+	purchase.isBeerChecked = $("#beer").is(':checked');
+	purchase.isHamburgerChecked = $("#hamburger").is(':checked');
+	purchase.isBillChecked = $("#bill").is(':checked');
 
 	return purchase;
 };
@@ -1795,16 +1797,19 @@ GUI.prototype.loadBody = function() {
 	strVar += "				<h1 id=\"label_27\" class=\"darkink\"> User account Activation  <\/h1>          "   ;
 	strVar += "				<div class=\"ui-field-contain\">";
 	strVar += "    				<fieldset data-role=\"controlgroup\">";
-	strVar += "        				<input type=\"radio\" name=\"license-choice\" id=\"radio-choice-v-1a\" value=\"oneYear\" checked=\"checked\">";
-	strVar += "        				<label id=\"label_28\" for=\"radio-choice-v-1a\">License valid for a year<\/label>";
-	strVar += "        				<input type=\"radio\" name=\"license-choice\" id=\"radio-choice-v-1b\" value=\"fourYears\">";
-	strVar += "        				<label id=\"label_29\" for=\"radio-choice-v-1b\">License valid for 4 years<\/label>";
-//	strVar += "       				<input type=\"checkbox\" name=\"Backup\" id=\"Backup\">";
-//	strVar += "        				<label id=\"label_30\" for=\"Backup\">Back-up functionality<\/label>";
-	strVar += "        				<input type=\"checkbox\" name=\"NGOdonation\" id=\"NGOdonation\">";
-	strVar += "        				<label id=\"label_31\" for=\"NGOdonation\">Donation for associated NGOs<\/label>";
-	strVar += "        				<input type=\"checkbox\" name=\"FSIdonation\" id=\"FSIdonation\">";
-	strVar += "        				<label id=\"label_32\" for=\"FSIdonation\">Donation for our Open Source Initiative<\/label>";
+
+	strVar += "       				<input type=\"checkbox\" name=\"coffee\" id=\"coffee\">  ";
+	strVar += "        				<label id=\"label_28\" for=\"coffee\">  <img src=\"./js/36x36/2615.png\"> <\/label>  ";
+	
+	strVar += "       				<input type=\"checkbox\" name=\"beer\" id=\"beer\">";
+	strVar += "        				<label id=\"label_29\" for=\"beer\"> <img src=\"./js/36x36/1f37a.png\"> <\/label>";
+
+	strVar += "       				<input type=\"checkbox\" name=\"hamburger\" id=\"hamburger\">";
+	strVar += "        				<label id=\"label_30\" for=\"hamburger\"> <img src=\"./js/36x36/1f354.png\"> <\/label>";
+
+	strVar += "        				<input type=\"checkbox\" name=\"bill\" id=\"bill\">";
+	strVar += "        				<label id=\"label_31\" for=\"bill\"> <img src=\"./js/36x36/1f50c.png\"> <\/label>";
+	
 	strVar += "    				<\/fieldset>";
 	strVar += "				<\/div>";
 	strVar += "				<h3 class=\"darkink\"> <spam id=\"label_33\"> Total :<\/spam> <spam id=\"price\"> 1 &euro;<\/spam><\/h3>";
@@ -2288,10 +2293,6 @@ GUI.prototype.onAppBrowserLoad = function(event) {
     	gui.inAppBrowser.removeEventListener('loadstop', gui.onAppBrowserLoad );
 		
 		app.transactionID = decodeURI(postman.getParameterByName("transactionID",event.url));
-		app.licenseDurationChoosen = decodeURI(postman.getParameterByName("licenseDurationChoosen",event.url));
-		app.isNGOdonationChecked = decodeURI(postman.getParameterByName("isNGOdonationChecked",event.url));
-		app.isFSIdonationChecked = decodeURI(postman.getParameterByName("isFSIdonationChecked",event.url));
-		                
 		setTimeout( function(){ gui.inAppBrowser.close } , config.TIME_WAIT_HTTP_POST );
     }    
     if (event.url.match("cancelPayment") !== null) {
@@ -2734,11 +2735,11 @@ GUI.prototype.setLocalLabels = function() {
 	document.getElementById("profileTelephone").placeholder = dictionary.Literals.label_25;
 	document.getElementById("profileEmail").placeholder = dictionary.Literals.label_26;
 	document.getElementById("label_27").innerHTML = dictionary.Literals.label_27;
-	document.getElementById("label_28").innerHTML = dictionary.Literals.label_28;
-	document.getElementById("label_29").innerHTML = dictionary.Literals.label_29;
+//	document.getElementById("label_28").innerHTML = dictionary.Literals.label_28;
+//	document.getElementById("label_29").innerHTML = dictionary.Literals.label_29;
 //	document.getElementById("label_30").innerHTML = dictionary.Literals.label_30;
-	document.getElementById("label_31").innerHTML = dictionary.Literals.label_31;
-	document.getElementById("label_32").innerHTML = dictionary.Literals.label_32;
+//	document.getElementById("label_31").innerHTML = dictionary.Literals.label_31;
+//	document.getElementById("label_32").innerHTML = dictionary.Literals.label_32;
 	document.getElementById("label_33").innerHTML = dictionary.Literals.label_33;
 	document.getElementById("buyButton").innerHTML = dictionary.Literals.label_34;
 	document.getElementById("label_37").innerHTML = dictionary.Literals.label_37;
@@ -3996,10 +3997,10 @@ GUI.prototype.refreshPurchasePrice = function() {
 	var purchase = gui.getPurchaseDetails();
 	var price = 0;
 	
-	if(purchase.licenseDurationChoosen == "fourYears") price = price + 3;
-	if(purchase.licenseDurationChoosen == "oneYear") price = price + 1;
-	if(purchase.isNGOdonationChecked) price = price + 1;
-	if(purchase.isFSIdonationChecked) price = price + 1;
+	if(purchase.isCoffeeChecked) price = price + 1;
+	if(purchase.isBeerChecked) price = price + 3;
+	if(purchase.isHamburgerChecked) price = price + 6;
+	if(purchase.isBillChecked) price = price + 40;
 	
 	$("#price").html(price + "\u20AC");
 	
@@ -5812,14 +5813,14 @@ function Dictionary(){
 		label_24 : "Commentary...",
 		label_25 : "Telephone...",
 		label_26 : "e-mail",
-		label_27 : "User account Activation",
+		label_27 : "invite knet",
 		label_28 : "License valid for a year",
 		label_29 : "License valid for 4 years",
 		label_30 : "Back-up functionality",
 		label_31 : "Donation for associated NGOs",
 		label_32 : "Donation for our Open Source Initiative",
 		label_33 : "Total: ",
-		label_34 : "Buy",
+		label_34 : "donate",
 		label_35 : "Welcome ! we're generating your security channel, this process could take a few minutes, please be patience",
 		label_36 : "new Group",
 		label_37 : "My Groups",
@@ -6156,14 +6157,14 @@ function Dictionary(){
 		label_24 : "Kommentar...",
 		label_25 : "Telefon...",
 		label_26 : "e-mail",
-		label_27: "Benutzerkonto-Aktivierung",
+		label_27: "einladen knet",
 		label_28: "Lizenz g&uuml;ltig f&uuml;r ein Jahr",
 		label_29: "Lizenz g&uuml;ltig f&uuml;r 4 Jahre",
 		label_30: "Back-up-Funktionalit&auml;t",
 		label_31: "Spende f&uuml;r assoziierten NGOs",
 		label_32: "Spende f&uuml;r unsere Open Source Initiative",
 		label_33: "Gesamtsumme: ",
-		label_34: "Kaufen",
+		label_34: "spenden",
 		label_35 : "Willkommen! Wir machen Ihrer Sicherheitsprotokoll, Dieser Prozess k\xF6nnte ein paar Minuten dauern, bitte et was Geduld",
 		label_36 : "neue Gruppe",
 		label_37 : "meine Gruppen",
@@ -6510,14 +6511,14 @@ function Dictionary(){
 		label_24 : "Commento...",
 		label_25 : "Telefono...",
 		label_26 : "e-mail",
-		label_27: "Conto di attivazione per l'utente",
+		label_27: "invita Knet",
 		label_28: "Licenza valida per un anno",
 		label_29: "Licenza valida per 4 anni",
 		label_30: "Funzionalit&agrave; di back-up",
 		label_31: "Donazione per le ONG associate",
 		label_32: "Donazione per la nostra iniziativa Open Source",
 		label_33: "Totale: ",
-		label_34: "Acquistare",
+		label_34: "donare",
 		label_35 : "Benvenuto! generando il vostro protocollo di sicurezza, questo processo potrebbe richiedere alcuni minuti, si prega di essere pazienti",
 		label_36 : "nuovo gruppo",
 		label_37 : "I miei gruppi",
@@ -6865,14 +6866,14 @@ function Dictionary(){
 		label_24 : "Comentario...",
 		label_25 : "Tel\xE9fono...",
 		label_26 : "e-mail",
-		label_27: "Activaci&oacute;n de cuenta de usuario",
-		label_28: "Licencia v&aacute;lida por un a&ntilde;o",
+		label_27: "Invita a knet",
+		label_28: "<img src=\"js/36x36/1f600.png \">",
 		label_29: "Licencia v&aacute;lida por 4 a&ntilde;os",
 		label_30: "Funcionalidad de back-up",
 		label_31: "Donaci&oacute;n para las ONG asociadas",
 		label_32: "Donaci&oacute;n para nuestra Iniciativa Open Source",
 		label_33: "Total: ",
-		label_34: "Comprar"	,
+		label_34: "donar"	,
 		label_35 : "\u00A1Bienvenido! generando su canal de seguridad, este proceso podrÃ­a tardar unos minutos, por favor sea paciente",
 		label_36 : "nuevo grupo",
 		label_37 : "mis Grupos",
@@ -7182,14 +7183,14 @@ function Dictionary(){
 		label_24 : "Commentaire...",
 		label_25 : "T\xE9l\xE9phone...",
 		label_26 : "e-mail",
-		label_27: "Activation du compte de l'utilisateur",
+		label_27: "invite Knet",
 		label_28: "licence valide pour un an",
 		label_29: "licence valide pour 4 ans",
 		label_30: "fonctionnalit&eacute; de back-up",
 		label_31: "Don pour les ONG associ&eacute;es",
 		label_32: "Don pour notre Open Source Initiative",
 		label_33: "Total: ",
-		label_34: "Acheter",
+		label_34: "faire un don",
 		label_35 : "Bienvenue! g&eacute;n&eacute;ration de votre protocole de s&eacute;curit&eacute;, ce processus peut prendre quelques minutes, soyez patient svp",
 		label_36 : "nouveau groupe",
 		label_37 : "mes Groupes",
@@ -7536,14 +7537,14 @@ function Dictionary(){
 		label_24 : "Comentario...",
 		label_25 : "Telefone...",
 		label_26 : "e-mail"	,
-		label_27: "Ativa&ccedil;&atilde;o de Conta de Usu&aacute;rio",
+		label_27: "convida Knet",
 		label_28: "Licen&ccedil;a v&aacute;lida por um ano",
 		label_29: "licen&ccedil;a v&aacute;lida por 4 anos",
 		label_30: "back-up funcionalidade",
 		label_31: "Doa&ccedil;&atilde;o para as ONGs associadas",
 		label_32: "Doa&ccedil;&atilde;o para o nosso Iniciativa Open Source",
 		label_33: "Total: ",
-		label_34: "Comprar",
+		label_34: "doar",
 		label_35 : "Bem-vindo! gerando seu protocolo de seguranÃ§a, esse processo pode levar alguns minutos, por favor, seja paciente",
 		label_36 : "novo grupo",
 		label_37 : "meus Grupos",

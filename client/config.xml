@@ -4,8 +4,8 @@
         xmlns:gap = "http://phonegap.com/ns/1.0"
         xmlns:android = "http://schemas.android.com/apk/res/android"
         id        = "com.instaltic.knet"
-        version   = "0.5.8"
-        versionCode = "2671" >
+        version   = "0.6.0"
+        versionCode = "2673" >
 
     <name>knet</name>
     <description>
@@ -125,6 +125,6 @@
     <!-- iOS SECTION     -->
 
     <config-file platform="ios" target="*-Info.plist" parent="CFBundleURLTypes"></config-file>
-    <config-file  platform="ios" parent="CFBundleShortVersionString"> <string>0.5.6</string> </config-file>
+    <config-file  platform="ios" parent="CFBundleShortVersionString"> <string>0.5.9</string> </config-file>
  
 </widget>
