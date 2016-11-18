@@ -3803,7 +3803,26 @@ GUI.prototype.showTargetOnForwardMenu = function( obj ) {
 };
 
 GUI.prototype.showTermsAndConditions = function() {	
-	var html = '';	
+	var html = '';
+	
+	html += "<div class=\"container\">";
+	html += "	<div class=\"row\">";
+	html += "		<div class=\"col-lg-3 col-md-3 col-sm-4 col-xs-12\">";
+	html += "			<div id=\"sidebar\">";
+	html += "				<div class=\"user\">";
+	html += "					<div class=\"user-head\">";
+	html += "						<img id=\"profilePhoto\" src=\"./res/logo_300x300.jpg\"/>";
+	html += "						<div class=\"hr-center\"><\/div>";
+	html += "						<h5 id=\"label_80\" >" + dictionary.Literals.label_80 + "<\/h5>";
+	html += "						<div class=\"hr-center\"><\/div>";
+	html += "					<\/div>";
+	html += "				<\/div>";
+	html += "			<\/div>";
+	html += "		<\/div>";
+	html += "	<\/div>";
+	html += "<\/div>";
+	
+	html += '<a id="label_79" class="ui-btn ui-corner-all ui-shadow ui-btn-b" >'+dictionary.Literals.label_59+'</a>';
 	html += "<h1>Terms and Conditions (\"Terms\")<\/h1>";
 	html += "<p>Please read these Terms and Conditions carefully before using either the knet mobile app or the http:\/\/www.instaltic.com\/knet website (the \"Service\") operated by InstalTIC S.L. (\"us\", \"we\", or \"our\").<\/p>";
 	html += "<p>Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who access or use the Service.<\/p>";
@@ -3844,6 +3863,10 @@ GUI.prototype.showTermsAndConditions = function() {
 	
 	gui.showDialog( html );
 	$("#label_59").click(function(){
+		$("#popupDiv").popup( "close" );
+		$("#popupDiv").remove();
+	});
+	$("#label_79").click(function(){
 		$("#popupDiv").popup( "close" );
 		$("#popupDiv").remove();
 	});
@@ -4272,7 +4295,7 @@ Application.prototype.bindPushEvents = function() {
 Application.prototype.connect2paypal = function(myPurchase) {
 	
 	$.ajax({
-		url: 'https://' + config.ipServerSockets +  ":" + config.portServerSockets + '/payment',
+		url: 'https://' + config.ipServerSockets +  ":" + config.portServerSockets + '/wss/payment',
 		method : "POST",
 		data: {	
 			handshakeToken: user.handshakeToken  , 
@@ -5821,7 +5844,7 @@ function Dictionary(){
 		label_32 : "Donation for our Open Source Initiative",
 		label_33 : "Total: ",
 		label_34 : "donate",
-		label_35 : "Welcome ! we're generating your security channel, this process could take a few minutes, please be patience",
+		label_35 : "Welcome! we're generating your security channel, this process could take a few minutes, please be patience",
 		label_36 : "new Group",
 		label_37 : "My Groups",
 		label_38 : "create",
@@ -5856,6 +5879,7 @@ function Dictionary(){
 		label_76 : "Ask the organizer?",
 		label_77 : "Do you want to add this member into your group?",
 		label_78 : "Request sent",
+		label_80 : "Welcome!",
 		
 		CLDR : {
 			  "main": {
@@ -6200,6 +6224,7 @@ function Dictionary(){
 		label_76 : "Fragen Sie den Veranstalter?",
 		label_77 : "Do you want to add this member into your group?",
 		label_78 : "Request sent",
+		label_80 : "Willkommen!",
 		CLDR : {
 		  "main": {
 		    "de": {
@@ -6554,6 +6579,7 @@ function Dictionary(){
 		label_76 : "Chiedi l'organizzatore?",
 		label_77 : "Do you want to add this member into your group?",
 		label_78 : "Request sent",
+		label_80 : "Benvenuto!",
 		CLDR : {
 			  "main": {
 			    "it": {
@@ -6909,6 +6935,8 @@ function Dictionary(){
 		label_76 : "Preguntar al organizador?",
 		label_77 : "Do you want to add this member into your group?",
 		label_78 : "Request sent",
+		label_80 : "\u00A1Bienvenido!",
+
 		CLDR : {
 			  "main": {
 			    "es": {
@@ -7226,6 +7254,7 @@ function Dictionary(){
 		label_76 : "Demandez &agrave; l'organisateur?",
 		label_77 : "Do you want to add this member into your group?",
 		label_78 : "Request sent",
+		label_80 : "Bienvenue!",
 		CLDR : {
 			  "main": {
 			    "fr": {
@@ -7579,6 +7608,7 @@ function Dictionary(){
 		label_75 : "juntar-se",
 		label_76 : "Pe&ccedil;a o organizador?",
 		label_77 : "Do you want to add this member into your group?",
+		label_80 : "Bem-vindo!",
 
 
 		CLDR : {
