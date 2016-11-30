@@ -3294,7 +3294,7 @@ GUI.prototype.showMsgInConversation = function( message, options ) {
 	var classOfmessageStateColor = "";
 		
 	if ( message.from == user.publicClientID ){
-		authorOfMessage = " ";
+		authorOfMessage = "";
 
 		classOfmessageStateColor = "red-no-rx-by-srv";		
 		if (message.markedAsRead == true){
@@ -3310,7 +3310,7 @@ GUI.prototype.showMsgInConversation = function( message, options ) {
 		if (typeof contact == 'undefined' || contact == null) 
 			return;
 			
-		authorOfMessage = contact.nickName;
+		authorOfMessage = "<span class='user'>"+ contact.nickName   +"</span>";
 				
 		if (message.markedAsRead == false) {		  	
 			var messageACK = {	
@@ -3418,16 +3418,15 @@ GUI.prototype.showMsgInConversation = function( message, options ) {
 	
 	var html2insert = 	
 		'<div class="activity">'+
-		//'	<div class="avatar"></div>'+
-		'	<span class="posted_at">'+
-		'  		<div id="messageStateColor_' + message.msgID + '" class="' + classOfmessageStateColor + '"></div>'+	
-				gui.formatter.formatDate ( timeStampOfMessage , { datetime: "medium" } ) +
-		'	</span>'+
 		'	<div class="readable">'+
-		'		<span class="user">'+ authorOfMessage   +'</span>'+
-		'		<span class="content">'+ htmlOfContent + htmlOfVideoPreview +'</span>'+
+				authorOfMessage +
+		'		<span class="content">'+ htmlOfContent + htmlOfVideoPreview +'</span>'+		
+		'		<span class="posted_at">'+
+		'  			<div id="messageStateColor_' + message.msgID + '" class="' + classOfmessageStateColor + '"></div>'+	
+					gui.formatter.formatDate ( timeStampOfMessage , { datetime: "medium" } ) +
+		'		</span>'+
 		'	</div>' +
-		'</div>' ;
+		'</div>';
 	
 	var $newMsg = $(html2insert);
 	
@@ -3822,9 +3821,15 @@ GUI.prototype.showTermsAndConditions = function() {
 	html += "	<\/div>";
 	html += "<\/div>";
 	
+	html += "<div class=\"container\">";
+	html += "	<div class=\"row\">";
+	html += "		<div class=\"col-lg-9 col-md-9 col-sm-8 col-xs-12\">";
+	html += "			<div id=\"content\">";
+	html += "				<div class=\"main-content\">";
+	
 	html += '<a id="label_79" class="ui-btn ui-corner-all ui-shadow ui-btn-b" >'+dictionary.Literals.label_59+'</a>';
 	html += "<h1>Terms and Conditions (\"Terms\")<\/h1>";
-	html += "<p>Please read these Terms and Conditions carefully before using either the knet mobile app or the http:\/\/www.instaltic.com\/knet website (the \"Service\") operated by InstalTIC S.L. (\"us\", \"we\", or \"our\").<\/p>";
+	html += "<p>Please read these Terms and Conditions carefully before using either the knet mobile app or the http:\/\/www.knet-chat.org website (the \"Service\") operated by InstalTIC S.L. (\"us\", \"we\", or \"our\").<\/p>";
 	html += "<p>Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who access or use the Service.<\/p>";
 	html += "<p>By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms then you may not access the Service.<\/p>";
 	html += "<p><strong> privacy policy <\/strong><\/p>";
@@ -3859,7 +3864,12 @@ GUI.prototype.showTermsAndConditions = function() {
 	html += "<p><strong><\/strong><\/p>";
 	html += "<p><strong><br><\/strong><\/p>";
 	html += '<a id="label_59" class="ui-btn ui-corner-all ui-shadow ui-btn-b" >'+dictionary.Literals.label_59+'</a>';
-	html += "<p><strong><br><\/strong><\/p>";
+	html += "<p><strong><br><\/strong><\/p>";	
+	html += "				<\/div>";
+	html += "			<\/div>";
+	html += "		<\/div>";
+	html += "	<\/div>";
+	html += "<\/div>";
 	
 	gui.showDialog( html );
 	$("#label_59").click(function(){
@@ -4747,7 +4757,7 @@ Application.prototype.registrationProcess = function(){
 
 Application.prototype.init = function() {
 	
-	window.shimIndexedDB.__useShim();
+	//window.shimIndexedDB.__useShim();
 	gui.loadBody();
 	gui.loadAsideMenuMainPage();
 	gui.bindDOMevents();	
