@@ -910,6 +910,8 @@ function GUI() {
 	this.listOfPlans = null;
 	this.isPlanDisplayed = false;
 	this.timeoutPickupRTC = null;
+	this.authorLastMsgPrint = "";
+	
 };
 
 GUI.prototype._parseLinks = function(htmlOfContent) {
@@ -3417,7 +3419,7 @@ GUI.prototype.showMsgInConversation = function( message, options ) {
 	var timeStampOfMessage = new Date(message.timestamp);
 	
 	var html2insert = 	
-		'<div class="activity">'+
+	//	'<div class="activity">'+
 		'	<div class="readable">'+
 				authorOfMessage +
 		'		<span class="content">'+ htmlOfContent + htmlOfVideoPreview +'</span>'+		
@@ -3425,8 +3427,10 @@ GUI.prototype.showMsgInConversation = function( message, options ) {
 		'  			<div id="messageStateColor_' + message.msgID + '" class="' + classOfmessageStateColor + '"></div>'+	
 					gui.formatter.formatDate ( timeStampOfMessage , { datetime: "medium" } ) +
 		'		</span>'+
-		'	</div>' +
-		'</div>';
+		'	</div>';
+	//	'</div>';
+	
+
 	
 	var $newMsg = $(html2insert);
 	
@@ -3463,12 +3467,25 @@ GUI.prototype.showMsgInConversation = function( message, options ) {
 	if (message.from != user.publicClientID){
 		$newMsg.css("background", "#FFFFE0"); 
 	}
+
 	if ( options.isReverse ){
-		$("#chat-page-content").prepend($newMsg);
+		if ( gui.authorLastMsgPrint != message.from ){		
+			$("#chat-page-content").prepend('<div class="activity"></div>');			
+		}
+		$(".activity").first().find('.user').remove();
+		$(".activity").first().prepend($newMsg);
 	}else{
-		$("#chat-page-content").append($newMsg);
-		$("#chat-page-content").trigger("create");
+		if ( gui.authorLastMsgPrint != message.from ){		
+			$("#chat-page-content").append('<div class="activity"></div>');			
+		}else {
+			$newMsg.find('.user').remove();
+		}
+		$(".activity").last().append($newMsg);	
 	}
+		
+	$("#chat-page-content").trigger("create");
+	gui.authorLastMsgPrint = message.from;
+	
 	if ( options.withFX ){
 		$('.blue-r-by-end').delay(config.TIME_FADE_ACK).fadeTo(config.TIME_FADE_ACK, 0);		
 		setTimeout( function() { 
