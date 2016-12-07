@@ -19,7 +19,7 @@ var serveStatic = require('serve-static');  // serve static files
 var easyrtc = require('easyrtc'); 
 
 var config 			= require('./lib/Config.js');
-var BrokerOfVisibles= require('./lib/BrokerOfVisibles.js');
+var Broker			= require('./lib/BrokerOfVisibles.js');
 var PostMan			= require('./lib/PostMan.js');
 var Message			= require('./lib/Message.js');
 var paypal 			= require('./lib/Paypal.js');
@@ -47,7 +47,7 @@ var webServer;
 webServer = http.createServer(app);
 
 var	io = require("socket.io")(webServer);
-var	brokerOfVisibles = new BrokerOfVisibles(io, logger);
+var	broker = new Broker(io, logger);
 var	postMan = new PostMan(io, logger, parseInt(argv.instanceNumber) );
  
 
@@ -180,7 +180,7 @@ app.get('/privacyPolicy', function (req, res) {
 
 app.locals.notifyNeighbours = function (client, online){
 	
-	brokerOfVisibles.getListOfPeopleAround(client, online).then(function(listOfPeople){ 
+	broker.getListOfPeopleAround(client, online).then(function(listOfPeople){ 
 		
 		postMan.send("notificationOfNewContact", { list : listOfPeople }, client);
 		
@@ -201,30 +201,24 @@ app.locals.notifyNeighbours = function (client, online){
 			list2send.push(visible);
 			
 			listOfPeople.map(function (c){
-				brokerOfVisibles.isClientOnline(c.publicClientID).then(function(client2BeNotified){										
+				broker.getClientById(c.publicClientID).then(function( client2BeNotified ){										
 					postMan.send("notificationOfNewContact",  { list : list2send } , client2BeNotified);
 				});	
-			});
-			
-		}
-		
+			});			
+		}		
 	});	
 	
 };
 
 app.locals.onClientAlive = function ( publicClientID , socket ){
 	
-	brokerOfVisibles.getClientById( publicClientID ).then(function(client){
+	broker.getClientById( publicClientID ).then(function(client){
 		
 		if (client == null ||
-			publicClientID != socket.visibleClient.publicClientID ){
+			publicClientID != socket.client.publicClientID ){
 	  		logger.info('onClientAlive ::: publicClientID != publicClientID');	  		
 			return;
 		}
-		
-		client.socketid = socket.id ;
-		socket.visibleClient = client;			
-		brokerOfVisibles.updateClientsProfile( client );
 		
 		//XEP-0013: Flexible Offline Message Retrieval,2.3 Requesting Message Headers
 		postMan.sendKeysDeliveries( client ); 
@@ -253,16 +247,12 @@ app.locals.onConnection = function ( client ){
 };
 
 app.locals.onDisconnect = function(socket) {
-	
-	socket.visibleClient.socketid = null ;	
-	brokerOfVisibles.updateClientsProfile(socket.visibleClient);	
-	logger.info("onDisconnect ::: client: " + socket.visibleClient.publicClientID + " socket: " + socket.socketid);
-	
+	logger.info("onDisconnect ::: client: " + socket.client.publicClientID + " socket: " + socket.socketid );
 };
 
 app.locals.onRequestOfListOfPeopleAround = function (input, socket) {
 	
-	var client = socket.visibleClient;
+	var client = socket.client;
 	
 	if (client.nickName == null){
 		logger.info("onRequestOfListOfPeopleAround  ::: slowly....");
@@ -274,11 +264,11 @@ app.locals.onRequestOfListOfPeopleAround = function (input, socket) {
 		logger.info("onRequestOfListOfPeopleAround  ::: upsss let's send the people around ... anyway");
 	}
 	
-	if ( brokerOfVisibles.isLocationWellFormatted( parameters.location ) ) {	  			
+	if ( broker.isLocationWellFormatted( parameters.location ) ) {	  			
 		client.location.lat = parameters.location.lat.toString() ;	
 		client.location.lon = parameters.location.lon.toString() ;
 		// update DB
-		brokerOfVisibles.updateClientsProfile(client);		  				  			
+		broker.updateClientsProfile(client);		  				  			
 	}
 	
 	if (client == null ) logger.error("onRequestOfListOfPeopleAround  ::: upsss client es null");
@@ -290,39 +280,39 @@ app.locals.onRequestOfListOfPeopleAround = function (input, socket) {
 
 app.locals.onPlanCreation = function (input, socket) {
 	
-	var client = socket.visibleClient;
+	var client = socket.client;
 	
 	var params = postMan.getPlanParams( input, client );
 	if ( params == null) {
 		logger.info("onPlanCreation  ::: upsss parameters == null ");
 		return;
 	}
-	brokerOfVisibles.createNewPlan( client, params );	  				  			
+	broker.createNewPlan( client, params );	  				  			
 
 };
 
 app.locals.onPlanModification = function (input, socket) {
 	
-	var client = socket.visibleClient;
+	var client = socket.client;
 	
 	var params = postMan.getPlanParams( input, client );
 	if ( params == null) {
 		logger.info("onPlanModification  ::: upsss parameters == null ");
 		return;
 	}
-	brokerOfVisibles.updatePlan( client, params );	  				  			
+	broker.updatePlan( client, params );	  				  			
 
 };
 
 
 app.locals.onProfileRetrieval = function(input , socket) {
 	
-	var client = socket.visibleClient;
+	var client = socket.client;
 	
 	var parameters = postMan.getProfileRetrievalParameters(input, client);		
 	if (parameters == null) return;	
 	
-	brokerOfVisibles.getProfileByID( parameters.publicClientID2getImg ).then(function(profile){
+	broker.getProfileByID( parameters.publicClientID2getImg ).then(function(profile){
 		
 		if ( profile == null) return;
 
@@ -338,7 +328,7 @@ app.locals.onProfileRetrieval = function(input , socket) {
 
 app.locals.onProfileUpdate = function(input , socket) {	
 	
-	var client = socket.visibleClient;	
+	var client = socket.client;	
 
 	var parameters = postMan.getProfileResponseParameters(input, client);		
 	if (parameters == null) return;	
@@ -355,8 +345,8 @@ app.locals.onProfileUpdate = function(input , socket) {
 	logger.debug("onProfileUpdate  ::: client.version", client.version);
 
 	
-	brokerOfVisibles.updateClientsProfile( client );
-	brokerOfVisibles.updateClientsPhoto( client, parameters.img );
+	broker.updateClientsProfile( client );
+	broker.updateClientsPhoto( client, parameters.img );
 	
 	if (client == null ) logger.error("onProfileUpdate  ::: upsss client es null");
 	var online = true;
@@ -368,8 +358,8 @@ app.locals.onProfileUpdate = function(input , socket) {
 
 app.locals.onPushRegistration = function( input , socket) {	
 	
-	var client = socket.visibleClient;
-	logger.info("onPushRegistration ::: client: " + client.publicClientID + " socket: " + client.socketid);
+	var client = socket.client;
+	logger.info("onPushRegistration ::: client: " + client.publicClientID + " socket: " + socket.socketid );
 	//TODO
 	var registration = postMan.getPushRegistration( input , client);		
 	if ( registration == null ){
@@ -377,28 +367,28 @@ app.locals.onPushRegistration = function( input , socket) {
 		return;
 	}
 	
-	brokerOfVisibles.getClientById( registration.publicClientID ).then(function(client){
+	broker.getClientById( registration.publicClientID ).then(function(client){
 		
 		if (client == null ||
-			registration.publicClientID != socket.visibleClient.publicClientID ){
+			registration.publicClientID != socket.client.publicClientID ){
 	  		logger.error('onPushRegistration ::: publicClientID != publicClientID');	  		
 			return;
 		}
 
 		client.pushToken = registration.token; 
-		socket.visibleClient = client;
-		brokerOfVisibles.updatePushRegistry( client );	
+		socket.client = client;
+		broker.updatePushRegistry( client );	
 	});	
 	
 };
 
 app.locals.onRequest4Plans = function(input , socket) {
 	
-	var client = socket.visibleClient;	
+	var client = socket.client;	
 	var params = postMan.getRequest4Plans(input, client);		
 	if (params == null) return;	
 	
-	brokerOfVisibles.getListOfPlansAround( params ).then(function(listOfPlans){		
+	broker.getListOfPlansAround( params ).then(function(listOfPlans){		
 		postMan.send("PlansAround", { list : listOfPlans }, client);
 	});
 	
@@ -406,11 +396,11 @@ app.locals.onRequest4Plans = function(input , socket) {
 
 app.locals.onReqPlanImg = function(input , socket) {
 	
-	var client = socket.visibleClient;	
+	var client = socket.client;	
 	var params = postMan.getReqPlanImg(input, client);		
 	if (params == null) return;	
 	
-	brokerOfVisibles.getImgOfPlan( params ).then(function( res ){		
+	broker.getImgOfPlan( params ).then(function( res ){		
 		postMan.send("ImgOfPlanFromServer", res , client);
 	});
 	
@@ -420,31 +410,26 @@ app.locals.onWhoIsOnline = function( input , socket) {
 	
 	logger.debug('WhoIsonline ::: init ' );
 
-	var client = socket.visibleClient;	
+	var client = socket.client;	
 	var ping = postMan.getWhoIsOnline( input, client);		
 	if (ping == null) return;
-
 	
-	var pong = { 
-		idWhoIsOnline: ping.idWhoIsOnline			
-	};
-	
+	var pong = { idWhoIsOnline: ping.idWhoIsOnline };
 	logger.debug('WhoIsonline ::: ', pong );
-	
-	
+		
 	ping.listOfReceivers.map(function( receiver ){
-		brokerOfVisibles.isClientOnline(receiver).then(function( clientReceiver ){	
-			if ( clientReceiver != null ){			
+		broker.getClientById( receiver ).then(function( clientReceiver ){
+			if ( clientReceiver != null ){	
 				postMan.send("WhoIsOnline",  pong, clientReceiver );
-				logger.debug('WhoIsonline ::: ', pong );	  
-	 		}			
+				logger.debug('WhoIsonline ::: ', pong );
+			}
 		});
 	});
 };
 
 app.locals.onWhoIsWriting = function( input , socket) {	
 
-	var client = socket.visibleClient;	
+	var client = socket.client;	
 	var ping = postMan.getWhoIsWriting( input, client);		
 	if (ping == null) return;
 
@@ -454,7 +439,7 @@ app.locals.onWhoIsWriting = function( input , socket) {
 	};
 	
 	ping.listOfReceivers.map(function( receiver ){
-		brokerOfVisibles.isClientOnline(receiver).then(function( clientReceiver ){	
+		broker.getClientById( receiver ).then(function( clientReceiver ){	
 			if ( clientReceiver != null ){			
 				postMan.send("WhoIsWriting",  pong, clientReceiver );
 				logger.debug('WhoIsWriting ::: ',pong );	  
@@ -465,7 +450,7 @@ app.locals.onWhoIsWriting = function( input , socket) {
 
 app.locals.onMessageDeliveryACK = function(input, socket) {		
 	
-	var client = socket.visibleClient;
+	var client = socket.client;
 	
 	var messageACKparameters = postMan.getDeliveryACK(input, client);		
 	if (messageACKparameters == null) return;
@@ -476,36 +461,36 @@ app.locals.onMessageDeliveryACK = function(input, socket) {
 		return;
 	}
 				
-	brokerOfVisibles.isClientOnline(messageACKparameters.from).then(function(clientSender){	
+	broker.getClientById(messageACKparameters.from).then(function(clientSender){	
 		
 		var deliveryReceipt = { 
 			msgID : messageACKparameters.msgID, 
 			typeOfACK : (messageACKparameters.typeOfACK == "ACKfromAddressee") ? "ACKfromAddressee" : "ReadfromAddressee",
 			to : messageACKparameters.to 	
 		};								
-				
-		if ( clientSender != null ){			
-			postMan.send("MessageDeliveryReceipt",  deliveryReceipt , clientSender );
-			postMan.deleteMessageAndACK(deliveryReceipt);
- 		}else {
- 			postMan.deleteMessage( deliveryReceipt );
- 			postMan.archiveACK( messageACKparameters );
- 		}
 		
+		postMan.send("MessageDeliveryReceipt",  deliveryReceipt , clientSender );
+		
+		if ( client.mainDevice == socket.device ){
+			postMan.deleteMessageAndACK(deliveryReceipt);
+		}else{
+ 			postMan.archiveACK( messageACKparameters );
+		}
+	
 	});
 	
 };
 
 app.locals.onMessageRetrieval = function( input, socket) {		
 	
-	var client = socket.visibleClient;		
+	var client = socket.client;		
 	
 	var retrievalParameters = postMan.getMessageRetrieval( input , client);		
 	if (retrievalParameters == null) return;		
 	
 	postMan.getMessageFromArchive(retrievalParameters, client).then(function(message){	
 		if (message != null){
-			postMan.sendMsg( message , client);				
+			postMan.forwardMsg( message , client);				
 		}
 	});
 	
@@ -514,8 +499,8 @@ app.locals.onMessageRetrieval = function( input, socket) {
 //XEP-0013: Flexible Offline Message Retrieval,2.3 Requesting Message Headers 
 app.locals.onReconnectNotification = function( input, socket ) {
 	
-	var client = socket.visibleClient;	
-	logger.info("onReconnectNotification ::: client: " + client.publicClientID + " socket: " + client.socketid);
+	var client = socket.client;	
+	logger.info("onReconnectNotification ::: client: " + client.publicClientID + " socket: " + socket.socketid );
 	
 	var notification = postMan.getReconnectNotification( input , client);		
 	if ( notification == null ){
@@ -529,7 +514,7 @@ app.locals.onReconnectNotification = function( input, socket ) {
 
 app.locals.onKeysDelivery = function( input, socket){		
 
-	var client = socket.visibleClient;
+	var client = socket.client;
 	
 	var keysDelivery = postMan.getKeysDelivery(input , client);		
 	if ( keysDelivery == null ) return;
@@ -541,7 +526,7 @@ app.locals.onKeysDelivery = function( input, socket){
 		return;
 	}
 				
-	brokerOfVisibles.isClientOnline(keysDelivery.to).then(function(clientReceiver){				
+	broker.isClientOnline(keysDelivery.to).then(function(clientReceiver){				
 		if ( clientReceiver != null ){			
 			postMan.send("KeysDelivery",  keysDelivery , clientReceiver ); 					
  		}else {
@@ -559,7 +544,7 @@ app.locals.onKeysDelivery = function( input, socket){
 
 app.locals.onKeysRequest = function( input, socket){		
 
-	var client = socket.visibleClient;
+	var client = socket.client;
 	
 	var KeysRequest = postMan.getKeysRequest( input , client);		
 	if ( KeysRequest == null ) return;
@@ -571,7 +556,7 @@ app.locals.onKeysRequest = function( input, socket){
 		return;
 	}
 				
-	brokerOfVisibles.isClientOnline(KeysRequest.to).then(function(clientReceiver){				
+	broker.isClientOnline(KeysRequest.to).then(function(clientReceiver){				
 		if ( clientReceiver != null ){			
 			postMan.send("KeysRequest",  KeysRequest , clientReceiver ); 					
  		}else {
@@ -583,7 +568,7 @@ app.locals.onKeysRequest = function( input, socket){
 
 app.locals.onMessage2client = function( msg , socket){		
 
-	var client = socket.visibleClient;	
+	var client = socket.client;	
 	if ( postMan.isUUID( msg.to ) == false  ||
 		 postMan.isUUID( msg.from ) == false ||
 		 postMan.isUUID( msg.msgID ) == false ||
@@ -605,18 +590,35 @@ app.locals.onMessage2client = function( msg , socket){
 		to : msg.to
 	};	
 	postMan.send("MessageDeliveryReceipt",  deliveryReceipt , client);
-	
+	/*
+	 * 
+	 * var clients = io.sockets.adapter.rooms['Room Name'].sockets;   
+
+//to get the number of clients
+var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
+
+for (var clientId in clients ) {
+
+     //this is the socket of each client in the room.
+     var clientSocket = io.sockets.connected[clientId];
+
+     //you can do whatever you need with this
+     clientSocket.emit('new event', "Updates");
+
+}
+
+	 * */
 		
 	
-	brokerOfVisibles.isClientOnline( msg.to ).then(function(clientReceiver){				
+	broker.isClientOnline( msg.to ).then(function(clientReceiver){				
 		if ( clientReceiver != null ){
 			//logger.info('onMessage2client ::: client is online' + JSON.stringify( msg ) );
-			postMan.sendMsg( msg , clientReceiver ); 					
+			postMan.forwardMsg( msg , clientReceiver ); 					
  		}else {
  			//logger.info('onMessage2client ::: client is offline' + JSON.stringify( msg ) ); 			
  			postMan.archiveMessage( msg );
  			
- 			brokerOfVisibles.getPushRegistryByID( msg.to ).then(function( pushRegistry ){				
+ 			broker.getPushRegistryByID( msg.to ).then(function( pushRegistry ){				
  				if ( pushRegistry != null ){			
  					postMan.sendPushNotification( msg, pushRegistry );
  		 		}		
@@ -633,7 +635,7 @@ app.locals.onLoginRequest = function (socket , input) {
 		return;
 	}
 	
-	brokerOfVisibles.getClientByHandshakeToken(input.handshakeToken).then(function(client){
+	broker.getClientByHandshakeToken(input.handshakeToken).then(function(client){
 		
 		if (client == null ){
 	  		logger.error('login ::: unknown client with this handshakeToken' + input.handshakeToken );	  		
@@ -647,8 +649,8 @@ app.locals.onLoginRequest = function (socket , input) {
 		logger.info('onLoginRequest ::: client ' + client.publicClientID + ' ip ' + ip );
 		
 		var clientUpdate = [ 
-             brokerOfVisibles.updateClientsLocation( client, ip ) ,
-		     brokerOfVisibles.updateClientsHandshake( client )
+             broker.updateClientsLocation( client, ip ) ,
+		     broker.updateClientsHandshake( client )
 		];
 		
 		var server2connect = postMan.getRightServer2connect();
@@ -677,7 +679,7 @@ app.locals.onLoginRequest = function (socket , input) {
 app.locals.onRegistryRequest = function (socket , input) {
 	logger.debug("app.locals.onRegistryRequest ::: do something...", input);
 	
-	brokerOfVisibles.createNewClient( input.clientPEMpublicKey ).then(function (newClient){			
+	broker.createNewClient( input.clientPEMpublicKey ).then(function (newClient){			
 		var answer = {
 			event : "registration",
 			data : {
@@ -749,17 +751,19 @@ if ( conf.useTLS ){
 		
 		var token = socket.handshake.query.token;		
 		var version = socket.handshake.query.version;
-		
+		var device = socket.handshake.query.device;
+				
 		var decodedToken = postMan.decodeHandshake(token);		
 		var joinServerParameters = postMan.getJoinServerParameters(decodedToken);	
 		if ( joinServerParameters == null ){ return;}  	
 		
-		brokerOfVisibles.getClientByHandshakeToken ( joinServerParameters.handshakeToken ).then(function(client){
+		broker.getClientByHandshakeToken ( joinServerParameters.handshakeToken ).then(function(client){
 
 			client.version = version;
 			logger.debug('io.use ::: client.version : ', client.version);
 			logger.info('io.use ::: client.visibility : ', client.visibility);
-			
+			logger.info('io.use ::: device : ', device);
+			logger.info('io.use ::: main device : ', client.mainDevice);
 			
 			if (client == null){
 				logger.info('io.use ::: I dont find this freaking client in the DB');
@@ -767,14 +771,13 @@ if ( conf.useTLS ){
 			}			
 			var verified = postMan.verifyHandshake ( token , client );		
 		  	if (client && verified == true){	  		
-		  		client.socketid = socket.id ;
+		  		//client.socketid = socket.id ;		  		 		
 		  		// update DB
-		  		brokerOfVisibles.updateClientsProfile(client);	  		
+		  		broker.updateClientsProfile(client);	  		
 		  		//attaches the client to the socket
-		  		socket.visibleClient = client;	  		
-				if(client.socketid == ""){
-					logger.debug('io.use :::  WARNING client already connected warning!!!!');				  			
-				}
+		  		socket.client = client;
+		  		socket.device = device;
+				
 				next();			
 		  	}else{
 		  		logger.error('io.use ::: Got disconnect in auth..! wrong handshake');  		
@@ -786,12 +789,12 @@ if ( conf.useTLS ){
 
 	io.sockets.on("connection", function (socket) {
 		
-		if ( typeof socket.visibleClient == 'undefined'){
+		if ( typeof socket.client == 'undefined'){
 			logger.info("ERROR ::: 404 " );
 			socket.disconnect(); 
 		}
-		var client = socket.visibleClient;
-		logger.info("connection ::: client: " + client.publicClientID + " socket: " + client.socketid);
+		var client = socket.client;
+		logger.info("connection ::: client: " + client.publicClientID + " socket.device: " + socket.device );
 		
 		//XEP-0305: XMPP Quickstart
 		app.locals.onConnection( client );
@@ -873,7 +876,7 @@ easyrtc.events.on("roomJoin", function(connectionObj, roomName, roomParameter, c
 
 var DBConnectionEstablished = [
 	postMan.initDBConnection( conf.db.user, conf.db.pass, conf.db.host, conf.db.name ),
-	brokerOfVisibles.initDBConnection( conf.db.user, conf.db.pass, conf.db.host, conf.db.name )
+	broker.initDBConnection( conf.db.user, conf.db.pass, conf.db.host, conf.db.name )
 ];
 
 when.all ( DBConnectionEstablished ).then(function(){

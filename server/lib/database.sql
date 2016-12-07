@@ -112,7 +112,7 @@ CREATE TABLE public.client
   publicclientid uuid NOT NULL,
   indexofcurrentkey integer,
   currentchallenge uuid,
-  socketid text,
+  maindevice uuid,
   membersince bigint,
   nickname text,
   commentary text,

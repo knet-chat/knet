@@ -221,7 +221,7 @@ function BrokerOfVisibles(_io, _logger) {
 	    						.field("indexofcurrentkey")
 	    						.field("currentchallenge")
 	    						.field("publicclientid")
-	    						.field("socketid")
+	    						.field("maindevice")
 	    						.field("membersince")
 	    						.field("nickname")
 	    						.field("commentary")
@@ -267,10 +267,10 @@ function BrokerOfVisibles(_io, _logger) {
 			    else
 			    	client.currentChallenge = entry.currentchallenge;
 			    
-			    if (entry.socketid == null)
-			    	client.socketid = "";
+			    if (entry.maindevice == null)
+			    	client.mainDevice = "";
 			    else
-			    	client.socketid = entry.socketid ; 
+			    	client.mainDevice = entry.maindevice ; 
 			    
 			    client.memberSince = entry.membersince;
 			    client.nickName = entry.nickname;
@@ -308,7 +308,7 @@ function BrokerOfVisibles(_io, _logger) {
 	    						.field("indexofcurrentkey")
 	    						.field("currentchallenge")
 	    						.field("publicclientid")
-	    						.field("socketid")
+	    						.field("maindevice")
 	    						.field("membersince")
 	    						.field("nickname")
 	    						.field("commentary")
@@ -354,10 +354,10 @@ function BrokerOfVisibles(_io, _logger) {
 			    else
 			    	client.currentChallenge = entry.currentchallenge;
 			    
-			    if (entry.socketid == null)
-			    	client.socketid = "";
+			    if (entry.maindevice == null)
+			    	client.mainDevice = "";
 			    else
-			    	client.socketid = entry.socketid ; 
+			    	client.mainDevice = entry.maindevice ; 
 			    
 			    client.memberSince = entry.membersince;
 			    client.nickName = entry.nickname;
@@ -513,7 +513,7 @@ function BrokerOfVisibles(_io, _logger) {
 							    .set("indexofcurrentkey", newClient.indexOfCurrentKey )
 							    .set("membersince", newClient.memberSince )
 							    .set("currentchallenge", newClient.currentChallenge )
-							    .set("socketid ", null)
+							    .set("maindevice ", null)
 							    .set("nickname", null)
 							    .set("commentary", null)
 							    .set("location", null)
@@ -758,7 +758,6 @@ function BrokerOfVisibles(_io, _logger) {
 		var query2send = squel.update()
 						    .table("client")
 						    .set("location", "ST_GeographyFromText('SRID=4326;POINT(" + client.location.lon + " " + client.location.lat + ")')" , {dontQuote: true} )
-						    .set("socketid", client.socketid)
 						    .set("nickname", client.nickName)
 						    .set("commentary", client.commentary)
 						    .set("lastprofileupdate", client.lastProfileUpdate)
@@ -822,20 +821,20 @@ function BrokerOfVisibles(_io, _logger) {
 	    var d = when.defer();
 	    
 	    var query2send = squel.select()
-	    						.field("indexofcurrentkey")
-	    						.field("currentchallenge")
-	    						.field("publicclientid")
-	    						.field("socketid")
-	    						.field("membersince")
-	    						.field("nickname")
-	    						.field("commentary")
-	    						.field("myarrayofkeys")
-	    						.field("location")
-	    						.field("ST_X(location::geometry)", "lon")
-	    						.field("ST_Y(location::geometry)", "lat")
-							    .from("client")
-							    .where("publicclientid = '" + publicClientID + "'")								    
-							    .toString();
+    						.field("indexofcurrentkey")
+    						.field("currentchallenge")
+    						.field("publicclientid")
+    						.field("socketid")
+    						.field("membersince")
+    						.field("nickname")
+    						.field("commentary")
+    						.field("myarrayofkeys")
+    						.field("location")
+    						.field("ST_X(location::geometry)", "lon")
+    						.field("ST_Y(location::geometry)", "lat")
+						    .from("client")
+						    .where("publicclientid = '" + publicClientID + "'")								    
+						    .toString();
 	    
 		clientOfDB.query(query2send, function(err, result) {
 		    

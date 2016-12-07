@@ -280,7 +280,7 @@ function PostMan( _io, _logger, _instanceNumber) {
 				});
 				
 				var message = { list : messageHeaders };
-				io.sockets.to(client.socketid).emit("ServerReplytoDiscoveryHeaders", PostMan.prototype.encrypt( message , client ));
+				self.triggerClientsEvent( client, 'ServerReplytoDiscoveryHeaders', message );
 				
 			}catch (ex) {
 				logger.debug("sendMessageHeaders  :::  exceptrion thrown " + ex  );						
@@ -466,11 +466,13 @@ function PostMan( _io, _logger, _instanceNumber) {
 						to : r.receiver 	
 					};
 
-					io.sockets.to(client.socketid).emit(
-						"MessageDeliveryReceipt", 
-						PostMan.prototype.encrypt(deliveryReceipt, client ) , 
-						self.deleteMessageAndACK(deliveryReceipt) 
+					self.triggerClientsEvent( 
+						client, 
+						'MessageDeliveryReceipt', 
+						deliveryReceipt, 
+						self.deleteMessageAndACK(deliveryReceipt)
 					);
+
 				});
 			}catch (ex) {
 				logger.debug("sendMessageACKs  :::  exceptrion thrown " + ex  );						
@@ -534,12 +536,14 @@ function PostMan( _io, _logger, _instanceNumber) {
 					var KeysRequest = { 
 						from : r.sender, 
 						to : r.receiver 	
-					};	
-					io.sockets.to(client.socketid).emit(
-						"KeysRequest", 
-						PostMan.prototype.encrypt( KeysRequest, client ) , 
+					};
+					self.triggerClientsEvent( 
+						client, 
+						'KeysRequest', 
+						KeysRequest, 
 						self.deleteKeysRequest( KeysRequest )
 					);
+
 				});				
 			
 			}catch (ex) {
@@ -576,11 +580,14 @@ function PostMan( _io, _logger, _instanceNumber) {
 						keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted.replace(/##\&#39##/g, "'");
 					keysDelivery.setOfKeys.symKeysEncrypted.iv2use = 
 					 	keysDelivery.setOfKeys.symKeysEncrypted.iv2use.replace(/##\&#39##/g, "'");
-					io.sockets.to(client.socketid).emit(
-						"KeysDelivery", 
-						PostMan.prototype.encrypt( keysDelivery, client ) , 
+					
+					self.triggerClientsEvent( 
+						client, 
+						'KeysDelivery', 
+						keysDelivery, 
 						self.deleteKeysDelivery( keysDelivery )
 					);
+					
 				});			
 			}catch (ex) {
 				logger.debug("sendKeysDeliveries  :::  exceptrion thrown " + ex  );						
@@ -598,7 +605,7 @@ function PostMan( _io, _logger, _instanceNumber) {
 				}
 			}
 			
-			io.sockets.to(client.socketid).emit("locationFromServer", PostMan.prototype.encrypt( position, client )  );
+			self.triggerClientsEvent( client, 'locationFromServer',	position );			
 		
 		}catch (ex) {
 			logger.debug("sendDetectedLocation  :::  exception thrown " + ex  );						
@@ -708,14 +715,14 @@ function PostMan( _io, _logger, _instanceNumber) {
 		
 		if (typeof event2trigger !== 'string' ||
 			typeof data !== 'object' || data == null || 
-			typeof client !== 'object' || client == null || client.socketid == null	) 	{	
+			typeof client !== 'object' || client == null ) 	{	
 			
 			logger.debug("postman ::: send ::: can't send " );			
 			return null;
 		}	
 		
-		try{		
-			io.sockets.to(client.socketid).emit(event2trigger, PostMan.prototype.encrypt( data, client ) );
+		try{
+			self.triggerClientsEvent( client, event2trigger, data );
 						
 		}catch(e){
 			logger.debug("postman ::: send ::: exception"  + e);
@@ -723,17 +730,25 @@ function PostMan( _io, _logger, _instanceNumber) {
 			
 	};
 	
-	this.sendMsg = function( msg , client ) {
+	this.forwardMsg = function( msg , client ) {
 		
 		try{		
-			io.sockets.to(client.socketid).emit("MessageFromClient", msg );
+			io.sockets.to( client.publicClientID ).emit( 'MessageFromClient', msg);
 						
 		}catch(e){
-			logger.debug("postman ::: send ::: exception"  + e);
+			logger.debug("postman ::: forwardMsg ::: exception"  + e);
 		}		
 			
-	};	
+	};
 	
+	this.triggerClientsEvent = function( client, event, obj , callback) {		
+		try{
+			var cb = ( callback ) ? callback : function(){} ;			
+			io.sockets.to( client.publicClientID ).emit( event, PostMan.prototype.encrypt( obj, client ), cb );
+		}catch(e){
+			logger.debug("postman ::: triggerClientsEvent ::: exception"  + e);
+		}			
+	};	
 };	
 
 
