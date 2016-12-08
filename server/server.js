@@ -471,10 +471,10 @@ app.locals.onMessageDeliveryACK = function(input, socket) {
 		
 		postMan.send("MessageDeliveryReceipt",  deliveryReceipt , clientSender );
 		
-		if ( client.mainDevice == socket.device ){
-			postMan.deleteMessageAndACK(deliveryReceipt);
+		if ( postMan.isMainDeviceOnline( clientSender ) ){
+			postMan.deleteMessageAndACK(deliveryReceipt);			
 		}else{
- 			postMan.archiveACK( messageACKparameters );
+			postMan.archiveACK( messageACKparameters );
 		}
 	
 	});
@@ -517,27 +517,15 @@ app.locals.onKeysDelivery = function( input, socket){
 	var client = socket.client;
 	
 	var keysDelivery = postMan.getKeysDelivery(input , client);		
-	if ( keysDelivery == null ) return;
-	
+	if ( keysDelivery == null ) return;	
 	logger.debug('onKeysDelivery ::: input ' + JSON.stringify(keysDelivery) );
-	
-	if ( keysDelivery.from != client.publicClientID ){
-		logger.info('onKeysDelivery ::: something went wrong on onKeysDelivery ' );
-		return;
-	}
-				
-	broker.isClientOnline(keysDelivery.to).then(function(clientReceiver){				
-		if ( clientReceiver != null ){			
-			postMan.send("KeysDelivery",  keysDelivery , clientReceiver ); 					
- 		}else {
- 			keysDelivery.setOfKeys.masterKeyEncrypted = 
- 				keysDelivery.setOfKeys.masterKeyEncrypted.replace(/'/g, "##&#39##");
-			keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted = 
-				keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted.replace(/'/g, "##&#39##");
-			keysDelivery.setOfKeys.symKeysEncrypted.iv2use = 	
-				keysDelivery.setOfKeys.symKeysEncrypted.iv2use.replace(/'/g, "##&#39##");
- 			postMan.archiveKeysDelivery(keysDelivery);
- 		}		
+
+	broker.getClientById( keysDelivery.to ).then(function(clientReceiver){				
+		if ( clientReceiver == null ) return;
+		postMan.send("KeysDelivery",  keysDelivery , clientReceiver );
+		if ( ! postMan.isMainDeviceOnline( clientReceiver ) ){
+			postMan.archiveKeysDelivery(keysDelivery);			
+		}
 	});
 
 };
@@ -550,18 +538,13 @@ app.locals.onKeysRequest = function( input, socket){
 	if ( KeysRequest == null ) return;
 	
 	logger.info('onKeysRequest ::: KeysRequest: ' + JSON.stringify(KeysRequest) );
-	
-	if ( KeysRequest.from != client.publicClientID ){
-		logger.info('onKeysRequest ::: something went wrong on KeysRequest ' );
-		return;
-	}
 				
-	broker.isClientOnline(KeysRequest.to).then(function(clientReceiver){				
-		if ( clientReceiver != null ){			
-			postMan.send("KeysRequest",  KeysRequest , clientReceiver ); 					
- 		}else {
- 			postMan.archiveKeysRequest(KeysRequest);
- 		}		
+	broker.getClientById( KeysRequest.to ).then(function( clientReceiver ){				
+		if ( clientReceiver == null ) return;			
+		postMan.send( "KeysRequest",  KeysRequest , clientReceiver );
+		if ( ! postMan.isMainDeviceOnline( clientReceiver ) ){
+			postMan.archiveKeysRequest(KeysRequest);	
+		} 			
 	});
 
 };
@@ -581,50 +564,24 @@ app.locals.onMessage2client = function( msg , socket){
 		logger.info('onMessage2client ::: something went wrong' + JSON.stringify(msg) );
 		return;
 	}
-	
-	app.locals.onClientAlive( msg.from, socket);
-	
 	var deliveryReceipt = { 
 		msgID : msg.msgID, 
 		typeOfACK : "ACKfromServer", 
 		to : msg.to
 	};	
 	postMan.send("MessageDeliveryReceipt",  deliveryReceipt , client);
-	/*
-	 * 
-	 * var clients = io.sockets.adapter.rooms['Room Name'].sockets;   
-
-//to get the number of clients
-var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
-
-for (var clientId in clients ) {
-
-     //this is the socket of each client in the room.
-     var clientSocket = io.sockets.connected[clientId];
-
-     //you can do whatever you need with this
-     clientSocket.emit('new event', "Updates");
-
-}
-
-	 * */
-		
 	
-	broker.isClientOnline( msg.to ).then(function(clientReceiver){				
-		if ( clientReceiver != null ){
-			//logger.info('onMessage2client ::: client is online' + JSON.stringify( msg ) );
-			postMan.forwardMsg( msg , clientReceiver ); 					
- 		}else {
- 			//logger.info('onMessage2client ::: client is offline' + JSON.stringify( msg ) ); 			
- 			postMan.archiveMessage( msg );
- 			
+	broker.getClientById( msg.to ).then(function( clientReceiver ){				
+		if ( clientReceiver == null ) return;
+		postMan.forwardMsg( msg , clientReceiver );
+		if ( ! postMan.isMainDeviceOnline( clientReceiver ) ){
+			postMan.archiveMessage( msg );	 			
  			broker.getPushRegistryByID( msg.to ).then(function( pushRegistry ){				
  				if ( pushRegistry != null ){			
  					postMan.sendPushNotification( msg, pushRegistry );
  		 		}		
  			});
- 			 
- 		}		
+		}			
 	});
 };
 
@@ -794,6 +751,7 @@ if ( conf.useTLS ){
 			socket.disconnect(); 
 		}
 		var client = socket.client;
+		socket.join( client.publicClientID );
 		logger.info("connection ::: client: " + client.publicClientID + " socket.device: " + socket.device );
 		
 		//XEP-0305: XMPP Quickstart

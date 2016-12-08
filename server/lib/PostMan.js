@@ -407,6 +407,13 @@ function PostMan( _io, _logger, _instanceNumber) {
 	 */
 	this.archiveKeysDelivery = function( keysDelivery ) {
 		
+		keysDelivery.setOfKeys.masterKeyEncrypted = 
+				keysDelivery.setOfKeys.masterKeyEncrypted.replace(/'/g, "##&#39##");
+		keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted = 
+			keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted.replace(/'/g, "##&#39##");
+		keysDelivery.setOfKeys.symKeysEncrypted.iv2use = 	
+			keysDelivery.setOfKeys.symKeysEncrypted.iv2use.replace(/'/g, "##&#39##");
+		
 		var query2send = squel.insert()
 			    .into("keysdelivery")
 			    .set("sender", keysDelivery.from)
@@ -466,13 +473,18 @@ function PostMan( _io, _logger, _instanceNumber) {
 						to : r.receiver 	
 					};
 
-					self.triggerClientsEvent( 
+					/* self.triggerClientsEvent( 
 						client, 
 						'MessageDeliveryReceipt', 
 						deliveryReceipt, 
 						self.deleteMessageAndACK(deliveryReceipt)
 					);
-
+					*/
+					self.triggerClientsEvent( 
+						client, 
+						'MessageDeliveryReceipt', 
+						deliveryReceipt
+					);
 				});
 			}catch (ex) {
 				logger.debug("sendMessageACKs  :::  exceptrion thrown " + ex  );						
@@ -515,6 +527,19 @@ function PostMan( _io, _logger, _instanceNumber) {
 		}		
 	};
 	
+	this.isMainDeviceOnline = function( client ) {	
+		var isOnline = false;
+		var sockets = io.sockets.adapter.rooms[ client.publicClientId ].sockets;
+		var numClients = (typeof sockets !== 'undefined') ? Object.keys( sockets ).length : 0;
+		logger.debug('isMainDeviceOnline ::: numClients: ', numClients);
+		
+		for (var id in sockets ) {
+			var clientSocket = io.sockets.connected[ id ];
+			if ( clientSocket.device == client.mainDevice ) isOnline = true;
+		}
+		return isOnline;
+	};
+	
 	
 	this.sendKeysRequests = function(client) {
 
@@ -537,13 +562,19 @@ function PostMan( _io, _logger, _instanceNumber) {
 						from : r.sender, 
 						to : r.receiver 	
 					};
-					self.triggerClientsEvent( 
+					/*
+					 self.triggerClientsEvent( 
 						client, 
 						'KeysRequest', 
 						KeysRequest, 
 						self.deleteKeysRequest( KeysRequest )
 					);
-
+					*/
+					self.triggerClientsEvent( 
+						client, 
+						'KeysRequest', 
+						KeysRequest
+					);
 				});				
 			
 			}catch (ex) {
@@ -581,12 +612,19 @@ function PostMan( _io, _logger, _instanceNumber) {
 					keysDelivery.setOfKeys.symKeysEncrypted.iv2use = 
 					 	keysDelivery.setOfKeys.symKeysEncrypted.iv2use.replace(/##\&#39##/g, "'");
 					
-					self.triggerClientsEvent( 
+					/*
+					 self.triggerClientsEvent( 
 						client, 
 						'KeysDelivery', 
 						keysDelivery, 
 						self.deleteKeysDelivery( keysDelivery )
 					);
+					*/
+					self.triggerClientsEvent( 
+						client, 
+						'KeysDelivery', 
+						keysDelivery
+					);					
 					
 				});			
 			}catch (ex) {
