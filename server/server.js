@@ -215,7 +215,7 @@ app.locals.onClientAlive = function ( publicClientID , socket ){
 	broker.getClientById( publicClientID ).then(function(client){
 		
 		if (client == null ||
-			publicClientID != socket.client.publicClientID ){
+			publicClientID != socket.myClient.publicClientID ){
 	  		logger.info('onClientAlive ::: publicClientID != publicClientID');	  		
 			return;
 		}
@@ -247,12 +247,12 @@ app.locals.onConnection = function ( client ){
 };
 
 app.locals.onDisconnect = function(socket) {
-	logger.info("onDisconnect ::: client: " + socket.client.publicClientID + " socket: " + socket.socketid );
+	logger.info("onDisconnect ::: client: " + socket.myClient.publicClientID + " socket: " + socket.socketid );
 };
 
 app.locals.onRequestOfListOfPeopleAround = function (input, socket) {
 	
-	var client = socket.client;
+	var client = socket.myClient;
 	
 	if (client.nickName == null){
 		logger.info("onRequestOfListOfPeopleAround  ::: slowly....");
@@ -280,7 +280,7 @@ app.locals.onRequestOfListOfPeopleAround = function (input, socket) {
 
 app.locals.onPlanCreation = function (input, socket) {
 	
-	var client = socket.client;
+	var client = socket.myClient;
 	
 	var params = postMan.getPlanParams( input, client );
 	if ( params == null) {
@@ -293,7 +293,7 @@ app.locals.onPlanCreation = function (input, socket) {
 
 app.locals.onPlanModification = function (input, socket) {
 	
-	var client = socket.client;
+	var client = socket.myClient;
 	
 	var params = postMan.getPlanParams( input, client );
 	if ( params == null) {
@@ -307,7 +307,7 @@ app.locals.onPlanModification = function (input, socket) {
 
 app.locals.onProfileRetrieval = function(input , socket) {
 	
-	var client = socket.client;
+	var client = socket.myClient;
 	
 	var parameters = postMan.getProfileRetrievalParameters(input, client);		
 	if (parameters == null) return;	
@@ -328,7 +328,7 @@ app.locals.onProfileRetrieval = function(input , socket) {
 
 app.locals.onProfileUpdate = function(input , socket) {	
 	
-	var client = socket.client;	
+	var client = socket.myClient;	
 
 	var parameters = postMan.getProfileResponseParameters(input, client);		
 	if (parameters == null) return;	
@@ -358,7 +358,7 @@ app.locals.onProfileUpdate = function(input , socket) {
 
 app.locals.onPushRegistration = function( input , socket) {	
 	
-	var client = socket.client;
+	var client = socket.myClient;
 	logger.info("onPushRegistration ::: client: " + client.publicClientID + " socket: " + socket.socketid );
 	//TODO
 	var registration = postMan.getPushRegistration( input , client);		
@@ -370,13 +370,13 @@ app.locals.onPushRegistration = function( input , socket) {
 	broker.getClientById( registration.publicClientID ).then(function(client){
 		
 		if (client == null ||
-			registration.publicClientID != socket.client.publicClientID ){
+			registration.publicClientID != socket.myClient.publicClientID ){
 	  		logger.error('onPushRegistration ::: publicClientID != publicClientID');	  		
 			return;
 		}
 
 		client.pushToken = registration.token; 
-		socket.client = client;
+		socket.myClient = client;
 		broker.updatePushRegistry( client );	
 	});	
 	
@@ -384,7 +384,7 @@ app.locals.onPushRegistration = function( input , socket) {
 
 app.locals.onRequest4Plans = function(input , socket) {
 	
-	var client = socket.client;	
+	var client = socket.myClient;	
 	var params = postMan.getRequest4Plans(input, client);		
 	if (params == null) return;	
 	
@@ -396,7 +396,7 @@ app.locals.onRequest4Plans = function(input , socket) {
 
 app.locals.onReqPlanImg = function(input , socket) {
 	
-	var client = socket.client;	
+	var client = socket.myClient;	
 	var params = postMan.getReqPlanImg(input, client);		
 	if (params == null) return;	
 	
@@ -410,7 +410,7 @@ app.locals.onWhoIsOnline = function( input , socket) {
 	
 	logger.debug('WhoIsonline ::: init ' );
 
-	var client = socket.client;	
+	var client = socket.myClient;	
 	var ping = postMan.getWhoIsOnline( input, client);		
 	if (ping == null) return;
 	
@@ -429,7 +429,7 @@ app.locals.onWhoIsOnline = function( input , socket) {
 
 app.locals.onWhoIsWriting = function( input , socket) {	
 
-	var client = socket.client;	
+	var client = socket.myClient;	
 	var ping = postMan.getWhoIsWriting( input, client);		
 	if (ping == null) return;
 
@@ -450,7 +450,7 @@ app.locals.onWhoIsWriting = function( input , socket) {
 
 app.locals.onMessageDeliveryACK = function(input, socket) {		
 	
-	var client = socket.client;
+	var client = socket.myClient;
 	
 	var messageACKparameters = postMan.getDeliveryACK(input, client);		
 	if (messageACKparameters == null) return;
@@ -483,7 +483,7 @@ app.locals.onMessageDeliveryACK = function(input, socket) {
 
 app.locals.onMessageRetrieval = function( input, socket) {		
 	
-	var client = socket.client;		
+	var client = socket.myClient;		
 	
 	var retrievalParameters = postMan.getMessageRetrieval( input , client);		
 	if (retrievalParameters == null) return;		
@@ -499,7 +499,7 @@ app.locals.onMessageRetrieval = function( input, socket) {
 //XEP-0013: Flexible Offline Message Retrieval,2.3 Requesting Message Headers 
 app.locals.onReconnectNotification = function( input, socket ) {
 	
-	var client = socket.client;	
+	var client = socket.myClient;	
 	logger.info("onReconnectNotification ::: client: " + client.publicClientID + " socket: " + socket.socketid );
 	
 	var notification = postMan.getReconnectNotification( input , client);		
@@ -514,7 +514,7 @@ app.locals.onReconnectNotification = function( input, socket ) {
 
 app.locals.onKeysDelivery = function( input, socket){		
 
-	var client = socket.client;
+	var client = socket.myClient;
 	
 	var keysDelivery = postMan.getKeysDelivery(input , client);		
 	if ( keysDelivery == null ) return;	
@@ -532,7 +532,7 @@ app.locals.onKeysDelivery = function( input, socket){
 
 app.locals.onKeysRequest = function( input, socket){		
 
-	var client = socket.client;
+	var client = socket.myClient;
 	
 	var KeysRequest = postMan.getKeysRequest( input , client);		
 	if ( KeysRequest == null ) return;
@@ -551,7 +551,7 @@ app.locals.onKeysRequest = function( input, socket){
 
 app.locals.onMessage2client = function( msg , socket){		
 
-	var client = socket.client;	
+	var client = socket.myClient;	
 	if ( postMan.isUUID( msg.to ) == false  ||
 		 postMan.isUUID( msg.from ) == false ||
 		 postMan.isUUID( msg.msgID ) == false ||
@@ -732,7 +732,7 @@ if ( conf.useTLS ){
 		  		// update DB
 		  		broker.updateClientsProfile(client);	  		
 		  		//attaches the client to the socket
-		  		socket.client = client;
+		  		socket.myClient = client;
 		  		socket.device = device;
 				
 				next();			
@@ -746,11 +746,11 @@ if ( conf.useTLS ){
 
 	io.sockets.on("connection", function (socket) {
 		
-		if ( typeof socket.client == 'undefined'){
+		if ( typeof socket.myClient == 'undefined'){
 			logger.info("ERROR ::: 404 " );
 			socket.disconnect(); 
 		}
-		var client = socket.client;
+		var client = socket.myClient;
 		socket.join( client.publicClientID );
 		logger.info("connection ::: client: " + client.publicClientID + " socket.device: " + socket.device );
 		

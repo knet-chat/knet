@@ -529,6 +529,7 @@ function PostMan( _io, _logger, _instanceNumber) {
 	
 	this.isMainDeviceOnline = function( client ) {	
 		var isOnline = false;
+		if ( typeof io.sockets.adapter.rooms[ client.publicClientId ] == 'undefined'  ) return false;
 		var sockets = io.sockets.adapter.rooms[ client.publicClientId ].sockets;
 		var numClients = (typeof sockets !== 'undefined') ? Object.keys( sockets ).length : 0;
 		logger.debug('isMainDeviceOnline ::: numClients: ', numClients);
@@ -779,10 +780,9 @@ function PostMan( _io, _logger, _instanceNumber) {
 			
 	};
 	
-	this.triggerClientsEvent = function( client, event, obj , callback) {		
+	this.triggerClientsEvent = function( client, event, obj ) {		
 		try{
-			var cb = ( callback ) ? callback : function(){} ;			
-			io.sockets.to( client.publicClientID ).emit( event, PostMan.prototype.encrypt( obj, client ), cb );
+			io.sockets.to( client.publicClientID ).emit( event, PostMan.prototype.encrypt( obj, client ) );
 		}catch(e){
 			logger.debug("postman ::: triggerClientsEvent ::: exception"  + e);
 		}			

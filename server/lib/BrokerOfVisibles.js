@@ -131,6 +131,7 @@ function BrokerOfVisibles(_io, _logger) {
 	};	
 	
 	//XEP-0080: User Location:: distribute its Location to its "Visible"s	
+//TODO
 	this.getListOfPeopleAround = function(client , online) {
 		
 		var d = when.defer();
@@ -148,7 +149,6 @@ function BrokerOfVisibles(_io, _logger) {
 	    						.field("visibility")
 							    .from("client")							    				    
 							    .order("location::geometry <-> 'SRID=4326;POINT(" + client.location.lon + " " + client.location.lat + ")'::geometry" )
-							    .where("socketid IS NOT NULL")
 							    .where("visibility = 'on'")
 							    .limit(config.MAX_PROFILES_QUERY)
 							    .toString();			
