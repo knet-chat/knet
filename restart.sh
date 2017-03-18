@@ -15,10 +15,8 @@ NUMBER_OF_INSTANCES=$(($targetCnt + 0))
 COUNTER=0
 while [  $COUNTER -lt $NUMBER_OF_INSTANCES ]; do
   forever start -l $SW_PATH/server/log/instance_$COUNTER.log -a $SW_PATH/server/server.js --instanceNumber=$COUNTER &
-  let COUNTER=COUNTER+1 
+  let COUNTER=COUNTER+1
 done
 sleep 3;
 
 tail -f $SW_PATH/server/log/instance_*.log
-
-
