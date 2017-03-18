@@ -518,7 +518,7 @@ app.locals.onKeysDelivery = function( input, socket){
 
 	var keysDelivery = postMan.getKeysDelivery(input , client);
 	if ( keysDelivery == null ) return;
-	logger.debug('onKeysDelivery ::: input ' + JSON.stringify(keysDelivery) );
+	//logger.debug('onKeysDelivery ::: input ' + JSON.stringify(keysDelivery) );
 
 	broker.getClientById( keysDelivery.to ).then(function(clientReceiver){
 		if ( clientReceiver == null ) return;
@@ -643,7 +643,7 @@ app.locals.onRegistryRequest = function (socket , input) {
 				publicClientID : newClient.publicClientID ,
 				myArrayOfKeys : newClient.myArrayOfKeys,
 				handshakeToken : newClient.handshakeToken,
-        mainDevice : newClient.mainDevice						
+        mainDevice : newClient.mainDevice
 			}
 		};
 		socket.TLS.prepare( JSON.stringify(answer) );
