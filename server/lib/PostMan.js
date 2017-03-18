@@ -531,7 +531,6 @@ function PostMan( _io, _logger, _instanceNumber) {
 		var isOnline = false;
 		if ( typeof io.sockets.adapter.rooms[ client.publicClientId ] == 'undefined'  ){
 			logger.debug('isMainDeviceOnline ::: return: false ');
-
 			return false;
 		}
 		var sockets = io.sockets.adapter.rooms[ client.publicClientId ].sockets;
