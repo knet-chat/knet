@@ -529,9 +529,6 @@ function PostMan( _io, _logger, _instanceNumber) {
 
 	this.isMainDeviceOnline = function( client ) {
 		var isOnline = false;
-		logger.debug('isMainDeviceOnline ::: client.publicClientId ', client  );
-		logger.debug('isMainDeviceOnline ::: client.publicClientId ', client.publicClientID );
-		logger.debug('isMainDeviceOnline ::: io.sockets.adapter.rooms ',io.sockets.adapter.rooms[ client.publicClientID ]);
 		if ( typeof io.sockets.adapter.rooms[ client.publicClientID ] == 'undefined'  ){
 			logger.debug('isMainDeviceOnline ::: return: false ');
 			return false;
@@ -541,9 +538,11 @@ function PostMan( _io, _logger, _instanceNumber) {
 		logger.debug('isMainDeviceOnline ::: numClients: ', numClients);
 
 		for (var id in sockets ) {
-			logger.debug('isMainDeviceOnline ::: id: ', id);
-			logger.debug('isMainDeviceOnline ::: io.sockets.connected: ', io.sockets.connected);
+
 			var clientSocket = io.sockets.connected[ id ];
+			logger.debug('isMainDeviceOnline ::: clientSocket.device: ', clientSocket.device);
+			logger.debug('isMainDeviceOnline ::: client.mainDevice: ', client.mainDevice);
+
 			if ( clientSocket.device == client.mainDevice ) isOnline = true;
 		}
 		logger.debug('isMainDeviceOnline ::: return: false ',isOnline);
