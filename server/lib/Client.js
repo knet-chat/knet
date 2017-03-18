@@ -19,11 +19,11 @@ function Client( pubKeyPEM ) {
                         forge.random.getBytesSync(32),
                         forge.random.getBytesSync(32),
                         forge.random.getBytesSync(32)];
-  
-  for (i = 0; i < this.myArrayOfKeys.length; i++) { 
+
+  for (i = 0; i < this.myArrayOfKeys.length; i++) {
     this.myArrayOfKeys[i] = this.myArrayOfKeys[i].replace(/['"]/g,'X');
   }
-                        
+
   this.myArrayOfIV = 	[forge.random.getBytesSync(32),
                         forge.random.getBytesSync(32),
                         forge.random.getBytesSync(32),
@@ -33,16 +33,17 @@ function Client( pubKeyPEM ) {
                         forge.random.getBytesSync(32),
                         forge.random.getBytesSync(32),
                         forge.random.getBytesSync(32)];
-  
-  for (i = 0; i < this.myArrayOfIV.length; i++) { 
+
+  for (i = 0; i < this.myArrayOfIV.length; i++) {
    this.myArrayOfIV[i] = this.myArrayOfIV[i].replace(/['"]/g,'X');
   }
-  
+
   this.handshakeToken = uuid.v4();
   //newer than 2015
   this.lastProfileUpdate = 1420070401000;
   this.pubKeyPEM = pubKeyPEM;
   this.visibility = "on";
+  this.mainDevice = uuid.v4();
 
 };
 
