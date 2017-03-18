@@ -51,7 +51,7 @@ var workers = workerFarm(require.resolve('./KeysGenerator'));
 function PostMan( _io, _logger, _instanceNumber) {
 	var io = _io; //pointer to io.sockets
 	var listOfMessages = []; //array of Message.js (DB)
-	var listOfACKs = []; //array of {msgID ,to ,from } (DB)	
+	var listOfACKs = []; //array of {msgID ,to ,from } (DB)
 	var clientOfDB = null;
 	var self = this;
 	var lastServerAsigned = 0;
@@ -62,7 +62,7 @@ function PostMan( _io, _logger, _instanceNumber) {
 
 
 	this.createAsymetricKeys = function() {
-		
+
 		var options = {};
 		options.bits = 2048;
 		options.e = 0x10001;
@@ -122,16 +122,16 @@ function PostMan( _io, _logger, _instanceNumber) {
 		var setOfKeys = {};
 		setOfKeys.publicKey = forge.pki.publicKeyToPem( keys.publicKey );
 		setOfKeys.privateKey = forge.pki.privateKeyToPem( keys.privateKey );
-		setOfKeys.certificate = forge.pki.certificateToPem( cert );	
+		setOfKeys.certificate = forge.pki.certificateToPem( cert );
 
 		return setOfKeys;
 	};
-	
+
 	this.createBufferOfKeys = function() {
 		logger.info(
 			'Postman ::: creating Buffer of Keys, size of buffer: ',
 			config.MAX_SIZE_ASIM_KEYS_BUFFER );
-		
+
 		/*for (i = 0; i < config.MAX_SIZE_ASIM_KEYS_BUFFER; i++) {
 			workers(function (keys) {
 				listOfAsimetricKeys.push( keys );
@@ -142,9 +142,9 @@ function PostMan( _io, _logger, _instanceNumber) {
 			listOfAsimetricKeys.push( self.createAsymetricKeys() );
 			logger.debug("callback ::: current number of certs", listOfAsimetricKeys.length );
 		}
-		
+
 	};
-	
+
 	this.createTLSConnection = function( options ) {
 
 		var serverTLS = forge.tls.createConnection({
@@ -175,7 +175,7 @@ function PostMan( _io, _logger, _instanceNumber) {
 		    return options.keys.privateKey;
 		  },
 		  // send base64-encoded TLS data to client
-		  tlsDataReady:  function(c) {			
+		  tlsDataReady:  function(c) {
 			  try{
 				  var data2send = c.tlsData.getBytes();
 				  io.sockets.to(options.socket.id).emit('data2Client', forge.util.encode64( data2send ) );
@@ -198,36 +198,36 @@ function PostMan( _io, _logger, _instanceNumber) {
 		  },
 		  error: function(c, error) {
 		    logger.error('Server error: ' + error.message);
-		    //c.close();		    
+		    //c.close();
 		  }
 		});
-		
+
 		return serverTLS;
 	};
-	
+
 	this.getAsymetricKeyFromList = function (){
 		//workers(function (keys) {
 		//	listOfAsimetricKeys.push( keys );
-		//});*/		  
+		//});*/
 		indexOfAsimetricKeyArray = indexOfAsimetricKeyArray + 1;
 		if (indexOfAsimetricKeyArray >= config.MAX_SIZE_ASIM_KEYS_BUFFER){
 			indexOfAsimetricKeyArray = 0;
 		}
 		return listOfAsimetricKeys[indexOfAsimetricKeyArray];
 
-	};	
+	};
 
-	
+
     //TODO : what about calling `done()` to release the client back to the pool
     //	done();
     //	client.end();
 	this.initDBConnection = function (user, pass, host, name){
-		
+
 		if ( conf.useTLS ){
 			logger.info('PostMan:::initDBConnection this server generates Keys');
 			self.createBufferOfKeys();
-		}		
-		
+		}
+
 		var d = when.defer();
 		var conString = "postgres://" +  user + ":" + pass + "@" + host + "/" + name;
 		pg.connect(conString, function(err, client, done) {
@@ -237,91 +237,91 @@ function PostMan( _io, _logger, _instanceNumber) {
 			logger.info('PostMan ::: correctly connected to the Database');
 			clientOfDB = client;
 			return d.resolve(true);
-		});	
-		return d.promise;	
-	};	
+		});
+		return d.promise;
+	};
 	//TODO #4 check if this new message makes the Buffer of sender/receiver become full
 	//PostMan verifies if either the buffer of the sender or the buffer of the Receiver is full
 	this.isPostBoxFull= function(message) {
 		//get from the message the sender and receiver
-		//var isPostBoxFull = false;		
+		//var isPostBoxFull = false;
 		return false;
-	
+
 	};
-	
+
 	//XEP-0013: Flexible Offline Message Retrieval,2.3 Requesting Message Headers :: sends Mailbox headers to client, it emits ServerReplytoDiscoveryHeaders
-	this.sendMessageHeaders = function(client) {		
-		
+	this.sendMessageHeaders = function(client) {
+
 	    var query2send = squel.select()
 	    						.field("msgid")
-							    .from("message")							    
-							    .where("receiver = '" + client.publicClientID + "'")							    
+							    .from("message")
+							    .where("receiver = '" + client.publicClientID + "'")
 							    .toString();
-		
+
 		clientOfDB.query(query2send, function(err, result) {
-		
+
 			if(err) {
-				logger.error('sendMessageHeaders ::: error running query', err);	
+				logger.error('sendMessageHeaders ::: error running query', err);
 			}
-			
+
 			try {
-			
-				if ( typeof result.rows == "undefined" || result.rows.length == 0){					
+
+				if ( typeof result.rows == "undefined" || result.rows.length == 0){
 					return;
 				}
-				
+
 				var messageHeaders = [];
 				result.rows.map(function(r){
-					var header2add = {	
+					var header2add = {
 						msgID : r.msgid,
 						size : 0
 					};
 					messageHeaders.push(header2add);
 				});
-				
+
 				var message = { list : messageHeaders };
 				self.triggerClientsEvent( client, 'ServerReplytoDiscoveryHeaders', message );
-				
+
 			}catch (ex) {
-				logger.debug("sendMessageHeaders  :::  exceptrion thrown " + ex  );						
+				logger.debug("sendMessageHeaders  :::  exceptrion thrown " + ex  );
 			}
-		
-		});	 
-		
+
+		});
+
 	};
-	
+
 	this.setAsymetricKey2List = function ( keys ){
 		listOfAsimetricKeys.push(keys);
-		logger.debug("setAsymetricKey2List  :::  length: ", listOfAsimetricKeys.length);		
-	};	
-	
+		logger.debug("setAsymetricKey2List  :::  length: ", listOfAsimetricKeys.length);
+	};
+
 	this.getMessageFromArchive = function(retrievalParameters , client) {
-		
+
 		var d = when.defer();
-	    
+
 	    var query2send = squel.select()
 						    .from("message")
-						    .where("msgid = '" + retrievalParameters.msgID + "'")							    
-						    .where("receiver = '" + client.publicClientID + "'")							    
+						    .where("msgid = '" + retrievalParameters.msgID + "'")
+						    .where("receiver = '" + client.publicClientID + "'")
 						    .toString();
-	    
+
 		clientOfDB.query(query2send, function(err, result) {
-		    
+
 		    if(err) {
-		    	logger.error('getMessageFromArchive ::: error running query', err);	
+		    	logger.error('getMessageFromArchive ::: error running query', err);
 		    	return d.resolve(err);
 		    }
-		    
+
 		    try {
-		    	
+
 			    if (typeof result.rows[0] == "undefined"  ){
 			    	//logger.debug('getMessageFromArchive ::: publicClientID not registered or socket is set to null --> offline for client:' + publicClientID );
 			    	return  d.resolve(null);
 			    }
-		    		    
+
 			    var message = {};
 			    var entry = result.rows[0];
-			    
+
 			    message.msgID = entry.msgid;
 			    message.to = entry.receiver;
 			    message.from = entry.sender;
@@ -329,26 +329,26 @@ function PostMan( _io, _logger, _instanceNumber) {
 			    message.messageBody.encryptedMsg = message.messageBody.encryptedMsg.replace(/##\&#39##/g, "'");
 			    message.timestamp = entry.timestamp ;
 			    message.chatWith = entry.chatwith ;
-			    			   		    
-			    
+
+
 			    return  d.resolve(message);
-			    
+
 		    }catch (ex) {
 				logger.debug("getMessageFromArchive  :::  exception thrown " + ex  );
-				return  d.resolve(null);	
+				return  d.resolve(null);
 			}
-		    
+
 		  });
-		
-		return d.promise;	  
-	  
+
+		return d.promise;
+
 	};
-	
-	
+
+
 	this.archiveMessage = function(msg) {
-		
+
 		msg.messageBody.encryptedMsg = msg.messageBody.encryptedMsg.replace(/'/g, "##&#39##");
-		
+
 		var query2send = squel.insert()
 						    .into("message")
 						    .set("msgid", msg.msgID)
@@ -356,41 +356,41 @@ function PostMan( _io, _logger, _instanceNumber) {
 						    .set("sender", msg.from)
 						    .set("messagebody", JSON.stringify(msg.messageBody) )
 						    .set("timestamp", msg.timestamp)
-						    .set("chatwith", msg.chatWith)							    
+						    .set("chatwith", msg.chatWith)
 						    .toString() ;
-				    
-		clientOfDB.query(query2send, function(err, result) {		     
-			//clientOfDB.done();		    
+
+		clientOfDB.query(query2send, function(err, result) {
+			//clientOfDB.done();
 			if(err) {
-		    	logger.error('archiveMessage :::error running query', err);	
+		    	logger.error('archiveMessage :::error running query', err);
 		    	logger.error('archiveMessage ::: query error: ', query2send);
-		    }	    
+		    }
 		});
 	};
 
 
-	
+
 	this.archiveACK = function(messageACKparameters) {
-		
+
 		var query2send = squel.insert()
 			    .into("messageack")
 			    .set("msgid", messageACKparameters.msgID)
 			    .set("receiver", messageACKparameters.to)
 			    .set("sender", messageACKparameters.from)
-			    .set("type", messageACKparameters.typeOfACK)			    							    
+			    .set("type", messageACKparameters.typeOfACK)
 			    .toString() ;
-		
+
 		clientOfDB.query(query2send, function(err, result) {
-			
+
 			//clientOfDB.done();
-			
+
 			if(err) {
-				logger.error('archiveMessage :::error running query', err);	
+				logger.error('archiveMessage :::error running query', err);
 				logger.error('archiveMessage ::: query error: ', query2send);
-			}		    
-		
+			}
+
 		});
-		
+
 	};
 	/**
 	 var data = {
@@ -398,53 +398,53 @@ function PostMan( _io, _logger, _instanceNumber) {
 		to : contact.publicClientID,
 		setOfKeys : {
 			masterKeyEncrypted : masterKeyEncrypted,
-			symKeysEncrypted : { 
-				iv2use : iv2use , 
-				keysEncrypted : cipher.output.data 
+			symKeysEncrypted : {
+				iv2use : iv2use ,
+				keysEncrypted : cipher.output.data
 			}
 		}
-	};	 
+	};
 	 */
 	this.archiveKeysDelivery = function( keysDelivery ) {
-		
-		keysDelivery.setOfKeys.masterKeyEncrypted = 
+
+		keysDelivery.setOfKeys.masterKeyEncrypted =
 				keysDelivery.setOfKeys.masterKeyEncrypted.replace(/'/g, "##&#39##");
-		keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted = 
+		keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted =
 			keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted.replace(/'/g, "##&#39##");
-		keysDelivery.setOfKeys.symKeysEncrypted.iv2use = 	
+		keysDelivery.setOfKeys.symKeysEncrypted.iv2use =
 			keysDelivery.setOfKeys.symKeysEncrypted.iv2use.replace(/'/g, "##&#39##");
-		
+
 		var query2send = squel.insert()
 			    .into("keysdelivery")
 			    .set("sender", keysDelivery.from)
 			    .set("receiver", keysDelivery.to)
 			    .set("setofkeys", JSON.stringify(keysDelivery.setOfKeys) )
 			    .toString() ;
-		
-		clientOfDB.query(query2send, function(err, result) {	
+
+		clientOfDB.query(query2send, function(err, result) {
 			if(err) {
-				logger.error('archiveKeysDelivery :::error running query', err);	
+				logger.error('archiveKeysDelivery :::error running query', err);
 				logger.error('archiveKeysDelivery ::: query error: ', query2send);
-			}		
+			}
 		});
-				
+
 	};
 
 	this.archiveKeysRequest = function( input ) {
-		
+
 		var query2send = squel.insert()
 			    .into("keysrequest")
 			    .set("sender", input.from)
 			    .set("receiver", input.to)
 			    .toString() ;
-		
-		clientOfDB.query(query2send, function(err, result) {	
+
+		clientOfDB.query(query2send, function(err, result) {
 			if(err) {
-				logger.error('archiveKeysRequest :::error running query', err);	
+				logger.error('archiveKeysRequest :::error running query', err);
 				logger.error('archiveKeysRequest ::: query error: ', query2send);
-			}		
+			}
 		});
-		
+
 	};
 
 	this.sendMessageACKs = function(client) {
@@ -453,46 +453,46 @@ function PostMan( _io, _logger, _instanceNumber) {
 								.field("msgid")
 								.field("receiver")
 								.field("type")
-							    .from("messageack")							    
-							    .where("sender = '" + client.publicClientID + "'")							    
+							    .from("messageack")
+							    .where("sender = '" + client.publicClientID + "'")
 							    .toString();
-							    
+
 		clientOfDB.query(query2send, function(err, result) {
-		
+
 			if(err) {
-				logger.error('sendMessageACKs ::: error running query', err);	
-			}			
-			try {			
-				if ( typeof result.rows == "undefined" || result.rows.length == 0 )					
+				logger.error('sendMessageACKs ::: error running query', err);
+			}
+			try {
+				if ( typeof result.rows == "undefined" || result.rows.length == 0 )
 					return;
-					
+
 				result.rows.map(function(r){
-					var deliveryReceipt = { 
-						msgID : r.msgid, 
+					var deliveryReceipt = {
+						msgID : r.msgid,
 						typeOfACK : r.type,
-						to : r.receiver 	
+						to : r.receiver
 					};
 
-					/* self.triggerClientsEvent( 
-						client, 
-						'MessageDeliveryReceipt', 
-						deliveryReceipt, 
+					/* self.triggerClientsEvent(
+						client,
+						'MessageDeliveryReceipt',
+						deliveryReceipt,
 						self.deleteMessageAndACK(deliveryReceipt)
 					);
 					*/
-					self.triggerClientsEvent( 
-						client, 
-						'MessageDeliveryReceipt', 
+					self.triggerClientsEvent(
+						client,
+						'MessageDeliveryReceipt',
 						deliveryReceipt
 					);
 				});
 			}catch (ex) {
-				logger.debug("sendMessageACKs  :::  exceptrion thrown " + ex  );						
-			}		
-		});		
+				logger.debug("sendMessageACKs  :::  exceptrion thrown " + ex  );
+			}
+		});
 	};
-	
-	
+
+
 	this.sendPushNotification = function( msg, pushRegistry ) {
 
 		try {
@@ -500,7 +500,7 @@ function PostMan( _io, _logger, _instanceNumber) {
 				collapseKey: 'do_not_collapse',
 			    priority: 'high',
 			    delayWhileIdle: false,
-			    timeToLive: 2419200,			    
+			    timeToLive: 2419200,
 			});
 			message.addData('title', 'knet');
 			message.addData('message', 'knet');
@@ -509,285 +509,290 @@ function PostMan( _io, _logger, _instanceNumber) {
 			//message.addNotification('body', 'SMS');
 			//message.addNotification('icon', 'myicon');
 			//message.addNotification('tag', 'knet');
-			 
+
 			var regTokens = [];
 			regTokens.push( pushRegistry.token );
-			 
-			// Set up the sender with you API key 
+
+			// Set up the sender with you API key
 			var sender = new gcm.Sender( config.keyGCM );
-			 
-			// Now the sender can be used to send messages 
+
+			// Now the sender can be used to send messages
 			sender.send(message, { registrationTokens: regTokens }, function (err, response) {
 			    if(err) logger.debug("sendPushNotification :::  err " + err  );
 			    else    logger.debug("sendPushNotification :::  response " + response );
-			});		
-			
+			});
+
 		}catch (ex) {
-			logger.debug("sendPushNotification :::  exception " + ex  );						
-		}		
+			logger.debug("sendPushNotification :::  exception " + ex  );
+		}
 	};
-	
-	this.isMainDeviceOnline = function( client ) {	
+
+	this.isMainDeviceOnline = function( client ) {
 		var isOnline = false;
-		if ( typeof io.sockets.adapter.rooms[ client.publicClientId ] == 'undefined'  ) return false;
+		if ( typeof io.sockets.adapter.rooms[ client.publicClientId ] == 'undefined'  ){
+			logger.debug('isMainDeviceOnline ::: return: false ');
+
+			return false;
+		}
 		var sockets = io.sockets.adapter.rooms[ client.publicClientId ].sockets;
 		var numClients = (typeof sockets !== 'undefined') ? Object.keys( sockets ).length : 0;
 		logger.debug('isMainDeviceOnline ::: numClients: ', numClients);
-		
+
 		for (var id in sockets ) {
 			var clientSocket = io.sockets.connected[ id ];
 			if ( clientSocket.device == client.mainDevice ) isOnline = true;
 		}
+		logger.debug('isMainDeviceOnline ::: return: false ',isOnline);
 		return isOnline;
 	};
-	
-	
+
+
 	this.sendKeysRequests = function(client) {
 
 	    var query2send = squel.select()
 							.field("sender")
 							.field("receiver")
-						    .from("keysrequest")							    
-						    .where("receiver = '" + client.publicClientID + "'")							    
+						    .from("keysrequest")
+						    .where("receiver = '" + client.publicClientID + "'")
 						    .toString();
-			
+
 		clientOfDB.query(query2send, function(err, result) {
-		
+
 			if(err) logger.error('sendKeysRequests ::: error running query', err);
-			try {			
-				if ( typeof result.rows == "undefined" || result.rows.length == 0 )					
-					return;				
-				
+			try {
+				if ( typeof result.rows == "undefined" || result.rows.length == 0 )
+					return;
+
 				result.rows.map(function(r){
-					var KeysRequest = { 
-						from : r.sender, 
-						to : r.receiver 	
+					var KeysRequest = {
+						from : r.sender,
+						to : r.receiver
 					};
 					/*
-					 self.triggerClientsEvent( 
-						client, 
-						'KeysRequest', 
-						KeysRequest, 
+					 self.triggerClientsEvent(
+						client,
+						'KeysRequest',
+						KeysRequest,
 						self.deleteKeysRequest( KeysRequest )
 					);
 					*/
-					self.triggerClientsEvent( 
-						client, 
-						'KeysRequest', 
+					self.triggerClientsEvent(
+						client,
+						'KeysRequest',
 						KeysRequest
 					);
-				});				
-			
+				});
+
 			}catch (ex) {
-				logger.debug("sendMessageACKs  :::  exceptrion thrown " + ex  );						
-			}		
-		});		
+				logger.debug("sendMessageACKs  :::  exceptrion thrown " + ex  );
+			}
+		});
 	}; // END sendKeysRequests
-	
+
 	this.sendKeysDeliveries = function(client) {
 
 	    var query2send = squel.select()
 							.field("sender")
 							.field("receiver")
 							.field("setofkeys")
-						    .from("keysdelivery")							    
-						    .where("receiver = '" + client.publicClientID + "'")							    
+						    .from("keysdelivery")
+						    .where("receiver = '" + client.publicClientID + "'")
 						    .toString();
-			
+
 		clientOfDB.query(query2send, function(err, result) {
 			try {
-				if(err) logger.error('sendKeysDeliveries ::: error running query', err);						
-				if ( typeof result.rows == "undefined" || result.rows.length == 0 )	 return;				
-				
+				if(err) logger.error('sendKeysDeliveries ::: error running query', err);
+				if ( typeof result.rows == "undefined" || result.rows.length == 0 )	 return;
+
 				result.rows.map(function(r){
-					var keysDelivery = {						
-						from : r.sender, 
+					var keysDelivery = {
+						from : r.sender,
 						to : r.receiver,
-						setOfKeys : r.setofkeys 	
+						setOfKeys : r.setofkeys
 					};
-										
-					keysDelivery.setOfKeys.masterKeyEncrypted = 
+
+					keysDelivery.setOfKeys.masterKeyEncrypted =
  						keysDelivery.setOfKeys.masterKeyEncrypted.replace(/##\&#39##/g, "'");
-					keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted = 
+					keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted =
 						keysDelivery.setOfKeys.symKeysEncrypted.keysEncrypted.replace(/##\&#39##/g, "'");
-					keysDelivery.setOfKeys.symKeysEncrypted.iv2use = 
+					keysDelivery.setOfKeys.symKeysEncrypted.iv2use =
 					 	keysDelivery.setOfKeys.symKeysEncrypted.iv2use.replace(/##\&#39##/g, "'");
-					
+
 					/*
-					 self.triggerClientsEvent( 
-						client, 
-						'KeysDelivery', 
-						keysDelivery, 
+					 self.triggerClientsEvent(
+						client,
+						'KeysDelivery',
+						keysDelivery,
 						self.deleteKeysDelivery( keysDelivery )
 					);
 					*/
-					self.triggerClientsEvent( 
-						client, 
-						'KeysDelivery', 
+					self.triggerClientsEvent(
+						client,
+						'KeysDelivery',
 						keysDelivery
-					);					
-					
-				});			
+					);
+
+				});
 			}catch (ex) {
-				logger.debug("sendKeysDeliveries  :::  exceptrion thrown " + ex  );						
-			}		
-		});		
-	}; // END sendKeysDeliveries		
-	
+				logger.debug("sendKeysDeliveries  :::  exceptrion thrown " + ex  );
+			}
+		});
+	}; // END sendKeysDeliveries
+
 	this.sendDetectedLocation = function(client) {
 
-		try{			
+		try{
 			var position = {
 				coords : {
 					latitude : client.location.lat,
 					longitude : client.location.lon,
 				}
 			}
-			
-			self.triggerClientsEvent( client, 'locationFromServer',	position );			
-		
+
+			self.triggerClientsEvent( client, 'locationFromServer',	position );
+
 		}catch (ex) {
-			logger.debug("sendDetectedLocation  :::  exception thrown " + ex  );						
+			logger.debug("sendDetectedLocation  :::  exception thrown " + ex  );
 		}
-		
+
 	};
-	
+
 	this.deleteMessageAndACK = function(deliveryReceipt) {
-	    
+
 		var query2send = squel.delete()
 						    .from("message")
-						    .where("msgid = '" + deliveryReceipt.msgID + "'")							    
-						    .where("receiver = '" + deliveryReceipt.to + "'")							    
+						    .where("msgid = '" + deliveryReceipt.msgID + "'")
+						    .where("receiver = '" + deliveryReceipt.to + "'")
 						    .toString() + " ; " +
 						 squel.delete()
 						    .from("messageack")
-						    .where("msgid = '" + deliveryReceipt.msgID + "'")							    
+						    .where("msgid = '" + deliveryReceipt.msgID + "'")
 						    .where("receiver = '" + deliveryReceipt.to + "'")
-						    .where("type = '" + deliveryReceipt.typeOfACK + "'")							    
+						    .where("type = '" + deliveryReceipt.typeOfACK + "'")
 						    .toString() ;
-		   
+
 		clientOfDB.query(query2send, function(err, result) {
 			try {
-		
+
 				if(err) {
-					logger.error('deleteMessageAndACK ::: error running query', err);	
-				}						
-			
+					logger.error('deleteMessageAndACK ::: error running query', err);
+				}
+
 			}catch (ex) {
-				logger.debug("deleteMessageAndACK  :::  exception thrown " + ex  );						
+				logger.debug("deleteMessageAndACK  :::  exception thrown " + ex  );
 			}
-		
-		});	
-	
+
+		});
+
 	};
-	
+
 	this.deleteMessage = function(deliveryReceipt) {
-	    
+
 		var query2send = squel.delete()
 						    .from("message")
-						    .where("msgid = '" + deliveryReceipt.msgID + "'")							    
-						    .where("receiver = '" + deliveryReceipt.to + "'")							    
-						    .toString() 
-		   
+						    .where("msgid = '" + deliveryReceipt.msgID + "'")
+						    .where("receiver = '" + deliveryReceipt.to + "'")
+						    .toString()
+
 		clientOfDB.query(query2send, function(err, result) {
-			try {		
+			try {
 				if(err) {
-					logger.error('deleteMessage ::: error running query', err);	
-				}			
+					logger.error('deleteMessage ::: error running query', err);
+				}
 			}catch (ex) {
-				logger.debug("deleteMessage  :::  exception thrown " + ex  );						
-			}		
-		});	
-	
+				logger.debug("deleteMessage  :::  exception thrown " + ex  );
+			}
+		});
+
 	};
-	
+
 	this.deleteKeysRequest = function( KeysRequest ) {
-	    
+
 		var query2send = squel.delete()
 						    .from("keysrequest")
-						    .where("sender = '" + KeysRequest.from + "'")							    
-						    .where("receiver = '" + KeysRequest.to + "'")							    
-						    .toString() 
-		   
+						    .where("sender = '" + KeysRequest.from + "'")
+						    .where("receiver = '" + KeysRequest.to + "'")
+						    .toString()
+
 		clientOfDB.query(query2send, function(err, result) {
-			try {		
+			try {
 				if(err) {
-					logger.error('deleteKeysRequest ::: error running query', err);	
-				}		
+					logger.error('deleteKeysRequest ::: error running query', err);
+				}
 			}catch (ex) {
-				logger.debug("deleteKeysRequest  :::  exception thrown " + ex  );						
+				logger.debug("deleteKeysRequest  :::  exception thrown " + ex  );
 			}
-		});	
+		});
 	};
-	
+
 	this.deleteKeysDelivery = function( KeysDelivery ) {
-	    
+
 		var query2send = squel.delete()
 						    .from("keysdelivery")
-						    .where("sender = '" + KeysDelivery.from + "'")							    
-						    .where("receiver = '" + KeysDelivery.to + "'")							    
-						    .toString() 
-		   
+						    .where("sender = '" + KeysDelivery.from + "'")
+						    .where("receiver = '" + KeysDelivery.to + "'")
+						    .toString()
+
 		clientOfDB.query(query2send, function(err, result) {
-			try {		
+			try {
 				if(err) {
-					logger.error('deleteKeysDelivery ::: error running query', err);	
-				}		
+					logger.error('deleteKeysDelivery ::: error running query', err);
+				}
 			}catch (ex) {
-				logger.debug("deleteKeysDelivery  :::  exception thrown " + ex  );						
+				logger.debug("deleteKeysDelivery  :::  exception thrown " + ex  );
 			}
-		});	
-	};	
-	
+		});
+	};
+
 	this.getRightServer2connect = function() {
-		
+
 		lastServerAsigned = lastServerAsigned + 1;
 		if (lastServerAsigned >= config.listOfServerSockets.length){
 			lastServerAsigned = 0;
 		}
 
-		return config.listOfServerSockets[lastServerAsigned];		
-		
+		return config.listOfServerSockets[lastServerAsigned];
+
 	};
-	
+
 	this.send = function(event2trigger, data , client ) {
-		
+
 		if (typeof event2trigger !== 'string' ||
-			typeof data !== 'object' || data == null || 
-			typeof client !== 'object' || client == null ) 	{	
-			
-			logger.debug("postman ::: send ::: can't send " );			
+			typeof data !== 'object' || data == null ||
+			typeof client !== 'object' || client == null ) 	{
+
+			logger.debug("postman ::: send ::: can't send " );
 			return null;
-		}	
-		
+		}
+
 		try{
 			self.triggerClientsEvent( client, event2trigger, data );
-						
+
 		}catch(e){
 			logger.debug("postman ::: send ::: exception"  + e);
-		}		
-			
+		}
+
 	};
-	
+
 	this.forwardMsg = function( msg , client ) {
-		
-		try{		
+
+		try{
 			io.sockets.to( client.publicClientID ).emit( 'MessageFromClient', msg);
-						
+
 		}catch(e){
 			logger.debug("postman ::: forwardMsg ::: exception"  + e);
-		}		
-			
+		}
+
 	};
-	
-	this.triggerClientsEvent = function( client, event, obj ) {		
+
+	this.triggerClientsEvent = function( client, event, obj ) {
 		try{
 			io.sockets.to( client.publicClientID ).emit( event, PostMan.prototype.encrypt( obj, client ) );
 		}catch(e){
 			logger.debug("postman ::: triggerClientsEvent ::: exception"  + e);
-		}			
-	};	
-};	
+		}
+	};
+};
 
 
 //verifies if it was signed with the current symmetric key of the client (number of the challenge)
@@ -795,31 +800,31 @@ function PostMan( _io, _logger, _instanceNumber) {
 
 PostMan.prototype.verifyHandshake = function(tokenHandshake, client) {
 	var verified = false;
-	try {		
-		var key = client.myArrayOfKeys[client.indexOfCurrentKey];			
-		verified = crypto.jws.JWS.verify(tokenHandshake, key);		
+	try {
+		var key = client.myArrayOfKeys[client.indexOfCurrentKey];
+		verified = crypto.jws.JWS.verify(tokenHandshake, key);
 
 		var a = tokenHandshake.split(".");
 		var uClaim = crypto.b64utos(a[1]);
 		var decodedHandshake = crypto.jws.JWS.readSafeJSONString(uClaim);
-		
+
 		var decryptedChallenge = PostMan.prototype.decrypt( decodeURI( decodedHandshake.challenge ) , client );
-		
+
 		if (decryptedChallenge == null || client == null){
 			console.error("verifyHandshake  :::  decryptedChallenge : " + JSON.stringify(decryptedChallenge) +  " client : " + JSON.stringify(client)  );
-			return false; 
+			return false;
 		}
-		
+
 		if (decryptedChallenge.challengeClear != client.currentChallenge){
 			verified = false;
 			console.error("verifyHandshake  :::  challenge different than current challenge "  );
 		}
-	} 
-	catch (ex) {	
-		console.error("verifyHandshake  :::  exception thrown "  + ex); 
+	}
+	catch (ex) {
+		console.error("verifyHandshake  :::  exception thrown "  + ex);
 	}
 
-	return verified; 	
+	return verified;
 };
 
 
@@ -832,12 +837,12 @@ PostMan.prototype.decodeHandshake = function(sJWS) {
 
 		//var pHeader = KJUR.jws.JWS.readSafeJSONString(uHeader);
 		var decodedHandshake = crypto.jws.JWS.readSafeJSONString(uClaim);
-	} 
-	catch (ex) {	
-		console.error("decodeHandshake  :::  exception thrown "  + ex.toString() ); 
+	}
+	catch (ex) {
+		console.error("decodeHandshake  :::  exception thrown "  + ex.toString() );
 	}
 
-	return decodedHandshake; 	
+	return decodedHandshake;
 };
 
 
@@ -845,23 +850,23 @@ PostMan.prototype.decodeHandshake = function(sJWS) {
 PostMan.prototype.getJoinServerParameters = function(joinParameters) {
 
 	try {
-				
-		if (typeof joinParameters == 'undefined' || 
-			joinParameters == null || 
+
+		if (typeof joinParameters == 'undefined' ||
+			joinParameters == null ||
 			PostMan.prototype.isUUID(joinParameters.handshakeToken) == false ||
 			typeof joinParameters.challenge !== 'string'  ||
 			joinParameters.challenge.length > config.MAX_SIZE_CHALLENGE ||
-			Object.keys(joinParameters).length != 2 ) {	
-				console.error("getJoinServerParameters  ::: didnt pass the typechecking " ); 
-				joinParameters = null;				
-		}	
-	} 
-	catch (ex) {	
-		console.error("getJoinServerParameters  :::  exceptrion thrown :"  + ex); 
-		joinParameters = null;	
+			Object.keys(joinParameters).length != 2 ) {
+				console.error("getJoinServerParameters  ::: didnt pass the typechecking " );
+				joinParameters = null;
+		}
+	}
+	catch (ex) {
+		console.error("getJoinServerParameters  :::  exceptrion thrown :"  + ex);
+		joinParameters = null;
 	}
 
-	return joinParameters; 	
+	return joinParameters;
 };
 
 PostMan.prototype.getRequestWhoIsaround = function(encryptedInput, client) {
@@ -869,21 +874,21 @@ PostMan.prototype.getRequestWhoIsaround = function(encryptedInput, client) {
 
 	try {
 		parameters = PostMan.prototype.decrypt(encryptedInput, client );
-				
+
 		if (typeof parameters.location.lat  !== 'string' ||
 			typeof parameters.location.lon  !== 'string' ||
 			Object.keys(parameters).length != 1 ||
-			Object.keys(parameters.location).length != 2) {	
+			Object.keys(parameters.location).length != 2) {
 				parameters = null;
-				console.error("getRequestWhoIsaround  ::: didnt pass the typechecking " + JSON.stringify(parameters) ); 
-		}	
-	} 
-	catch (ex) {	
-		console.error("getRequestWhoIsaround  :::  exceptrion thrown :"  + ex); 
-		parameters = null;	
+				console.error("getRequestWhoIsaround  ::: didnt pass the typechecking " + JSON.stringify(parameters) );
+		}
+	}
+	catch (ex) {
+		console.error("getRequestWhoIsaround  :::  exceptrion thrown :"  + ex);
+		parameters = null;
 	}
 
-	return parameters; 	
+	return parameters;
 };
 
 
@@ -891,150 +896,150 @@ PostMan.prototype.getRequestWhoIsaround = function(encryptedInput, client) {
 
 PostMan.prototype.getMessageRetrieval = function(encryptedInput , client) {
 	var retrievalParameters = null;
-	try {    	
-		retrievalParameters = PostMan.prototype.decrypt(encryptedInput, client );	
-	
+	try {
+		retrievalParameters = PostMan.prototype.decrypt(encryptedInput, client );
+
 		if (retrievalParameters == null ||
 			PostMan.prototype.isUUID(retrievalParameters.msgID) == false ||
 			Object.keys(retrievalParameters).length != 1 ) {
-			
+
 			console.error("getMessageRetrieval  :::  didn't pass the format check "   );
-			retrievalParameters = null; 
+			retrievalParameters = null;
 		}
 		return retrievalParameters;
-	} 
+	}
 	catch (ex) {
 		console.error("getMessageRetrieval  :::  exceptrion thrown " + ex  );
-		return null;	
+		return null;
 	}
 };
 
 
 PostMan.prototype.getPlanParams = function( encryptedInput , client ) {
 	var parameters = null;
-	try {    	
-		parameters = PostMan.prototype.decrypt(encryptedInput, client );	
+	try {
+		parameters = PostMan.prototype.decrypt(encryptedInput, client );
 
 		if (parameters == null ||
-			PostMan.prototype.isUUID(parameters.planId) == false  || 
-			PostMan.prototype.isUUID(parameters.organizer) == false  || 
+			PostMan.prototype.isUUID(parameters.planId) == false  ||
+			PostMan.prototype.isUUID(parameters.organizer) == false  ||
 			PostMan.prototype.lengthTest(parameters.imgsrc , config.MAX_SIZE_IMG ) == false ||
 			PostMan.prototype.lengthTest(parameters.nickName , config.MAX_SIZE_NICKNAME ) == false ||
 			PostMan.prototype.lengthTest(parameters.commentary , config.MAX_SIZE_COMMENTARY ) == false ||
 			typeof parameters.location.lat  !== 'string' ||
 			typeof parameters.location.lon  !== 'string' ||
-			Object.keys(parameters.location).length != 2 ||			
+			Object.keys(parameters.location).length != 2 ||
 			! (typeof parameters.meetingInitDate == 'number' ||  parameters.meetingInitDate == null ) ||
 			typeof parameters.meetingInitTime.hour  !== 'string' ||
 			typeof parameters.meetingInitTime.mins  !== 'string' ||
 			Object.keys(parameters.meetingInitTime).length != 2 ) {
-			
+
 			console.error("getPlanParams  :::  didn't pass the format check "   );
-			retrievalParameters = null; 
+			retrievalParameters = null;
 		}
 		return parameters;
-	} 
+	}
 	catch (ex) {
 		console.error("getPlanParams  :::  exceptrion thrown " + ex  );
-		return null;	
+		return null;
 	}
 };
 
 
 PostMan.prototype.getReqPlanImg = function( encryptedInput , client ) {
 	var parameters = null;
-	try {    	
-		parameters = PostMan.prototype.decrypt(encryptedInput, client );	
+	try {
+		parameters = PostMan.prototype.decrypt(encryptedInput, client );
 
 		if (parameters == null ||
 			PostMan.prototype.isUUID(parameters.planId) == false  ||
 			Object.keys( parameters ).length != 1 ) {
-			
+
 			console.error("getReqPlanImg  :::  didn't pass the format check "   );
-			retrievalParameters = null; 
+			retrievalParameters = null;
 		}
 		return parameters;
-	} 
+	}
 	catch (ex) {
 		console.error("getReqPlanImg  :::  exceptrion thrown " + ex  );
-		return null;	
+		return null;
 	}
 };
 
 
 PostMan.prototype.getProfileResponseParameters = function(encryptedInput , client) {
 	var parameters = null;
-	try {    	
-		parameters = PostMan.prototype.decrypt(encryptedInput, client );	
-	
+	try {
+		parameters = PostMan.prototype.decrypt(encryptedInput, client );
+
 		if (parameters == null ||
-			PostMan.prototype.isUUID(parameters.publicClientIDofSender) == false  || 
+			PostMan.prototype.isUUID(parameters.publicClientIDofSender) == false  ||
 			PostMan.prototype.lengthTest(parameters.nickName , config.MAX_SIZE_NICKNAME ) == false ||
 			PostMan.prototype.lengthTest(parameters.img , config.MAX_SIZE_IMG ) == false ||
 			PostMan.prototype.lengthTest(parameters.telephone , config.MAX_SIZE_COMMENTARY ) == false ||
 			PostMan.prototype.lengthTest(parameters.email , config.MAX_SIZE_COMMENTARY ) == false ||
 			PostMan.prototype.lengthTest(parameters.commentary , config.MAX_SIZE_COMMENTARY ) == false ||
 			!(parameters.visibility == "on" || parameters.visibility == "off" )   ) {
-			
+
 			console.error("getProfileResponseParameters  :::  didn't pass the format check "   );
-			retrievalParameters = null; 
+			retrievalParameters = null;
 		}
 		return parameters;
-	} 
+	}
 	catch (ex) {
 		console.error("getProfileResponseParameters  :::  exceptrion thrown " + ex  );
-		return null;	
+		return null;
 	}
 };
 
 
 PostMan.prototype.getProfileRetrievalParameters = function(encryptedInput , client) {
 	var parameters = null;
-	try {    	
-		parameters = PostMan.prototype.decrypt(encryptedInput, client );	
-	
+	try {
+		parameters = PostMan.prototype.decrypt(encryptedInput, client );
+
 		if (parameters == null ||
-			PostMan.prototype.isUUID(parameters.publicClientID2getImg) == false  || 
+			PostMan.prototype.isUUID(parameters.publicClientID2getImg) == false  ||
 			PostMan.prototype.isUUID(parameters.publicClientIDofRequester) == false  ||
-			! (typeof parameters.lastProfileUpdate == 'number' ||  parameters.lastProfileUpdate == null ) || 	 
+			! (typeof parameters.lastProfileUpdate == 'number' ||  parameters.lastProfileUpdate == null ) ||
 			Object.keys(parameters).length != 3) {
-			
+
 			console.error("getProfileRetrievalParameters  :::  didn't pass the format check "  + JSON.stringify(parameters) );
-			retrievalParameters = null; 
+			retrievalParameters = null;
 		}
 		return parameters;
-	} 
+	}
 	catch (ex) {
 		console.error("getProfileRetrievalParameters  :::  exceptrion thrown " + ex  );
-		return null;	
+		return null;
 	}
 };
 
 
 PostMan.prototype.getRequest4Plans = function( encryptedInput , client ) {
 	var parameters = null;
-	try {    	
-		parameters = PostMan.prototype.decrypt(encryptedInput, client );	
+	try {
+		parameters = PostMan.prototype.decrypt(encryptedInput, client );
 
 		if (parameters == null ||
 			typeof parameters.location.lat  !== 'string' ||
 			typeof parameters.location.lon  !== 'string' ||
-			Object.keys(parameters.location).length != 2 ||			
+			Object.keys(parameters.location).length != 2 ||
 			Object.keys(parameters).length != 1 ) {
-			
+
 			console.error("getRequest4Plans  :::  didn't pass the format check "   );
-			retrievalParameters = null; 
+			retrievalParameters = null;
 		}
 		return parameters;
-	} 
+	}
 	catch (ex) {
 		console.error("getRequest4Plans  :::  exceptrion thrown " + ex  );
-		return null;	
+		return null;
 	}
 };
 
 PostMan.prototype.sanitize = function(html) {
-	
+
 	var tagBody = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*';
 	var tagOrComment = new RegExp(
 	    '<(?:'
@@ -1047,7 +1052,7 @@ PostMan.prototype.sanitize = function(html) {
 	    + '|/?[a-z]'
 	    + tagBody
 	    + ')>',
-	    'gi');	
+	    'gi');
 	var oldHtml;
 	do {
 		oldHtml = html;
@@ -1087,82 +1092,82 @@ PostMan.prototype.escape = function (str) {
 
 
 
-PostMan.prototype.encrypt = function(message , client) {	
+PostMan.prototype.encrypt = function(message , client) {
 
 	try {
-		
+
 		var key = client.myArrayOfKeys[client.indexOfCurrentKey];
 		var iv = Math.floor((Math.random() * 7) + 0);
 
-		
+
 		var cipher = forge.cipher.createCipher('AES-CBC', key );
 		cipher.start({ iv : client.myArrayOfKeys[iv] });
 		cipher.update(forge.util.createBuffer( JSON.stringify(message) ) );
-		cipher.finish();		
-		
+		cipher.finish();
+
 		var envelope =  iv +  cipher.output.data  ;
-		
+
 		return envelope ;
 
 	}
-	catch (ex) {	
+	catch (ex) {
 		console.error("encrypt  :::  " + ex);
 		return null;
-	}	
+	}
 };
 
 PostMan.prototype.decrypt = function(encrypted, client) {
-	
+
 	if (encrypted.length > config.MAX_SIZE_SMS){
 		console.error("decrypt :::  size of SMS:" + encrypted.length );
 		return null;
-	} 
-	
+	}
+
 	var decipher = forge.cipher.createDecipher('AES-CBC', client.myArrayOfKeys[client.indexOfCurrentKey] );
-	
+
 	var iv = parseInt(encrypted.substring(0,1));
 
 	decipher.start({iv: client.myArrayOfKeys[iv] });
 	decipher.update(forge.util.createBuffer( encrypted.substring(1) ) );
 	decipher.finish();
-	
-	return crypto.jws.JWS.readSafeJSONString(decipher.output.data);	
-	
+
+	return crypto.jws.JWS.readSafeJSONString(decipher.output.data);
+
 };
 
 PostMan.prototype.decryptHandshake = function(encrypted, client) {
-	
+
 	var decipher = forge.cipher.createDecipher('AES-CBC', client.myArrayOfKeys[client.indexOfCurrentKey] );
-	
+
 	var iv = client.myArrayOfKeys[client.indexOfCurrentKey];
 
 	decipher.start({iv: iv });
 	decipher.update(forge.util.createBuffer( encrypted ) );
 	decipher.finish();
-	
-	return crypto.jws.JWS.readSafeJSONString(decipher.output.data);	
-	
+
+	return crypto.jws.JWS.readSafeJSONString(decipher.output.data);
+
 };
 
-PostMan.prototype.encryptHandshake = function(message , client) {	
+PostMan.prototype.encryptHandshake = function(message , client) {
 
 	try {
-		
+
 		var key = client.myArrayOfKeys[client.indexOfCurrentKey];
 		var iv = key;
 
 		var cipher = forge.cipher.createCipher('AES-CBC', key );
 		cipher.start({ iv : iv });
 		cipher.update(forge.util.createBuffer( JSON.stringify(message) ) );
-		cipher.finish();		
-		
+		cipher.finish();
+
 		return cipher.output.data ;
 
 	}
-	catch (ex) {	
+	catch (ex) {
 		console.error("encryptHandshake  :::  " + ex);
 		return null;
-	}	
+	}
 };
 
 
@@ -1175,8 +1180,8 @@ PostMan.prototype.getMessage = function(encrypted, client) {
 
 		inputMessage = PostMan.prototype.decrypt(encrypted, client);
 
-		if (inputMessage == null ||			
-			PostMan.prototype.isUUID(inputMessage.to) == false || 
+		if (inputMessage == null ||
+			PostMan.prototype.isUUID(inputMessage.to) == false ||
 			PostMan.prototype.isUUID(inputMessage.from) == false ||
 			PostMan.prototype.isUUID(inputMessage.msgID) == false ||
 			PostMan.prototype.isUUID(inputMessage.chatWith) == false ||
@@ -1185,197 +1190,197 @@ PostMan.prototype.getMessage = function(encrypted, client) {
 			typeof inputMessage.markedAsRead !== 'boolean' ||
 			typeof inputMessage.ACKfromServer !== 'boolean' ||
 			typeof inputMessage.ACKfromAddressee !== 'boolean' ||
-			Object.keys(inputMessage).length != 10	) 	{	
-			
+			Object.keys(inputMessage).length != 10	) 	{
+
 			console.error("getMessage  ::: didn't pass the format check 1" );
-			
+
 			return null;
-		}	
+		}
 
 		if ( inputMessage.size > config.MAX_SIZE_IMG ||
-			PostMan.prototype.lengthTest(inputMessage.messageBody , config.MAX_SIZE_IMG ) == false 	) 	{	
-			
+			PostMan.prototype.lengthTest(inputMessage.messageBody , config.MAX_SIZE_IMG ) == false 	) 	{
+
 			console.error("getMessage  ::: didn't pass the format check 2" );
 			return null;
 		}
-		
 
-		var message = new Message(inputMessage);			 	
-		
+
+		var message = new Message(inputMessage);
+
 		return message;
 	}
-	catch (ex) {	
-		console.error("getMessage  ::: didnt pass the format check ex:" + ex  + ex.stack ); 	
-		return null;	
-	} 	
+	catch (ex) {
+		console.error("getMessage  ::: didnt pass the format check ex:" + ex  + ex.stack );
+		return null;
+	}
 };
 
-PostMan.prototype.getDeliveryACK = function(encrypted, client) {	
-	try {    
+PostMan.prototype.getDeliveryACK = function(encrypted, client) {
+	try {
 		var deliveryACK = PostMan.prototype.decrypt(encrypted, client);
-		
+
 		if (deliveryACK == null ||
-			PostMan.prototype.isUUID(deliveryACK.msgID) == false  || 
+			PostMan.prototype.isUUID(deliveryACK.msgID) == false  ||
 			PostMan.prototype.isUUID(deliveryACK.to) == false  ||
 			PostMan.prototype.isUUID(deliveryACK.from) == false  ||
 			PostMan.prototype.isACKtype(deliveryACK.typeOfACK) == false ||
-			Object.keys(deliveryACK).length != 4  ) {	
-				
+			Object.keys(deliveryACK).length != 4  ) {
+
 			console.error("getDeliveryACK ::: didnt pass the format check 1 " + JSON.stringify( deliveryACK )  );
 			return null;
 		}
-		
-		return deliveryACK; 
+
+		return deliveryACK;
 	}
 	catch (ex) {
 		console.error("getDeliveryACK ::: didnt pass the format check ex:" + ex  + ex.stack );
 		return null;
-	}	
+	}
 };
 
 
-PostMan.prototype.getpublicClientIDOfRequest = function(encrypted, client) {	
-	try {    
+PostMan.prototype.getpublicClientIDOfRequest = function(encrypted, client) {
+	try {
 		var input = PostMan.prototype.decrypt(encrypted, client);
-		
+
 		if (input == null ||
 			typeof input.publicClientID !== 'string' ||
-			Object.keys(input).length != 1 ) {	
+			Object.keys(input).length != 1 ) {
 			console.error("getpublicClientIDOfRequest ::: didnt pass the format check 1 :" + input );
 			return null;
 		}
-		
-		return input.publicClientID; 
+
+		return input.publicClientID;
 	}
 	catch (ex) {
 		console.error("getpublicClientIDOfRequest ::: didnt pass the format check ex:" + ex  + ex.stack );
 		return null;
-	}	
+	}
 };
 
 
-PostMan.prototype.getKeysDelivery = function(encrypted, client) {	
-	try {    
+PostMan.prototype.getKeysDelivery = function(encrypted, client) {
+	try {
 		var input = PostMan.prototype.decrypt(encrypted, client);
-		
+
 		if (input == null ||
 			PostMan.prototype.isUUID(input.to) == false  ||
 			PostMan.prototype.isUUID(input.from) == false  ||
 			typeof input.setOfKeys != 'object' ||
-			Object.keys(input).length != 3 ) {	
+			Object.keys(input).length != 3 ) {
 			console.error("getKeysDelivery ::: didnt pass the format check 1 :" + input );
 			return null;
 		}
-		
-		return input; 
+
+		return input;
 	}
 	catch (ex) {
 		console.error("getKeysDelivery ::: didnt pass the format check ex:" + ex  + ex.stack );
 		return null;
-	}	
+	}
 };
 
 
-PostMan.prototype.getKeysRequest = function(encrypted, client) {	
-	try {    
+PostMan.prototype.getKeysRequest = function(encrypted, client) {
+	try {
 		var input = PostMan.prototype.decrypt(encrypted, client);
-		
+
 		if (input == null ||
 			PostMan.prototype.isUUID(input.to) == false  ||
 			PostMan.prototype.isUUID(input.from) == false  ||
-			Object.keys(input).length != 2 ) {	
+			Object.keys(input).length != 2 ) {
 			console.error("getKeysRequest ::: didnt pass the format check 1 :" + input );
 			return null;
-		}		
-		return input; 
+		}
+		return input;
 	}
 	catch (ex) {
 		console.error("getKeysRequest ::: didnt pass the format check ex:" + ex  + ex.stack );
 		return null;
-	}	
+	}
 };
 
-PostMan.prototype.getPushRegistration = function( encrypted, client) {	
-	try {    
+PostMan.prototype.getPushRegistration = function( encrypted, client) {
+	try {
 		var input = PostMan.prototype.decrypt(encrypted, client);
-		
+
 		if (input == null ||
 			PostMan.prototype.isUUID( input.publicClientID ) == false ||
 			typeof input.token != 'string' ||
-			Object.keys(input).length != 2 ) {	
+			Object.keys(input).length != 2 ) {
 			console.error("getPushRegistration ::: format check failed: " + input );
 			return null;
-		}		
-		return input; 
+		}
+		return input;
 	}
 	catch (ex) {
 		console.error("getPushRegistration ::: format check failed, ex: " + ex );
 		return null;
-	}	
+	}
 };
 
 
-PostMan.prototype.getReconnectNotification = function( encrypted, client) {	
-	try {    
+PostMan.prototype.getReconnectNotification = function( encrypted, client) {
+	try {
 		var input = PostMan.prototype.decrypt(encrypted, client);
-		
+
 		if (input == null ||
 			PostMan.prototype.isUUID( input.publicClientID ) == false ||
-			Object.keys(input).length != 1 ) {	
+			Object.keys(input).length != 1 ) {
 			console.error("getReconnectNotification ::: format check failed: " + input );
 			return null;
-		}		
-		return input; 
+		}
+		return input;
 	}
 	catch (ex) {
 		console.error("getReconnectNotification ::: format check failed, ex: " + ex );
 		return null;
-	}	
+	}
 };
 
 
-PostMan.prototype.getWhoIsOnline = function( encrypted, client) {	
-	try {    
+PostMan.prototype.getWhoIsOnline = function( encrypted, client) {
+	try {
 		var input = PostMan.prototype.decrypt(encrypted, client);
-		
+
 		if (input == null ||
 			PostMan.prototype.isUUID( input.idWhoIsOnline ) == false ||
-			Object.keys(input).length != 2 ) {	
+			Object.keys(input).length != 2 ) {
 			console.error("getWhoIsOnline ::: format check failed: " );
 			return null;
-		}		
-		return input; 
+		}
+		return input;
 	}
 	catch (ex) {
 		console.error("getWhoIsOnline ::: format check failed, ex: " + ex );
 		return null;
-	}	
+	}
 };
 
 
-PostMan.prototype.getWhoIsWriting = function( encrypted, client) {	
-	try {    
+PostMan.prototype.getWhoIsWriting = function( encrypted, client) {
+	try {
 		var input = PostMan.prototype.decrypt(encrypted, client);
-		
+
 		if (input == null ||
 			PostMan.prototype.isUUID( input.idWhoIsWriting ) == false ||
-			PostMan.prototype.isUUID( input.toWhoIsWriting ) == false ||		
-			Object.keys(input).length != 3 ) {	
+			PostMan.prototype.isUUID( input.toWhoIsWriting ) == false ||
+			Object.keys(input).length != 3 ) {
 			console.error("getWhoIsWriting ::: format check failed: " );
 			return null;
-		}		
-		return input; 
+		}
+		return input;
 	}
 	catch (ex) {
 		console.error("getWhoIsWriting ::: format check failed, ex: " + ex );
 		return null;
-	}	
+	}
 };
 
 
 
 
-PostMan.prototype.isUUID = function(uuid) {	
+PostMan.prototype.isUUID = function(uuid) {
 
 	if (typeof uuid == 'string')
 		return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(uuid);
@@ -1384,50 +1389,50 @@ PostMan.prototype.isUUID = function(uuid) {
 
 };
 
-PostMan.prototype.isInt = function(timeStamp) {	
+PostMan.prototype.isInt = function(timeStamp) {
 	return /^[0-9]+$/.test(String(timeStamp)) ;
 };
 //TODO
-PostMan.prototype.isPurchase = function(purchase) {	
+PostMan.prototype.isPurchase = function(purchase) {
 	return true;
 };
 //TODO
-PostMan.prototype.isPaypalToken = function(token) {	
+PostMan.prototype.isPaypalToken = function(token) {
 	return true;
 };
 //TODO
-PostMan.prototype.isPaypalPayer = function(payerID) {	
+PostMan.prototype.isPaypalPayer = function(payerID) {
 	return true;
 };
 
 
 
 
-PostMan.prototype.isRSAmodulus = function(modulus) {	
+PostMan.prototype.isRSAmodulus = function(modulus) {
 
 	if (typeof modulus == 'string' && modulus.length < config.MAX_SIZE_MODULUS ){
-		return true;	
-	}else{		
+		return true;
+	}else{
 		console.error("isRSAmodulus ::: didnt pass the format check ...." );
-		return false;		
+		return false;
 	}
 
 };
 
-PostMan.prototype.isACKtype = function(typeOfACK) {	
+PostMan.prototype.isACKtype = function(typeOfACK) {
 	if ( typeof typeOfACK == 'string' &&
-		 ( 	typeOfACK == 'ACKfromServer' || 
-			typeOfACK == 'ACKfromAddressee' || 
-			typeOfACK == 'ReadfromAddressee'	) ) {			
+		 ( 	typeOfACK == 'ACKfromServer' ||
+			typeOfACK == 'ACKfromAddressee' ||
+			typeOfACK == 'ReadfromAddressee'	) ) {
 		return true;
 	}else{
 		console.error("isACKtype ::: didnt pass the format check ");
-		return false;		
+		return false;
 	}
 };
 
 PostMan.prototype.lengthTest = function( obj , sizeLimit ) {
-	try { 
+	try {
 		if ( typeof obj == 'string' && obj.length < sizeLimit ){
 			return true;
 		}else{
