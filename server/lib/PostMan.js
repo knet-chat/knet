@@ -536,11 +536,13 @@ function PostMan( _io, _logger, _instanceNumber) {
 			logger.debug('isMainDeviceOnline ::: return: false ');
 			return false;
 		}
-		var sockets = io.sockets.adapter.rooms[ client.publicClientID ].sockets;
+		var sockets = io.sockets.adapter.rooms[ client.publicClientID ];
 		var numClients = (typeof sockets !== 'undefined') ? Object.keys( sockets ).length : 0;
 		logger.debug('isMainDeviceOnline ::: numClients: ', numClients);
 
 		for (var id in sockets ) {
+			logger.debug('isMainDeviceOnline ::: id: ', id);
+			logger.debug('isMainDeviceOnline ::: io.sockets.connected: ', io.sockets.connected);
 			var clientSocket = io.sockets.connected[ id ];
 			if ( clientSocket.device == client.mainDevice ) isOnline = true;
 		}
