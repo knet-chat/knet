@@ -28,7 +28,9 @@ function UserSettings( myUser ){
 	this.visibility = (typeof myUser.visibility == "undefined" ) ? "on" : myUser.visibility;
 //	this.privateKey = (typeof myUser.privateKey == "undefined" ) ? {} : myUser.privateKey;
 	this.keys = (typeof myUser.keys == "undefined" ) ? {} : myUser.keys;
-	this.device = (typeof myUser.mainDevice == "undefined" || myUser.mainDevice == "") ? this.assignId() : myUser.mainDevice ;
+	log.debug("UserSettings myUser", myUser);
+	this.myDevice = (typeof myUser.mainDevice == "undefined" ) ? this.assignId() : myUser.mainDevice ;
+	log.debug("UserSettings this.myDevice", this.myDevice);
 };
 UserSettings.prototype.updateUserSettings = function() {
 	var transaction = db.transaction(["usersettings"],"readwrite");
@@ -4383,13 +4385,14 @@ Application.prototype.connect2server = function(result){
   		socket.disconnect();
   	}
   	log.info("remoteServer" , remoteServer);
+		log.debug("Application.prototype.connect2server :: user.device " , user.myDevice);
 
   	var url = 'https://' + config.ipServerSockets +  ":" + config.portServerSockets ;
   	var options = {
 			forceNew : true,
 			secure : true,
 			reconnection : true,
-			query : 'token=' + app.tokenSigned + '&version=' + config.SW_VERSION + '&device=' + user.device ,
+			query : 'token=' + app.tokenSigned + '&version=' + config.SW_VERSION + '&device=' + user.myDevice ,
 			path: '/wss/socket.io'
 		};
   	socket = io.connect( url, options );
@@ -5154,8 +5157,8 @@ Application.prototype.sendLogin = function(){
 		},
 		onConnect_error :function(){
 			app.connecting = false;
-			log.info("callback ::: establishTLS ::: onConnect_error ");
-			setTimeout(function(){ app.sendLogin(); }, config.TIME_WAIT_HTTP_POST * 3);
+			//log.info("callback ::: establishTLS ::: onConnect_error ");
+			//setTimeout(function(){ app.sendLogin(); }, config.TIME_WAIT_HTTP_POST * 3);
 		}
 	};
 
@@ -7960,7 +7963,7 @@ function Dictionary(){
  * *********************************************************************************************/
 
 window.shimIndexedDB.__debug(false);
-log4javascript.setEnabled(false);
+log4javascript.setEnabled(true);
 
 /***********************************************************************************************
  * *********************************************************************************************
