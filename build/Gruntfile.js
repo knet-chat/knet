@@ -39,7 +39,7 @@ module.exports = function(grunt) {
  						'../client/js/pickadate.js-3.5.6/picker.date.js',
  						'../client/js/pickadate.js-3.5.6/picker.time.js',
  						'../client/js/pickadate.js-3.5.6/legacy.js',
- 						'../client/js/easyrtc-1.0.15.js',
+ 						'../client/js/easyrtc-1.1.0.js',
 						'../client/js/forge.bundle-0.7.0.js',
 						'../client/js/leaflet-1.0.1.js',
     	             	'../client/js/config.js'
@@ -64,14 +64,14 @@ module.exports = function(grunt) {
 					'../client/js/jquery.picedit-1.0.0.min.js':'../client/js/jquery.picedit-1.0.0.js',
 					'../client/js/jquery.emojipicker.min.js':'../client/js/jquery.emojipicker.js',
 					'../client/js/jquery.emojipicker.tw.min.js':'../client/js/jquery.emojipicker.tw.js',
-					'../client/js/jquery.debouncedresize.min.js':'../client/js/jquery.debouncedresize.js',	        
+					'../client/js/jquery.debouncedresize.min.js':'../client/js/jquery.debouncedresize.js',
 					'../client/js/twemoji.min.js':'../client/js/twemoji.min.js',
 					'../client/js/log4javascript-1.4.13.min.js':'../client/js/log4javascript-1.4.13.js',
 					'../client/js/photoswipe.min.js':'../client/js/photoswipe.min.js',
 					'../client/js/photoswipe-ui-default.min.js':'../client/js/photoswipe-ui-default.min.js',
 					'../client/js/jsrsasign-4.1.4-all-min.js': '../client/js/jsrsasign-4.1.4-all-min.js',
 					'../client/js/json-sans-eval-min.js':'../client/js/json-sans-eval-min.js',
-					'../client/js/jws-3.0.min.js':'../client/js/jws-3.0.min.js',        
+					'../client/js/jws-3.0.min.js':'../client/js/jws-3.0.min.js',
 					'../client/js/indexeddbshim.min-2.2.1.js':	'../client/js/indexeddbshim.min-2.2.1.js',
 					'../client/js/cldr-0.4.3.min.js':'../client/js/cldr-0.4.3.js',
 					'../client/js/cldr/event.min.js':'../client/js/cldr/event.js',
@@ -83,7 +83,7 @@ module.exports = function(grunt) {
 					'../client/js/pickadate.js-3.5.6/picker.date.min.js':	'../client/js/pickadate.js-3.5.6/picker.date.js',
 					'../client/js/pickadate.js-3.5.6/picker.time.min.js':	'../client/js/pickadate.js-3.5.6/picker.time.js',
 					'../client/js/pickadate.js-3.5.6/legacy.min.js':	'../client/js/pickadate.js-3.5.6/legacy.js',
-					'../client/js/easyrtc-1.0.15.min.js': '../client/js/easyrtc-1.0.15.js',
+					'../client/js/easyrtc-1.1.0.min.js': '../client/js/easyrtc-1.1.0.js',
 					'../client/js/forge.bundle-0.7.0.min.js':'../client/js/forge.bundle-0.7.0.js',
 					'../client/js/leaflet-1.0.1.min.js': '../client/js/leaflet-1.0.1.js',
 					'../client/js/config.min.js': '../client/js/config.js',
@@ -100,14 +100,14 @@ module.exports = function(grunt) {
 					'../client/js/jquery.picedit-1.0.0.min.js':'../client/js/jquery.picedit-1.0.0.js',
 					'../client/js/jquery.emojipicker.min.js':'../client/js/jquery.emojipicker.js',
 					'../client/js/jquery.emojipicker.tw.min.js':'../client/js/jquery.emojipicker.tw.js',
-					'../client/js/jquery.debouncedresize.min.js':'../client/js/jquery.debouncedresize.js',	        
+					'../client/js/jquery.debouncedresize.min.js':'../client/js/jquery.debouncedresize.js',
 					'../client/js/twemoji.min.js':'../client/js/twemoji.min.js',
 					'../client/js/log4javascript-1.4.13.min.js':'../client/js/log4javascript-1.4.13.js',
 					'../client/js/photoswipe.min.js':'../client/js/photoswipe.min.js',
 					'../client/js/photoswipe-ui-default.min.js':'../client/js/photoswipe-ui-default.min.js',
 					'../client/js/jsrsasign-4.1.4-all-min.js': '../client/js/jsrsasign-4.1.4-all-min.js',
 					'../client/js/json-sans-eval-min.js':'../client/js/json-sans-eval-min.js',
-					'../client/js/jws-3.0.min.js':'../client/js/jws-3.0.min.js',        
+					'../client/js/jws-3.0.min.js':'../client/js/jws-3.0.min.js',
 					'../client/js/indexeddbshim.min-2.2.1.js':	'../client/js/indexeddbshim.min-2.2.1.js',
 					'../client/js/cldr-0.4.3.min.js':'../client/js/cldr-0.4.3.js',
 					'../client/js/cldr/event.min.js':'../client/js/cldr/event.js',
@@ -119,20 +119,20 @@ module.exports = function(grunt) {
 					'../client/js/pickadate.js-3.5.6/picker.date.min.js':	'../client/js/pickadate.js-3.5.6/picker.date.js',
 					'../client/js/pickadate.js-3.5.6/picker.time.min.js':	'../client/js/pickadate.js-3.5.6/picker.time.js',
 					'../client/js/pickadate.js-3.5.6/legacy.min.js':	'../client/js/pickadate.js-3.5.6/legacy.js',
-					'../client/js/easyrtc-1.0.15.min.js': '../client/js/easyrtc-1.0.15.js',
+					'../client/js/easyrtc-1.1.0.min.js': '../client/js/easyrtc-1.1.0.js',
 					'../client/js/forge.bundle-0.7.0.min.js':'../client/js/forge.bundle-0.7.0.js',
 					'../client/js/leaflet-1.0.1.min.js': '../client/js/leaflet-1.0.1.js',
 					'../client/js/config.min.js': '../client/js/config.js',
 					'../client/js/app.min.js': '../client/js/app.js'
 				}
 			},
-			
+
 		},
 		clean: {
 			cordova: {
 				src: ['../client/js/libs.js']
 			}
-		},		
+		},
 		cssmin: {
 			cordova: {
 				options: {
@@ -189,20 +189,20 @@ module.exports = function(grunt) {
 	                    bundle: [
          	   				'../client/js/fastClick.min.js' ,
         					'../client/js/jquery-1.10.2.min.js',
-        					'../client/js/jquery.mobile.mobileinit.min.js',					
+        					'../client/js/jquery.mobile.mobileinit.min.js',
         					'../client/js/jquery.mobile-1.4.5.min.js',
         					'../client/js/jquery.browser.min.0.1.0.js',
         					'../client/js/jquery.picedit-1.0.0.min.js',
         					'../client/js/jquery.emojipicker.min.js',
         					'../client/js/jquery.emojipicker.tw.min.js',
-        					'../client/js/jquery.debouncedresize.min.js',	        
+        					'../client/js/jquery.debouncedresize.min.js',
         					'../client/js/twemoji.min.js',
         					'../client/js/log4javascript-1.4.13.min.js',
         					'../client/js/photoswipe.min.js',
         					'../client/js/photoswipe-ui-default.min.js',
         					'../client/js/jsrsasign-4.1.4-all-min.js',
         					'../client/js/json-sans-eval-min.js',
-        					'../client/js/jws-3.0.min.js',        
+        					'../client/js/jws-3.0.min.js',
         					'../client/js/indexeddbshim.min-2.2.1.js',
         					'../client/js/cldr-0.4.3.min.js',
         					'../client/js/cldr/event.min.js',
@@ -214,7 +214,7 @@ module.exports = function(grunt) {
         					'../client/js/pickadate.js-3.5.6/picker.date.min.js',
         					'../client/js/pickadate.js-3.5.6/picker.time.min.js',
         					'../client/js/pickadate.js-3.5.6/legacy.min.js',
-        					'../client/js/easyrtc-1.0.15.min.js',
+        					'../client/js/easyrtc-1.1.0.min.js',
         					'../client/js/forge.bundle-0.7.0.min.js',
         					'../client/js/leaflet-1.0.1.min.js',
         					'../client/js/config.min.js',
@@ -237,7 +237,7 @@ module.exports = function(grunt) {
 	                    bundle: [
         	   				'../client/js/fastClick.min.js' ,
         					'../client/js/jquery-1.10.2.min.js',
-        					'../client/js/jquery.mobile.mobileinit.min.js',					
+        					'../client/js/jquery.mobile.mobileinit.min.js',
         					'../client/js/jquery.mobile-1.4.5.min.js',
         					'../client/js/jquery.browser.min.0.1.0.js',
         					'../client/js/jquery.emojipicker.min.js',
@@ -250,7 +250,7 @@ module.exports = function(grunt) {
         					'../client/js/photoswipe-ui-default.min.js',
         					'../client/js/jsrsasign-4.1.4-all-min.js',
         					'../client/js/json-sans-eval-min.js',
-        					'../client/js/jws-3.0.min.js',        
+        					'../client/js/jws-3.0.min.js',
         					'../client/js/indexeddbshim.min-2.2.1.js',
         					'../client/js/cldr-0.4.3.min.js',
         					'../client/js/cldr/event.min.js',
@@ -262,7 +262,7 @@ module.exports = function(grunt) {
         					'../client/js/pickadate.js-3.5.6/picker.date.min.js',
         					'../client/js/pickadate.js-3.5.6/picker.time.min.js',
         					'../client/js/pickadate.js-3.5.6/legacy.min.js',
-        					'../client/js/easyrtc-1.0.15.min.js',
+        					'../client/js/easyrtc-1.1.0.min.js',
         					'../client/js/forge.bundle-0.7.0.min.js',
         					'../client/js/leaflet-1.0.1.min.js',
         					'../client/js/config.min.js',
@@ -291,14 +291,14 @@ module.exports = function(grunt) {
         					'../client/js/jquery.picedit-1.0.0.js',
         					'../client/js/jquery.emojipicker.js',
         					'../client/js/jquery.emojipicker.tw.js',
-        					'../client/js/jquery.debouncedresize.js',	        
+        					'../client/js/jquery.debouncedresize.js',
         					'../client/js/twemoji.min.js',
         					'../client/js/log4javascript-1.4.13.js',
         					'../client/js/photoswipe.min.js',
         					'../client/js/photoswipe-ui-default.min.js',
         					'../client/js/jsrsasign-4.1.4-all-min.js',
         					'../client/js/json-sans-eval-min.js',
-        					'../client/js/jws-3.0.min.js',        
+        					'../client/js/jws-3.0.min.js',
         					'../client/js/indexeddbshim.min-2.2.1.js',
         					'../client/js/cldr-0.4.3.js',
         					'../client/js/cldr/event.js',
@@ -310,7 +310,7 @@ module.exports = function(grunt) {
         					'../client/js/pickadate.js-3.5.6/picker.date.js',
         					'../client/js/pickadate.js-3.5.6/picker.time.js',
         					'../client/js/pickadate.js-3.5.6/legacy.js',
-        					'../client/js/easyrtc-1.0.15.js',
+        					'../client/js/easyrtc-1.1.0.js',
         					'../client/js/forge.bundle-0.7.0.js',
         					'../client/js/leaflet-1.0.1.js',
         					'../client/js/config.js',
@@ -360,7 +360,7 @@ module.exports = function(grunt) {
 	    	    }
 	    	  }
 	    }
-	});	
+	});
 
 	//load the packages
 	grunt.loadNpmTasks('grunt-contrib-concat');
