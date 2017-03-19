@@ -29,7 +29,7 @@ function UserSettings( myUser ){
 //	this.privateKey = (typeof myUser.privateKey == "undefined" ) ? {} : myUser.privateKey;
 	this.keys = (typeof myUser.keys == "undefined" ) ? {} : myUser.keys;
 	log.debug("UserSettings myUser", myUser);
-	this.myDevice = (typeof myUser.mainDevice == "undefined" ) ? this.assignId() : myUser.mainDevice ;
+	this.myDevice = (typeof myUser.myDevice == "undefined" ) ? this.assignId() : myUser.myDevice ;
 	log.debug("UserSettings this.myDevice", this.myDevice);
 };
 UserSettings.prototype.updateUserSettings = function() {
@@ -5089,7 +5089,7 @@ Application.prototype.userRegistration = function( data ){
 
 	if (typeof data == "undefined" || data == null ||
  		typeof data.publicClientID == "undefined" || data.publicClientID == null ||
-		typeof data.mainDevice == "undefined" || data.mainDevice == "" ||
+		typeof data.myDevice == "undefined" || data.myDevice == "" ||
  		typeof data.handshakeToken == "undefined" || data.handshakeToken == null ){
 		log.debug("userRegistration ::: something went wrong...");
 	}else{

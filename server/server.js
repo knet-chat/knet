@@ -643,7 +643,7 @@ app.locals.onRegistryRequest = function (socket , input) {
 				publicClientID : newClient.publicClientID ,
 				myArrayOfKeys : newClient.myArrayOfKeys,
 				handshakeToken : newClient.handshakeToken,
-        mainDevice : newClient.mainDevice
+        myDevice : newClient.mainDevice
 			}
 		};
 		socket.TLS.prepare( JSON.stringify(answer) );
