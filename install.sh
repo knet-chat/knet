@@ -9,7 +9,7 @@ DEPENDENCIES_LIST="git nodejs curl pgadmin3 postgresql-client-9.3 postgresql-9.3
 for package in $DEPENDENCIES_LIST
 do
  result=`dpkg-query -W -f='${Status}\n' $package | head -n1 | awk '{print $3;}'`
- if [ "$result" == "installed" ]; then
+ if [ "$result" = "installed" ]; then
   echo "INFO: package $package installed";
  else
   echo "INFO: package $package not installed, aborting installation";
@@ -18,7 +18,7 @@ fi
 done
 
 resultPING=`redis-cli ping`
-if [ "$resultPING" == "PONG" ]; then
+if [ "$resultPING" = "PONG" ]; then
  echo "INFO: package redis installed and running";
 else
  echo "INFO: package redis is not running, aborting installation";
